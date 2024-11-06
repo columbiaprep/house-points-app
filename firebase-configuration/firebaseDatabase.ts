@@ -1,65 +1,42 @@
-import { doc, getDoc, getFirestore, setDoc } from 'firebase/firestore';
+import { collection, getDoc, getDocs, getFirestore } from 'firebase/firestore';
 import app from './firebaseApp';
+import { useState } from 'react';
 
 const db = getFirestore(app);
 
+export const [allHousesLeaderboard, setAllHousesLeaderboard] = useState<{ house: any; points: any; rank: any; }[]>([]);
+export const [allIndividualLeaderboard, setAllIndividualLeaderboard] = useState<{ name: any; points: any; rank: any; }[]>([]);
 
+export const getAllHousesLeaderboardData = async () => {
+    const housesCollection = collection(db, 'Leaderboard/LeaderboardId/houseRankings');
+    getDocs(housesCollection).then((querySnapshot) => {
+                var leaderboardData: { house: any; points: any; rank: any; }[] = [];
+                querySnapshot.forEach((doc) => {
+                    // convert data into json
+                    const data = doc.data();
+                    leaderboardData.push({
+                        house: data.house,
+                        points: data.points,
+                        rank: data.rank
+                    });
+                });
+                setAllHousesLeaderboard(leaderboardData);
+            });
+}
 
-
-// Main Database Structure:
-
-    // Houses (Collection)
-    //   └── HouseId (Document)
-    //   ├── HouseName: "House Alpha"
-    //   ├── totalPoints: 80
-    //   └── categoryPoints: 
-    //       ├── caughtBeingGood: 50
-    //       └── attendingSklEvents: 30
-    //       └── participatingSklTeams: 20
-    // └── members (Subcollection)
-    //   └── memberId (Document)
-    //       ├── memberName: "Alice"
-    //       ├── totalPoints: 30
-    //       └── categoryPoints:
-    //           ├── caughtBeingGood: 20
-    //           └── attendingSklEvents: 10
-    //           └── participatingSklTeams: 20
-    //   └── memberId2 (Document)
-    //       ├── memberName: "Bob"
-    //       ├── totalPoints: 50
-    //       └── categoryPoints:
-    //           ├── caughtBeingGood: 30
-    //           └── attendingSklEvents: 20
-    //           └── participatingSklTeams: 20
-
-// Leaderboard Databases Structure (Auto-Compiled from the main database every 24 hours?):
-
-    // Leaderboard (Collection)
-    //   └── LeaderboardId (Document)
-    //       ├── houseRankings (Array)
-    //       │   ├── houseId (Object)
-    //       │   │   ├── HouseName: "House Alpha"
-    //       │   │   ├── totalPoints: 80
-    //       │   │   └── rank: 1
-    //       │   ├── houseId2 (Object)
-    //       │   │   ├── HouseName: "House Beta"
-    //       │   │   ├── totalPoints: 70
-    //       │   │   └── rank: 2
-    //       │   └── houseId3 (Object)
-    //       │       ├── HouseName: "House Gamma"
-    //       │       ├── totalPoints: 60
-    //       │       └── rank: 3
-    //       ├── memberRankings (Array)
-    //       │   ├── memberId (Object)
-    //       │   │   ├── memberName: "Alice"
-    //       │   │   ├── totalPoints: 30
-    //       │   │   └── rank: 1
-    //       │   ├── memberId2 (Object)
-    //       │   │   ├── memberName: "Bob"
-    //       │   │   ├── totalPoints: 50
-    //       │   │   └── rank: 2
-    //       │   └── memberId3 (Object)
-    //       │       ├── memberName: "Charlie"
-    //       │       ├── totalPoints: 25
-    //       │       └── rank: 3
-    //       └── lastUpdated: <timestamp> // Indicates the last time the leaderboard was updated
+export const getAllIndividualData = async () => {
+    const individualCollection = collection(db, 'Leaderboard/LeaderboardId/memberRankings');
+    getDocs(individualCollection).then((querySnapshot) => {
+                var individualData: { name: any; points: any; rank: any; }[] = [];
+                querySnapshot.forEach((doc) => {
+                    // convert data into json
+                    const data = doc.data();
+                    individualData.push({
+                        name: data.name,
+                        points: data.points,
+                        rank: data.rank
+                    });
+                });
+                setAllIndividualLeaderboard(individualData);
+            });
+}

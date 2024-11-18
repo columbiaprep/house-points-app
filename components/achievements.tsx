@@ -4,15 +4,20 @@ import { useState } from "react";
 import { Button } from "@nextui-org/button";
 import {Card, CardHeader, CardBody, CardFooter, Divider, Link, Image} from "@nextui-org/react";
 
-export const AchievementTrophyIcon = () => {
+interface TrophyIconProps {
+  achievementName: string,
+  achievementIconSrc: string
+}
+
+export const AchievementTrophyIcon: React.FC<TrophyIconProps> = ({achievementName, achievementIconSrc}) => {
   return (
    
     <div>
       <Image 
         width={50}
         height={50}
-        src="https://placehold.co/50x50"
-        alt=""
+        src={achievementIconSrc}
+        alt={achievementName}
         />
     </div>
    

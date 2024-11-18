@@ -4,6 +4,26 @@ import { useState } from "react";
 import { Button } from "@nextui-org/button";
 import {Card, CardHeader, CardBody, CardFooter, Divider, Link, Image} from "@nextui-org/react";
 
+interface TrophyIconProps {
+  achievementName: string,
+  achievementIconSrc: string
+}
+
+export const AchievementTrophyIcon: React.FC<TrophyIconProps> = ({achievementName, achievementIconSrc}) => {
+  return (
+   
+    <div>
+      <Image 
+        width={50}
+        height={50}
+        src={achievementIconSrc}
+        alt={achievementName}
+        />
+    </div>
+   
+  )
+}
+
 export const AchievementsContainer = () => {
     return (
       <Card className="max-w-[400px]">
@@ -19,7 +39,9 @@ export const AchievementsContainer = () => {
         </CardHeader>
         <Divider/>
         <CardBody>
-          
+          <AchievementTrophyIcon />
+          <AchievementTrophyIcon />
+          <AchievementTrophyIcon />
         </CardBody>
         <Divider/>
       </Card>

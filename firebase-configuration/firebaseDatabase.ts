@@ -1,42 +1,43 @@
-import { collection, getDoc, getDocs, getFirestore } from 'firebase/firestore';
-import app from './firebaseApp';
-import { useState } from 'react';
+import { collection, doc, getDocs, getFirestore, setDoc } from 'firebase/firestore';
 
-const db = getFirestore(app);
+const db = getFirestore();
 
-export const [allHousesLeaderboard, setAllHousesLeaderboard] = useState<{ house: any; points: any; rank: any; }[]>([]);
-export const [allIndividualLeaderboard, setAllIndividualLeaderboard] = useState<{ name: any; points: any; rank: any; }[]>([]);
-
-export const getAllHousesLeaderboardData = async () => {
-    const housesCollection = collection(db, 'Leaderboard/LeaderboardId/houseRankings');
-    getDocs(housesCollection).then((querySnapshot) => {
-                var leaderboardData: { house: any; points: any; rank: any; }[] = [];
-                querySnapshot.forEach((doc) => {
-                    // convert data into json
-                    const data = doc.data();
-                    leaderboardData.push({
-                        house: data.house,
-                        points: data.points,
-                        rank: data.rank
-                    });
-                });
-                setAllHousesLeaderboard(leaderboardData);
-            });
+interface IndividualDocument {
+  name: string;
+  grade: number;
+  house: string;
+  points: Array<number>;
+  id: string;
 }
 
-export const getAllIndividualData = async () => {
-    const individualCollection = collection(db, 'Leaderboard/LeaderboardId/memberRankings');
-    getDocs(individualCollection).then((querySnapshot) => {
-                var individualData: { name: any; points: any; rank: any; }[] = [];
-                querySnapshot.forEach((doc) => {
-                    // convert data into json
-                    const data = doc.data();
-                    individualData.push({
-                        name: data.name,
-                        points: data.points,
-                        rank: data.rank
-                    });
-                });
-                setAllIndividualLeaderboard(individualData);
-            });
+interface HouseDocument {
+  name: string;
+  points: Array<number>;
+  id: string;
+}
+
+export interface FirestoreDataProps {
+  individualsData: Array<IndividualDocument>;
+  housesData: Array<HouseDocument>;
+}
+
+async function fetchData() {
+  const individualsQuery = await getDocs(collection(db, 'individuals'));
+  const housesQuery = await getDocs(collection(db, 'houses'));
+  const individualsData = individualsQuery.docs.map((doc) => doc.data() as IndividualDocument);
+  const housesData = housesQuery.docs.map((doc) => doc.data() as HouseDocument);
+  return { individualsData, housesData };
+}
+
+export async function getServerSideProps(): Promise<{ props: { data: { individualsData: Array<IndividualDocument>, housesData: Array<HouseDocument> } } }> {
+  const data = await fetchData();
+  return { props: { data } };
+}
+
+export async function writeToIndividualData(data: IndividualDocument) {
+  await setDoc(doc(db, 'individuals', data.id), data);
+}
+
+export async function writeToHouseData(data: HouseDocument) {
+  await setDoc(doc(db, 'houses', data.name), data);
 }

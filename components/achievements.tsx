@@ -4,6 +4,21 @@ import { useState } from "react";
 import { Button } from "@nextui-org/button";
 import {Card, CardHeader, CardBody, CardFooter, Divider, Link, Image} from "@nextui-org/react";
 
+export const AchievementTrophyIcon = () => {
+  return (
+   
+    <div>
+      <Image 
+        width={50}
+        height={50}
+        src="https://placehold.co/50x50"
+        alt=""
+        />
+    </div>
+   
+  )
+}
+
 export const AchievementsContainer = () => {
     return (
       <Card className="max-w-[400px]">
@@ -19,7 +34,9 @@ export const AchievementsContainer = () => {
         </CardHeader>
         <Divider/>
         <CardBody>
-          
+          <AchievementTrophyIcon />
+          <AchievementTrophyIcon />
+          <AchievementTrophyIcon />
         </CardBody>
         <Divider/>
       </Card>

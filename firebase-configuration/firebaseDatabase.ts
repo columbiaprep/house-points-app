@@ -1,57 +1,43 @@
-import { addDoc, collection, getDoc, getDocs, getFirestore } from 'firebase/firestore';
-import app from './firebaseApp';
+import { collection, doc, getDocs, getFirestore, setDoc } from 'firebase/firestore';
 
-const db = getFirestore(app);
+const db = getFirestore();
 
-export const getAllHousesLeaderboardData = async (): Promise<{ house: string; points: number[]; rank: number; }[]> => {
-  const housesCollection = collection(db, 'houseRankings');
-  const querySnapshot = await getDocs(housesCollection);
-  const leaderboardData: { house: string; points: number[]; rank: number; }[] = [];
-  querySnapshot.forEach((doc) => {
-    const data = doc.data();
-    leaderboardData.push({
-      house: data.house,
-      points: data.points,
-      rank: data.rank,
-    });
-  });
-  return leaderboardData;
+interface IndividualDocument {
+  name: string;
+  grade: number;
+  house: string;
+  points: Array<number>;
+  id: string;
 }
 
-export const getAllIndividualData = async (): Promise<{ name: string; points: number[]; rank: number; house: string; grade: number; }[]> => {
-  const individualCollection = collection(db, 'individuals');
-  const querySnapshot = await getDocs(individualCollection);
-  const individualData: { name: string; points: number[]; rank: number; house: string; grade: number; }[] = [];
-  querySnapshot.forEach((doc) => {
-    const data = doc.data();
-    individualData.push({
-      name: data.name,
-      points: data.points,
-      rank: data.houseRank,
-      house: data.house,
-      grade: data.grade,
-    });
-  });
-  return individualData;
+interface HouseDocument {
+  name: string;
+  points: Array<number>;
+  id: string;
 }
 
-export const writeDummyDataForIndividuals = async () => {
-  const individualCollection = collection(db, 'individuals');
-  // Houses are: Red, Blue, Green, Gold, Silver, Pink, Purple, Orange
-  // Automatically generate 100 dummy data
-  for (let i = 0; i < 100; i++) {
-    const docRef = await addDoc(individualCollection, {
-      name: `Student ${i}`,
-      points: [
-        Math.floor(Math.random() * 100),
-        Math.floor(Math.random() * 100),
-        Math.floor(Math.random() * 100),
-      ],
-      houseRank: Math.floor(Math.random() * 8),
-      house: ['Red', 'Blue', 'Green', 'Gold', 'Silver', 'Pink', 'Purple', 'Orange'][Math.floor(Math.random() * 8)],
-      grade: Math.floor(Math.random() * 12) + 1,
-    });
-    console.log("Document written with ID: ", docRef.id);
-  }
+export interface FirestoreDataProps {
+  individualsData: Array<IndividualDocument>;
+  housesData: Array<HouseDocument>;
 }
 
+async function fetchData() {
+  const individualsQuery = await getDocs(collection(db, 'individuals'));
+  const housesQuery = await getDocs(collection(db, 'houses'));
+  const individualsData = individualsQuery.docs.map((doc) => doc.data() as IndividualDocument);
+  const housesData = housesQuery.docs.map((doc) => doc.data() as HouseDocument);
+  return { individualsData, housesData };
+}
+
+export async function getServerSideProps(): Promise<{ props: { data: { individualsData: Array<IndividualDocument>, housesData: Array<HouseDocument> } } }> {
+  const data = await fetchData();
+  return { props: { data } };
+}
+
+export async function writeToIndividualData(data: IndividualDocument) {
+  await setDoc(doc(db, 'individuals', data.id), data);
+}
+
+export async function writeToHouseData(data: HouseDocument) {
+  await setDoc(doc(db, 'houses', data.name), data);
+}

@@ -9,6 +9,17 @@ interface TrophyIconProps {
   achievementIconSrc: string
 }
 
+const dummyAchievementData = [
+  {
+    achievementName: "Top Points Earner",
+    achievementIconSrc: "https://placehold.co/25x25"
+  },
+  {
+    achievementName: "Fastest Climb",
+    achievementIconSrc: "https://placehold.co/25x25"
+  }
+]
+
 export const AchievementTrophyIcon: React.FC<TrophyIconProps> = ({achievementName, achievementIconSrc}) => {
   return (
    
@@ -38,10 +49,13 @@ export const AchievementsContainer = () => {
           />
         </CardHeader>
         <Divider/>
-        <CardBody>
-          <AchievementTrophyIcon />
-          <AchievementTrophyIcon />
-          <AchievementTrophyIcon />
+        <CardBody className="gap-2 grid grid-cols-2 sm:grid-cols-4">
+          <div className="gap-2 grid grid-cols-2 sm:grid-cols-4">
+          {dummyAchievementData.map((item, index) => (
+            <AchievementTrophyIcon key={index} achievementName={item.achievementName} achievementIconSrc={item.achievementIconSrc} />
+          )
+          )}
+          </div>
         </CardBody>
         <Divider/>
       </Card>

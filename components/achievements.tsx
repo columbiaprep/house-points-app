@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@nextui-org/button";
-import {Card, CardHeader, CardBody, CardFooter, Divider, Link, Image} from "@nextui-org/react";
+import {Card, CardHeader, CardBody, CardFooter, Divider, Tooltip, Image} from "@nextui-org/react";
 
 interface TrophyIconProps {
   achievementName: string,
@@ -17,20 +17,44 @@ const dummyAchievementData = [
   {
     achievementName: "Fastest Climb",
     achievementIconSrc: "https://placehold.co/25x25"
+  },
+  {
+    achievementName: "Top Points Earner",
+    achievementIconSrc: "https://placehold.co/25x25"
+  },
+  {
+    achievementName: "Fastest Climb",
+    achievementIconSrc: "https://placehold.co/25x25"
+  },
+  {
+    achievementName: "Top Points Earner",
+    achievementIconSrc: "https://placehold.co/25x25"
+  },
+  {
+    achievementName: "Fastest Climb",
+    achievementIconSrc: "https://placehold.co/25x25"
+  },
+  {
+    achievementName: "Top Points Earner",
+    achievementIconSrc: "https://placehold.co/25x25"
+  },
+  {
+    achievementName: "Fastest Climb",
+    achievementIconSrc: "https://placehold.co/25x25"
   }
 ]
 
 export const AchievementTrophyIcon: React.FC<TrophyIconProps> = ({achievementName, achievementIconSrc}) => {
   return (
    
-    <div>
-      <Image 
-        width={50}
-        height={50}
-        src={achievementIconSrc}
-        alt={achievementName}
-        />
-    </div>
+      <Tooltip showArrow={true} content={achievementName} >
+        <Image 
+          width={50}
+          height={50}
+          src={achievementIconSrc}
+          alt={achievementName}
+          />
+        </Tooltip>
    
   )
 }
@@ -49,13 +73,13 @@ export const AchievementsContainer = () => {
           />
         </CardHeader>
         <Divider/>
-        <CardBody className="gap-2 grid grid-cols-2 sm:grid-cols-4">
-          <div className="gap-2 grid grid-cols-2 sm:grid-cols-4">
+        <CardBody className="gap-2 grid grid-cols-4">
+          
           {dummyAchievementData.map((item, index) => (
             <AchievementTrophyIcon key={index} achievementName={item.achievementName} achievementIconSrc={item.achievementIconSrc} />
           )
           )}
-          </div>
+          
         </CardBody>
         <Divider/>
       </Card>

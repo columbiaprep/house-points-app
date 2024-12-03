@@ -1,3 +1,17 @@
+# Establish connection to firebase
+To establish a connection to firebase, follow the following steps:
+
+1. Create a .env file and insert the enviornmental variable information (found in shared google doc)
+2. Make sure Firebase CLI is installed globally using npm:
+```bash
+npm install firebase -g
+```
+3. Initialize firebase through command line by logging in
+```bash
+firebase init
+```
+
+
 # Next.js & NextUI Template
 
 This is a template for creating applications using Next.js 14 (app directory) and NextUI (v2).

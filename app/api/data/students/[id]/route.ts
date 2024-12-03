@@ -1,4 +1,4 @@
-import { fetchIndividual, writeToIndividualData } from "@/firebase-configuration/firebaseDatabase";
+import { fetchIndividual, writeToIndividualData, type IndividualDocument } from "@/firebase-configuration/firebaseDatabase";
 import { NextRequest, NextResponse } from "next/server";
 
 // For individual student data
@@ -10,9 +10,3 @@ export async function GET(req: NextRequest) {
     });
 }
 
-export async function POST(req: NextRequest) {
-    // Your POST logic here
-    return new NextResponse(JSON.stringify({ status: 200 }), {
-        headers: { 'Content-Type': 'application/json' },
-    });
-}

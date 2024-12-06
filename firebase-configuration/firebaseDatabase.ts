@@ -24,6 +24,13 @@ export interface FirestoreDataProps {
   housesData: Array<HouseDocument>;
 }
 
+export interface Student {
+  id: string;
+  name: string;
+  grade: number;
+  house: string;
+}
+
 export async function fetchAllIndividuals() {
   const individualsQuery = await getDocs(collection(db, 'individuals'));
   return individualsQuery.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -73,4 +80,32 @@ export async function writeToHouseData(ptsCategory: string, id: string, points: 
       throw new Error(`Unknown points category: ${ptsCategory}`);
   }
   await setDoc(doc(db, 'houses', id), updateData, { merge: true });
+}
+
+export async function getSavedHouseRosterData(): Promise<Array<Student>> {
+  const studentsQuery = await getDocs(collection(db, 'futureHouseRoster'));
+  return studentsQuery.docs.map(doc => {
+    const data = doc.data();
+    return {
+      id: doc.id,
+      name: data.name,
+      grade: data.grade,
+      house: data.house
+    } as Student;
+  });
+}
+
+export async function resetDatabase(roster: Array<Student>) {
+  const batch: Array<Promise<void>> = [];
+  roster.forEach(student => {
+    const studentDoc = doc(db, 'individuals', student.id);
+    batch.push(setDoc(studentDoc, {
+      name: student.name,
+      grade: student.grade,
+      house: student.house,
+      beingGoodPts: 0,
+      attendingEventsPts: 0
+    }));
+  });
+  await Promise.all(batch);
 }

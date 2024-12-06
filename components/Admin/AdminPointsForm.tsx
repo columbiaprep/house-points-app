@@ -95,7 +95,7 @@ const AdminPointsForm = () => {
     };
 
   return (
-    <div className="flex justify-center items-center min-h-screen">
+    <div className="flex w-[900px]">
       <Card isBlurred className="point-form-card border-none bg-background/60 dark:bg-default-100/50 shadow-lg p-6 w-3/6">
         <CardBody>
           <div className="flex flex-col gap-6">

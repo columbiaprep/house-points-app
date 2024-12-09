@@ -3,10 +3,12 @@ import { Input } from "@nextui-org/input";
 import axios from "axios";
 import React, { useState } from "react";
 import { Spinner } from "@nextui-org/spinner";
+import { Modal, ModalContent, useDisclosure, ModalFooter, ModalHeader, ModalBody } from "@nextui-org/react";
 
 const AdminReset = () => {
   const [fileContents, setFileContents] = useState<string>('');
   const [loading, setLoading] = useState(false);
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -36,7 +38,26 @@ const AdminReset = () => {
   return (
     <div className="container mt-4">
       <div>
-        <h2>Import Roster</h2>
+        <Modal isOpen={isOpen} onClose={onClose} title="Reset All House Rosters">
+                <ModalContent>
+                  <ModalHeader>Reset All House Rosters</ModalHeader>
+                  <ModalBody>
+                    <p>Are you sure you want to reset all house rosters?</p>
+                    <p>This action cannot be undone.</p>
+                  </ModalBody>
+                  <ModalFooter>
+                    <Button
+                      color="danger"
+                      onPress={handleFullReset}
+                      disabled={loading}
+                    >
+                      {loading ? <Spinner /> : "Reset All"}
+                    </Button>
+                    <Button onPress={onClose}>Cancel</Button>
+                  </ModalFooter>
+                </ModalContent>
+          </Modal>
+        <h2>Import Entire Houses Roster (Should Include: Name, Grade, House, ID)</h2>
         <div className="bg-gray-100 p-2 rounded flex flex-col font-sans gap-2">
           <div className="container w-1/4">
             <Input
@@ -45,9 +66,11 @@ const AdminReset = () => {
               accept=".csv"
               onChange={handleFileChange}
             />
-            <Button onClick={handleFullReset} className="mt-4 bg-red-400 p-2 rounded">
-              {loading ? <Spinner size="sm" /> : 'Reset All'}
-            </Button>
+            {fileContents && (
+              
+            <Button className="mt-4" onPress={onOpen}>Reset All</Button>
+            )}
+            
           </div>
           {fileContents && (
             <div className="mt-4 bg-white p-4 rounded shadow">
@@ -57,6 +80,7 @@ const AdminReset = () => {
           )}
         </div>
       </div>
+      
     </div>
   );
 };

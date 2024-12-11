@@ -92,7 +92,7 @@ const AdminPointsForm = () => {
       handleAddHousePoints();
     }
     // setTimeout(() => window.location.reload(), 1000);
-    };
+  };
 
   return (
     <div className="flex w-[900px]">
@@ -104,71 +104,74 @@ const AdminPointsForm = () => {
               <Radio value="student">Student</Radio>
               <Radio value="house">House</Radio>
             </RadioGroup>
-            { addBy === 'student' &&
-            <div className='by-student'>
-              <h3 className="text-xl font-semibold">By Student</h3>
-              <Autocomplete
-                className="w-full"
-                label="Student Name"
-                onSelectionChange={(value) => setSelectedStudent(value as string)}
-                value={selectedStudent}
-              >
-                {individualData.map((student) => (
-                  <AutocompleteItem key={student.id} value={student.id}>
-                    {student.name}
-                  </AutocompleteItem>
-                ))}
-              </Autocomplete>
-              <Select
-                label="Select a category"
-                className="w-full mt-4"
-                onSelectionChange={(value) => setSelectedCategory(value.currentKey as string)}
+            {addBy === 'student' &&
+              <div className='by-student'>
+                <h3 className="text-xl font-semibold">By Student</h3>
+                <Autocomplete
+                  className="w-full"
+                  label="Student Name"
+                  onSelectionChange={(value) => setSelectedStudent(value as string)}
+                  value={selectedStudent}
                 >
-                  
+                  {individualData.map((student) => (
+                    <AutocompleteItem key={student.id} value={student.id}>
+                      {student.name}
+                    </AutocompleteItem>
+                  ))}
+                </Autocomplete>
+                <Select
+                  label="Select a category"
+                  className="w-full mt-4"
+                  onSelectionChange={(value) => setSelectedCategory(value.currentKey as string)}
+                >
+
                   <SelectItem key="beingGoodPts">Caught Being Good</SelectItem>
                   <SelectItem key="attendingEventsPts">Attending Events</SelectItem>
+                  <SelectItem key="sportsTeamPts">Sports Team</SelectItem>
 
-              </Select>
-              <Input
-                type="number"
-                label="Points to Add"
-                className="mt-4 w-full"
-                onChange={(e) => setPointsToAdd(parseInt(e.target.value))}
-              />
-            </div>}
-            { addBy === 'house' &&
-            <div className='by-house'>
-              <h3 className="text-xl font-semibold">By House</h3>
-              <Select
-                label="Select a House"
-                className="w-full"
-                onChange={(e) => setSelectedHouse(e.target.value)}
-                value={selectedHouse}
-              >
-                {housesData.map((house) => (
-                  <SelectItem textValue={toTitleCase(house.name)} key={house.id} value={house.id}>
-                    {toTitleCase(house.name)} House
-                  </SelectItem>
-                ))}
-              </Select>
-              <Select
-                label="Select a category"
-                className="w-full mt-4"
-                onSelectionChange={(value) => setSelectedCategory(value.currentKey as string)}
+
+                </Select>
+                <Input
+                  type="number"
+                  label="Points to Add"
+                  className="mt-4 w-full"
+                  onChange={(e) => setPointsToAdd(parseInt(e.target.value))}
+                />
+              </div>}
+            {addBy === 'house' &&
+              <div className='by-house'>
+                <h3 className="text-xl font-semibold">By House</h3>
+                <Select
+                  label="Select a House"
+                  className="w-full"
+                  onChange={(e) => setSelectedHouse(e.target.value)}
+                  value={selectedHouse}
                 >
-                  
+                  {housesData.map((house) => (
+                    <SelectItem textValue={toTitleCase(house.name)} key={house.id} value={house.id}>
+                      {toTitleCase(house.name)} House
+                    </SelectItem>
+                  ))}
+                </Select>
+                <Select
+                  label="Select a category"
+                  className="w-full mt-4"
+                  onSelectionChange={(value) => setSelectedCategory(value.currentKey as string)}
+                >
+
                   <SelectItem key="beingGoodPts">Caught Being Good</SelectItem>
                   <SelectItem key="attendingEventsPts">Attending Events</SelectItem>
+                  <SelectItem key="sportsTeamPts">Sports Team</SelectItem>  
 
-              </Select>
-                
-              <Input
-                type="number"
-                label="Points to Add"
-                className="mt-4 w-full"
-                onChange={(e) => setPointsToAdd(parseInt(e.target.value))}
-              />
-            </div>}
+                </Select>
+
+                <Input
+                  type="number"
+                  label="Points to Add"
+                  className="mt-4 w-full"
+                  onChange={(e) => setPointsToAdd(parseInt(e.target.value))}
+                />
+              </div>}
             <Button className="mt-6 w-full" onClick={handleAddPoints}>
               Add Points
             </Button>

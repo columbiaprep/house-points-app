@@ -9,6 +9,7 @@ export interface IndividualDocument {
   house: string;
   beingGoodPts: number;
   attendingEventsPts: number;
+  sportsTeamPts: number;
   id: string;
 }
 
@@ -104,7 +105,8 @@ export async function resetDatabase(roster: Array<Student>) {
       grade: student.grade,
       house: student.house,
       beingGoodPts: 0,
-      attendingEventsPts: 0
+      attendingEventsPts: 0,
+      sportsTeamPts: 0
     }));
   });
   await Promise.all(batch);

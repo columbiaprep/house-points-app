@@ -15,7 +15,6 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
       const { points, id, category } = await req.json();
-    console.log(points, id, category)
 
       writeToIndividualData(category, id, points)
 

@@ -1,7 +1,9 @@
+"use client"
 import { Snippet } from "@nextui-org/snippet";
 import { Code } from "@nextui-org/code";
 import { Shout } from "@/components/shout";
-import { AchievementsContainer } from "@/components/achievements";
+import { AchievementsContainer } from "@/components/achievements"
+import { writeDummyDataForIndividuals } from "@/firebase-configuration/firebaseDatabase";
 
 export default function Home() {
   return (
@@ -16,6 +18,7 @@ export default function Home() {
             Get started by editing <Code color="primary">app/page.tsx</Code>
           </span>
         </Snippet>
+        <button onClick={() => writeDummyDataForIndividuals()} className="btn btn-primary">Button</button>
       </div>
     </section>
   );

@@ -52,8 +52,8 @@ const AdminMassPointsForm = () => {
 
 
                         </Select>
-                        <Input required type="number" className="p-2 rounded" placeholder="Points to Add" />
-                        <Button onClick={handleSubmission}>Add Points</Button>
+                        <Input required type="number" className="p-2 rounded" onChange={e => setPoints(parseInt(e.target.value))} placeholder="Points to Add" />
+                        <Button onPress={handleSubmission}>Add Points</Button>
                     </div>
                 </CardBody>
             </Card>

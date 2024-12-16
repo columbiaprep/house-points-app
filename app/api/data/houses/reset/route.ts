@@ -1,9 +1,10 @@
-import { NextApiRequest, NextApiResponse } from "next";
+import { NextRequest, NextResponse } from "next/server";
 import { resetDatabase, type Student } from "@/firebase-configuration/firebaseDatabase";
 import Papa from "papaparse";
 
-export const POST = async (req: NextApiRequest, res: NextApiResponse) => {
-    const { roster } = req.body;
+export const POST = async (req: NextRequest) => {
+    const body = await req.text();
+    const { roster } = JSON.parse(body);
 
     const parseResult = Papa.parse<Student>(roster, {
         header: true,
@@ -12,12 +13,12 @@ export const POST = async (req: NextApiRequest, res: NextApiResponse) => {
     });
 
     if (parseResult.errors.length > 0) {
-        return res.status(400).json({ message: "Error parsing CSV", errors: parseResult.errors });
+        return NextResponse.json({ message: "Error parsing CSV", errors: parseResult.errors }, { status: 400 });
     }
 
     const students: Array<Student> = parseResult.data;
 
     await resetDatabase(students);
 
-    res.status(200).json({ message: "Reset successful" });
+    return NextResponse.json({ message: "Reset successful" }, { status: 200 });
 };

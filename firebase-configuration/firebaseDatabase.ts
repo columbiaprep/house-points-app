@@ -1,4 +1,5 @@
-import { collection, doc, getDocs, getFirestore, setDoc } from 'firebase/firestore';
+"use server"
+import { collection, doc, getDoc, getDocs, getFirestore, setDoc } from 'firebase/firestore';
 import app from './firebaseApp';
 
 const db = getFirestore(app);
@@ -31,6 +32,8 @@ export interface Student {
   grade: number;
   house: string;
 }
+
+// House Data
 
 export async function fetchAllIndividuals() {
   const individualsQuery = await getDocs(collection(db, 'individuals'));
@@ -110,4 +113,21 @@ export async function resetDatabase(roster: Array<Student>) {
     }));
   });
   await Promise.all(batch);
+}
+
+// Authentication Data
+export async function addToDb(email: string, uid: string, displayName: string, photoURL: string) {
+  const userDoc = doc(db, 'users', email)
+  await setDoc(userDoc, {
+    uid,
+    displayName,
+    photoURL,
+    email
+  });
+}
+
+export async function checkIfUserExists(email: string) {
+  const userDoc = doc(db, 'users', email);
+  const userDocSnapshot = await getDoc(userDoc);
+  return userDocSnapshot.exists();
 }

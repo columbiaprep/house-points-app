@@ -1,6 +1,6 @@
 "use server"
 import { collection, doc, getDoc, getDocs, getFirestore, setDoc } from 'firebase/firestore';
-import app from './firebaseApp';
+import { app } from './firebaseAppServer';
 
 const db = getFirestore(app);
 
@@ -116,13 +116,25 @@ export async function resetDatabase(roster: Array<Student>) {
 }
 
 // Authentication Data
+async function getAdmins() {
+  const adminsQuery = await getDocs(collection(db, 'admins'));
+  return adminsQuery.docs.map(doc => doc.get('email'));
+}
+
 export async function addToDb(email: string, uid: string, displayName: string, photoURL: string) {
   const userDoc = doc(db, 'users', email)
+  var accountType = "";
+  for (let i = 0; i < 10; i++) {
+    if (email.includes(i.toString())) accountType = "student";
+    else if ((await getAdmins()).includes(email)) accountType = "admin";
+    else accountType = "teacher"
+  }
   await setDoc(userDoc, {
     uid,
     displayName,
     photoURL,
-    email
+    email,
+    accountType
   });
 }
 
@@ -130,4 +142,14 @@ export async function checkIfUserExists(email: string) {
   const userDoc = doc(db, 'users', email);
   const userDocSnapshot = await getDoc(userDoc);
   return userDocSnapshot.exists();
+}
+
+export async function getUserAccountType(email: string) {
+  const userDoc = doc(db, 'users', email);
+  const userDocSnapshot = await getDoc(userDoc);
+  if (userDocSnapshot.exists()) {
+    const data = userDocSnapshot.data();
+    return data?.accountType;
+  }
+  return null;
 }

@@ -1,8 +1,11 @@
 "use client"
+import { useAuth } from "@/contexts/AuthContext";
 import {
   Navbar as NextUINavbar
 } from "@nextui-org/navbar";
 import { Avatar, User } from "@nextui-org/react";
+
+const userData = useAuth();
 
 export const Navbar = () => {
 
@@ -16,8 +19,8 @@ export const Navbar = () => {
 const UserProfile = () => {
   return (
     <div className="flex items-center gap-2">
-      <Avatar isBordered radius="full" src="https://i.pravatar.cc/150?u=a04258114e29026708c" />
-      <span>John Doe</span>
+      <Avatar isBordered radius="full" src={userData.user?.photoURL ?? ""} />
+      <span>{userData.user?.displayName}</span>
     </div>
   );
 }

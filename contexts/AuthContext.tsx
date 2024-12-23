@@ -1,9 +1,8 @@
-"use client";
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { onAuthStateChanged, signOut, User, GoogleAuthProvider, signInWithRedirect } from 'firebase/auth';
-import { checkIfUserExists, addToDb, getUserAccountType } from '@/firebase-configuration/firebaseDatabase';
-import { useRouter } from 'next/navigation';
+"use client"
+import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
+import { onAuthStateChanged, signOut, GoogleAuthProvider, User, getRedirectResult, signInWithRedirect } from 'firebase/auth';
 import { auth } from '@/firebase-configuration/firebaseAuth';
+import { getUserAccountType } from '@/firebase-configuration/firebaseDatabase';
 
 interface AuthContextType {
   user: User | null;
@@ -15,42 +14,25 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
   const [accountType, setAccountType] = useState<string | null>(null);
-  const router = useRouter();
+  const [loading, setLoading] = useState<boolean>(true);
+  const [authAttempted, setAuthAttempted] = useState<boolean>(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      console.log("Auth state changed");
       if (user) {
-        const email = user.email;
-        if (email?.includes('cgps.org')) {
-          console.log('User is part of CGPS domain');
-
-          // Check if user is in Firestore database
-          const userExists = await checkIfUserExists(email);
-
-          // If not, add user to database
-          if (!userExists) {
-            if (user.email && user.uid && user.displayName && user.photoURL) {
-              await addToDb(user.email, user.uid, user.displayName, user.photoURL);
-            } else {
-              console.error('User does not have all required information');
-            }
-          }
-
-          // Get user account type
-          const accountType = await getUserAccountType(email);
+        console.log("User authenticated:", user);
+        setUser(user);
+        if (user.email) {
+          const accountType = await getUserAccountType(user.email);
           setAccountType(accountType);
-          setUser(user);
-        } else {
-          console.error('You must sign in with a CGPS email');
-          await signOut(auth);
-          alert('You must sign in with a CGPS email');
         }
       } else {
         setUser(null);
+        setAccountType(null);
       }
       setLoading(false);
     });
@@ -58,16 +40,38 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => unsubscribe();
   }, []);
 
+  useEffect(() => {
+    if (!loading && !authAttempted && (!user || !accountType)) {
+      console.log("Prompting login with Google");
+      authWithGoogle();
+      setAuthAttempted(true);
+    }
+  }, [loading, user, accountType, authAttempted]);
+
   const signOutUser = async () => {
+    setLoading(true);
     await signOut(auth);
     setUser(null);
-    router.push('/login');
+    setAccountType(null);
+    window.location.reload();
   };
 
   const authWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
     await signInWithRedirect(auth, provider);
-  };
+    getRedirectResult(auth).then((result) => {
+      if (result) {
+        console.log(user)
+        setUser(result.user);
+      }
+    }).catch((error) => {
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      const email = error.customData.email;
+      const credential = GoogleAuthProvider.credentialFromError(error);
+      console.error("Error authenticating with Google:", errorCode, errorMessage, email, credential);
+    });
+}
 
   return (
     <AuthContext.Provider value={{ user, accountType, loading, signOutUser, authWithGoogle }}>

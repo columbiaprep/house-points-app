@@ -144,7 +144,7 @@ export async function checkIfUserExists(email: string) {
   return userDocSnapshot.exists();
 }
 
-export async function getUserAccountType(email: string) {
+export async function getUserAccountType(email: string): Promise<string | null> {
   const userDoc = doc(db, 'users', email);
   const userDocSnapshot = await getDoc(userDoc);
   if (userDocSnapshot.exists()) {

@@ -12,16 +12,17 @@ interface AuthContextType {
   authWithGoogle: () => Promise<void>;
 }
 
+
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [accountType, setAccountType] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const [authAttempted, setAuthAttempted] = useState<boolean>(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      
       console.log("Auth state changed");
       if (user) {
         console.log("User authenticated:", user);
@@ -40,37 +41,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return () => unsubscribe();
   }, []);
 
-  useEffect(() => {
-    if (!loading && !authAttempted && (!user || !accountType)) {
-      console.log("Prompting login with Google");
-      authWithGoogle();
-      setAuthAttempted(true);
-    }
-  }, [loading, user, accountType, authAttempted]);
 
   const signOutUser = async () => {
     setLoading(true);
     await signOut(auth);
     setUser(null);
     setAccountType(null);
-    window.location.reload();
   };
 
   const authWithGoogle = async () => {
+    window.localStorage.setItem('signInInProgress', 'true');
     const provider = new GoogleAuthProvider();
     await signInWithRedirect(auth, provider);
-    getRedirectResult(auth).then((result) => {
-      if (result) {
-        console.log(user)
-        setUser(result.user);
-      }
-    }).catch((error) => {
-      const errorCode = error.code;
-      const errorMessage = error.message;
-      const email = error.customData.email;
-      const credential = GoogleAuthProvider.credentialFromError(error);
-      console.error("Error authenticating with Google:", errorCode, errorMessage, email, credential);
-    });
+    
 }
 
   return (

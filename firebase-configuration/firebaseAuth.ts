@@ -1,13 +1,6 @@
 "use client"
-import { GoogleAuthProvider, signInWithRedirect, onAuthStateChanged, signOut, User, getAuth } from 'firebase/auth';
-import { app } from './firebaseAppClient';
-
-const auth = getAuth(app);
-
-export const authWithGoogle = async () => {
-    const provider = new GoogleAuthProvider();
-    await signInWithRedirect(auth, provider);
-};
+import { onAuthStateChanged, signOut, User } from '@firebase/auth';
+import { auth } from './firebaseAppClient';
 
 export const handleAuthStateChange = (onUserAuthenticated: (user: User | null) => void) => {
     onAuthStateChanged(auth, (user) => {
@@ -22,5 +15,3 @@ export const handleAuthStateChange = (onUserAuthenticated: (user: User | null) =
 export const signOutUser = async () => {
     await signOut(auth);
 };
-
-export { auth };

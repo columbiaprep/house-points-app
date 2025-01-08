@@ -1,6 +1,6 @@
-"use server"
-import { collection, doc, getDoc, getDocs, getFirestore, setDoc } from 'firebase/firestore';
-import { app } from './firebaseAppServer';
+"use client";
+import { collection, doc, getDoc, getDocs, getFirestore, setDoc } from '@firebase/firestore';
+import app from './firebaseAppClient';
 
 const db = getFirestore(app);
 
@@ -125,9 +125,12 @@ export async function addToDb(email: string, uid: string, displayName: string, p
   const userDoc = doc(db, 'users', email)
   var accountType = "";
   for (let i = 0; i < 10; i++) {
-    if (email.includes(i.toString())) accountType = "student";
-    else if ((await getAdmins()).includes(email)) accountType = "admin";
-    else accountType = "teacher"
+    if (email.includes(i.toString())) {
+      accountType = "student";
+      break;
+    }
+  if ((await getAdmins()).includes(email)) accountType = "admin";
+  else accountType = "teacher"
   }
   await setDoc(userDoc, {
     uid,

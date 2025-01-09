@@ -1,4 +1,4 @@
-import { fetchAllHouses, writeToHouseData } from "@/firebase-configuration/firebaseDatabase";
+import { fetchAllHouses, writeToHouseData } from "@/firebase-configuration/firebaseDatabaseServer";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {

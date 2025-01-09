@@ -1,63 +1,84 @@
-"use client"
-import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
-import { onAuthStateChanged, signOut, GoogleAuthProvider, User, getRedirectResult, signInWithRedirect } from 'firebase/auth';
-import { auth } from '@/firebase-configuration/firebaseAuth';
-import { getUserAccountType } from '@/firebase-configuration/firebaseDatabase';
+"use client";
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import { GoogleAuthProvider, onAuthStateChanged, signInWithPopup, signOut, User } from '@firebase/auth';
+import { useRouter } from 'next/navigation';
+import { auth } from '@/firebase-configuration/firebaseAppClient';
+import { getUserAccountType, checkIfUserExists, addToDb } from '@/firebase-configuration/firebaseDbAuthClient';
 
 interface AuthContextType {
   user: User | null;
   accountType: string | null;
   loading: boolean;
+  photoURL: string;
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
   signOutUser: () => Promise<void>;
   authWithGoogle: () => Promise<void>;
 }
 
-
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
   const [accountType, setAccountType] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [photoURL, setPhotoURL] = useState<string>('');
+  const [signInPrompted, setSignInPrompted] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
+    setLoading(true);
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      
-      console.log("Auth state changed");
       if (user) {
-        console.log("User authenticated:", user);
         setUser(user);
-        if (user.email) {
-          const accountType = await getUserAccountType(user.email);
-          setAccountType(accountType);
+        const accountType = user.email ? await getUserAccountType(user.email) : null;
+        setAccountType(accountType);
+        if (user.photoURL) {
+          setPhotoURL(user.photoURL);
         }
+        setLoading(false);
       } else {
         setUser(null);
         setAccountType(null);
+        setLoading(false);
+        router.push('/auth');
       }
-      setLoading(false);
     });
-
     return () => unsubscribe();
-  }, []);
-
+  }, [router]);
 
   const signOutUser = async () => {
     setLoading(true);
     await signOut(auth);
     setUser(null);
     setAccountType(null);
+    setPhotoURL('');
+    setLoading(false);
+    router.push('/auth');
   };
 
   const authWithGoogle = async () => {
-    window.localStorage.setItem('signInInProgress', 'true');
+    setLoading(true);
+    if (signInPrompted) return;
+    setSignInPrompted(true);
+
     const provider = new GoogleAuthProvider();
-    await signInWithRedirect(auth, provider);
-    
-}
+    await signInWithPopup(auth, provider);
+    const user = auth.currentUser;
+    if (user) {
+      const exists = user.email ? await checkIfUserExists(user.email) : false;
+      if (!exists) {
+        if (user.email) {
+          await addToDb(user.email, user.uid, user.displayName || '', user.photoURL || '');
+        }
+      }
+    }
+    setUser(user);
+    router.push('/dashboard');
+    setLoading(false);
+  };
 
   return (
-    <AuthContext.Provider value={{ user, accountType, loading, signOutUser, authWithGoogle }}>
+    <AuthContext.Provider value={{ user, accountType, loading, photoURL, setLoading, signOutUser, authWithGoogle }}>
       {children}
     </AuthContext.Provider>
   );

@@ -1,6 +1,6 @@
 "use server"
-import { initializeApp } from 'firebase/app';
-import { getFirestore } from 'firebase/firestore';
+import { initializeApp } from '@firebase/app';
+import { getFirestore } from '@firebase/firestore';
 
 const firebaseConfig = {
     apiKey: process.env.NEXT_APP_FIREBASE_API_KEY,
@@ -13,4 +13,5 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+
 export {app, db};

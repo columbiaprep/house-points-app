@@ -1,12 +1,13 @@
 import { fetchIndividual } from "@/firebase-configuration/firebaseDatabaseServer";
 import { NextRequest, NextResponse } from "next/server";
 
-// For individual student data
 export async function GET(req: NextRequest) {
+  try {
     const id: string = req.nextUrl.pathname.split('/').pop() || '';
     const data = await fetchIndividual(id);
-    return new NextResponse(JSON.stringify({ status: 200, data: data }), {
-        headers: { 'Content-Type': 'application/json' },
-    });
+    return NextResponse.json({ status: 200, data: data });
+  } catch (error) {
+    console.error('Error fetching individual:', error);
+    return NextResponse.json({ status: 500, message: 'Internal Server Error' }, { status: 500 });
+  }
 }
-

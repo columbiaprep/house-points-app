@@ -22,7 +22,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
   const [accountType, setAccountType] = useState<string | null>(null);
   const [photoURL, setPhotoURL] = useState<string>('');
-  const [signInPrompted, setSignInPrompted] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -58,11 +57,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const authWithGoogle = async () => {
     setLoading(true);
-    if (signInPrompted) return;
-    setSignInPrompted(true);
 
     const provider = new GoogleAuthProvider();
-    await signInWithPopup(auth, provider);
+    await signInWithPopup(auth, provider).catch((error) => {
+      if (error.code === 'auth/popup-closed-by-user') {
+        router.push('/auth');
+      }
+    });
     const user = auth.currentUser;
     if (user) {
       const exists = user.email ? await checkIfUserExists(user.email) : false;

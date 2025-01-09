@@ -8,7 +8,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ status: 200, data: plainData });
   } catch (error) {
     console.error('Error fetching houses:', error);
-    return NextResponse.json({ status: 500, message: 'Internal Server Error' }, { status: 500 });
+    return NextResponse.json({ status: 500, message: 'Internal Server Error' });
   }
 }
 
@@ -20,6 +20,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ status: 200, message: 'Points added successfully' });
   } catch (error) {
     console.error('Failed to add points:', error);
-    return NextResponse.json({ status: 500, error: 'Failed to add points' }, { status: 500 });
+    return NextResponse.json({ status: 500, error: 'Failed to add points' });
   }
 }

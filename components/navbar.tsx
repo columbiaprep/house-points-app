@@ -6,7 +6,6 @@ import BrandImage from "@/public/cgps-houses-logo.png"
 
 export const Navbar = () => {
   const userData = useAuth();
-
   return (
     <>
       {userData.user && (

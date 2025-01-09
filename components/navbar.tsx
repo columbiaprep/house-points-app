@@ -35,9 +35,9 @@ const UserProfile = () => {
         </div>
       </DropdownTrigger>
       <DropdownMenu>
-        <DropdownItem className="text-black" key="profile">Profile</DropdownItem>
-        <DropdownItem className="text-black" key="settings">Settings</DropdownItem>
-        <DropdownItem className="text-black" key="logout" onPress={async () => await userData.signOutUser()}>
+        <DropdownItem key="profile">Profile</DropdownItem>
+        <DropdownItem key="settings">Settings</DropdownItem>
+        <DropdownItem key="logout" onPress={async () => await userData.signOutUser()}>
           Logout
         </DropdownItem>
       </DropdownMenu>

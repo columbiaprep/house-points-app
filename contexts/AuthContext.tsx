@@ -3,7 +3,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { GoogleAuthProvider, onAuthStateChanged, signInWithPopup, signOut, User } from '@firebase/auth';
 import { useRouter } from 'next/navigation';
 import { auth } from '@/firebase-configuration/firebaseAppClient';
-import {getUserAccountType, checkIfUserExists, addToDb} from '@/firebase-configuration/firebaseDbAuthClient';
+import { getUserAccountType, checkIfUserExists, addToDb } from '@/firebase-configuration/firebaseDbAuthClient';
 
 interface AuthContextType {
   user: User | null;
@@ -22,6 +22,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
   const [accountType, setAccountType] = useState<string | null>(null);
   const [photoURL, setPhotoURL] = useState<string>('');
+  const [signInPrompted, setSignInPrompted] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -39,12 +40,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser(null);
         setAccountType(null);
         setLoading(false);
-        router.push('/auth')
+        router.push('/auth');
       }
     });
-    setLoading(false);
     return () => unsubscribe();
-  }, []);
+  }, [router]);
 
   const signOutUser = async () => {
     setLoading(true);
@@ -53,10 +53,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setAccountType(null);
     setPhotoURL('');
     setLoading(false);
-    router.push('/auth')
+    router.push('/auth');
   };
 
   const authWithGoogle = async () => {
+    setLoading(true);
+    if (signInPrompted) return;
+    setSignInPrompted(true);
+
     const provider = new GoogleAuthProvider();
     await signInWithPopup(auth, provider);
     const user = auth.currentUser;
@@ -70,11 +74,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     setUser(user);
     router.push('/dashboard');
+    setLoading(false);
   };
 
-
   return (
-    <AuthContext.Provider value={{ user, accountType, photoURL, loading, setLoading, authWithGoogle, signOutUser }}>
+    <AuthContext.Provider value={{ user, accountType, loading, photoURL, setLoading, signOutUser, authWithGoogle }}>
       {children}
     </AuthContext.Provider>
   );

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { resetDatabase, type Student } from "@/firebase-configuration/firebaseDatabase";
+import { resetDatabase, type Student } from "@/firebase-configuration/firebaseDatabaseServer";
 import Papa from "papaparse";
 
 export const POST = async (req: NextRequest) => {

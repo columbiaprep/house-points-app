@@ -1,7 +1,7 @@
-import { collection, doc, getDocs, getFirestore, setDoc } from 'firebase/firestore';
-import app from './firebaseApp';
+"use server";
+import { collection, doc, getDocs, setDoc } from '@firebase/firestore';
+import { db } from '@/firebase-configuration/firebaseAppServer';
 
-const db = getFirestore(app);
 
 export interface IndividualDocument {
   name: string;
@@ -31,6 +31,8 @@ export interface Student {
   grade: number;
   house: string;
 }
+
+// House Data
 
 export async function fetchAllIndividuals() {
   const individualsQuery = await getDocs(collection(db, 'individuals'));

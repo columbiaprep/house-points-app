@@ -1,4 +1,4 @@
-import { fetchIndividual } from "@/firebase-configuration/firebaseDatabase";
+import { fetchIndividual } from "@/firebase-configuration/firebaseDatabaseServer";
 import { NextRequest, NextResponse } from "next/server";
 
 // For individual student data

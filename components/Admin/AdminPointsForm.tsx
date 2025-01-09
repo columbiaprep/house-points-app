@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Autocomplete, AutocompleteItem, Select, SelectItem, Input, Button, RadioGroup, Radio } from '@nextui-org/react';
 import { Card, CardBody } from '@nextui-org/card';
-import { type IndividualDocument, type HouseDocument } from '@/firebase-configuration/firebaseDatabase';
+import { type IndividualDocument, type HouseDocument } from '@/firebase-configuration/firebaseDatabaseServer';
 import { toTitleCase } from '@/config/globalFuncs';
 
 const getAllIndividualData = async () => {

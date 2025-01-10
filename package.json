@@ -47,6 +47,20 @@
     "typescript": "5.0.4"
   },
   "engines": {
-    "node": "22.x"
-  }
+    "node": "23.x"
+  },
+  "name": "cgps-houses",
+  "description": "To establish a connection to firebase, follow the following steps:",
+  "main": "next.config.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/columbiaprep/house-points-app.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/columbiaprep/house-points-app/issues"
+  },
+  "homepage": "https://github.com/columbiaprep/house-points-app#readme"
 }

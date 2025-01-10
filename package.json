@@ -47,7 +47,7 @@
     "typescript": "5.0.4"
   },
   "engines": {
-    "node": "23.x"
+    "node": "22.x"
   },
   "name": "cgps-houses",
   "description": "To establish a connection to firebase, follow the following steps:",

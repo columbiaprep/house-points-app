@@ -1,23 +1,23 @@
-import "@/styles/globals.css";
-import { Metadata, Viewport } from "next";
-import { Link } from "@nextui-org/link";
-import clsx from "clsx";
+import '@/styles/globals.css';
+import { Metadata } from 'next';
+import { Link } from '@nextui-org/link';
+import clsx from 'clsx';
 
-import { Providers } from "./providers";
+import { Providers } from './providers';
 
-import { siteConfig } from "@/config/site";
-import { fontSans } from "@/config/fonts";
-import { Navbar } from "@/components/navbar";
-import { AuthProvider, useAuth } from "@/contexts/AuthContext";
+import { siteConfig } from '@/config/site';
+import { fontSans } from '@/config/fonts';
+import { Navbar } from '@/components/navbar';
+import { AuthProvider } from '@/contexts/AuthContext';
 
 export const metadata: Metadata = {
   title: {
-    default: "CGPS Houses",
+    default: 'CGPS Houses',
     template: `%s - ${siteConfig.name}`,
   },
   description: siteConfig.description,
   icons: {
-    icon: "/cgps-houses-mini-logo.png",
+    icon: '/cgps-houses-mini-logo.png',
   },
 };
 
@@ -31,12 +31,12 @@ export default function RootLayout({
       <head />
       <body
         className={clsx(
-          "min-h-screen bg-background font-sans antialiased",
+          'min-h-screen bg-background font-sans antialiased',
           fontSans.variable,
         )}
       >
         <AuthProvider>
-          <Providers themeProps={{ attribute: "class" }}>
+          <Providers themeProps={{ attribute: 'class' }}>
             <div className="relative flex flex-col h-screen">
               <Navbar />
               <main className="container mx-auto max-w-7xl pt-16 px-6 flex-grow">

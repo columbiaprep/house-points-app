@@ -1,24 +1,39 @@
-import { NextRequest, NextResponse } from "next/server";
-import { resetDatabase, type Student } from "@/firebase-configuration/firebaseDatabaseServer";
-import Papa from "papaparse";
+'use server';
+import { NextRequest, NextResponse } from 'next/server';
+import Papa from 'papaparse';
 
-export const POST = async (req: NextRequest) => {
-    const body = await req.text();
-    const { roster } = JSON.parse(body);
+import {
+  resetDatabase,
+  type Student,
+} from '@/firebase-configuration/firebaseDatabaseServer';
 
-    const parseResult = Papa.parse<Student>(roster, {
-        header: true,
-        skipEmptyLines: true,
-        dynamicTyping: true,
-    });
+export async function POST(request: NextRequest) {
+  const body = await request.text();
+  const { roster } = JSON.parse(body);
 
-    if (parseResult.errors.length > 0) {
-        return NextResponse.json({ message: "Error parsing CSV", errors: parseResult.errors }, { status: 400 });
-    }
+  const parseResult = Papa.parse<Student>(roster, {
+    header: true,
+    skipEmptyLines: true,
+    dynamicTyping: true,
+  });
 
-    const students: Array<Student> = parseResult.data;
+  if (parseResult.errors.length > 0) {
+    return NextResponse.json(
+      { error: "Error parsing CSV" },
+      { status: 400 }
+    );
+  }
 
+  const students: Array<Student> = parseResult.data;
+
+  try {
     await resetDatabase(students);
-
-    return NextResponse.json({ message: "Reset successful" }, { status: 200 });
-};
+    return NextResponse.json({ status: 200 }, { status: 200 });
+  } catch (error) {
+    console.error('Failed to reset database:', error);
+    return NextResponse.json(
+      { error: 'Internal Server Error' },
+      { status: 500 }
+    );
+  }
+}

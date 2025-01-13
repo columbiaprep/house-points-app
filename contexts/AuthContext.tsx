@@ -1,9 +1,20 @@
-"use client";
+'use client';
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { GoogleAuthProvider, onAuthStateChanged, signInWithPopup, signOut, User } from '@firebase/auth';
+import {
+  GoogleAuthProvider,
+  onAuthStateChanged,
+  signInWithPopup,
+  signOut,
+  User,
+} from '@firebase/auth';
 import { useRouter } from 'next/navigation';
+
 import { auth } from '@/firebase-configuration/firebaseAppClient';
-import { getUserAccountType, checkIfUserExists, addToDb } from '@/firebase-configuration/firebaseDbAuthClient';
+import {
+  getUserAccountType,
+  checkIfUserExists,
+  addToDb,
+} from '@/firebase-configuration/firebaseDbAuthClient';
 
 interface AuthContextType {
   user: User | null;
@@ -17,7 +28,9 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [accountType, setAccountType] = useState<string | null>(null);
@@ -29,7 +42,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         setUser(user);
-        const accountType = user.email ? await getUserAccountType(user.email) : null;
+        const accountType = user.email
+          ? await getUserAccountType(user.email)
+          : null;
+
         setAccountType(accountType);
         if (user.photoURL) {
           setPhotoURL(user.photoURL);
@@ -42,6 +58,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         router.push('/auth');
       }
     });
+
     return () => unsubscribe();
   }, [router]);
 
@@ -59,17 +76,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setLoading(true);
 
     const provider = new GoogleAuthProvider();
+
     await signInWithPopup(auth, provider).catch((error) => {
       if (error.code === 'auth/popup-closed-by-user') {
         router.push('/auth');
       }
     });
     const user = auth.currentUser;
+
     if (user) {
       const exists = user.email ? await checkIfUserExists(user.email) : false;
+
       if (!exists) {
         if (user.email) {
-          await addToDb(user.email, user.uid, user.displayName || '', user.photoURL || '');
+          await addToDb(
+            user.email,
+            user.uid,
+            user.displayName || '',
+            user.photoURL || '',
+          );
         }
       }
     }
@@ -79,7 +104,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, accountType, loading, photoURL, setLoading, signOutUser, authWithGoogle }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        accountType,
+        loading,
+        photoURL,
+        setLoading,
+        signOutUser,
+        authWithGoogle,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
@@ -87,8 +122,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
 export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
+
   if (context === undefined) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
+
   return context;
 };

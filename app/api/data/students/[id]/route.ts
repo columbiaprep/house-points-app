@@ -1,13 +1,37 @@
-import { fetchIndividual } from "@/firebase-configuration/firebaseDatabaseServer";
-import { NextRequest, NextResponse } from "next/server";
+'use server';
+import { NextRequest, NextResponse } from 'next/server';
+import { fetchIndividual } from '@/firebase-configuration/firebaseDatabaseServer';
 
-export async function GET(req: NextRequest) {
+export async function GET(request: NextRequest) {
+  const id: string = request.nextUrl.pathname.split('/').pop() || '';
+
+  if (!id) {
+    return NextResponse.json(
+      { error: "ID is required" },
+      { status: 400 }
+    );
+  }
+
   try {
-    const id: string = req.nextUrl.pathname.split('/').pop() || '';
     const data = await fetchIndividual(id);
-    return NextResponse.json({ status: 200, data: data });
+
+    if (!data) {
+      return NextResponse.json(
+        { error: "Individual not found" },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json(
+      { data: data },
+      { status: 200 }
+    );
   } catch (error) {
     console.error('Error fetching individual:', error);
-    return NextResponse.json({ status: 500, message: 'Internal Server Error' });
+
+    return NextResponse.json(
+      { error: 'Internal Server Error' },
+      { status: 500 }
+    );
   }
 }

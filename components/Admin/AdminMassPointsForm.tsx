@@ -1,3 +1,4 @@
+import { writeToIndividualData } from '@/firebase-configuration/firebaseDb';
 import {
   Button,
   Card,
@@ -6,7 +7,6 @@ import {
   Select,
   SelectItem,
 } from '@nextui-org/react';
-import axios from 'axios';
 import { useState } from 'react';
 
 const AdminMassPointsForm = () => {
@@ -33,11 +33,7 @@ const AdminMassPointsForm = () => {
     const studentIds = fileContents.split('\n').map((line) => line.trim());
 
     studentIds.forEach(async (student) => {
-      await axios.post('api/data/students', {
-        points: points,
-        id: student,
-        category: category,
-      });
+      await writeToIndividualData(category, student, points);
     });
   };
 

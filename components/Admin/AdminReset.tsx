@@ -1,6 +1,5 @@
 import { Button } from '@nextui-org/button';
 import { Input } from '@nextui-org/input';
-import axios from 'axios';
 import React, { useState } from 'react';
 import { Spinner } from '@nextui-org/spinner';
 import {
@@ -11,6 +10,8 @@ import {
   ModalHeader,
   ModalBody,
 } from '@nextui-org/react';
+import Papa from 'papaparse';
+import { resetDatabase, Student } from '@/firebase-configuration/firebaseDb';
 
 const AdminReset = () => {
   const [fileContents, setFileContents] = useState<string>('');
@@ -35,13 +36,15 @@ const AdminReset = () => {
   const handleFullReset = async () => {
     setLoading(true);
     try {
-      const response = await axios.post('/api/data/houses/reset', {
-        roster: fileContents,
-      });
+      const parseResult = Papa.parse<Student>(fileContents, {
+        header: true,
+        skipEmptyLines: true,
+        dynamicTyping: true,
+    });
 
-      if (response.status !== 200) {
-        throw new Error(`Error: ${response.statusText}`);
-      }
+    const students: Array<Student> = parseResult.data;
+
+    await resetDatabase(students);
     } catch (error) {
       console.error('Failed to reset all house rosters:', error);
     }

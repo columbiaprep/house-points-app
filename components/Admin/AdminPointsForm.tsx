@@ -1,6 +1,5 @@
 'use client';
 import { useEffect, useState } from 'react';
-import axios from 'axios';
 import {
   Autocomplete,
   AutocompleteItem,
@@ -16,18 +15,17 @@ import { Card, CardBody } from '@nextui-org/card';
 import {
   type IndividualDocument,
   type HouseDocument,
-} from '@/firebase-configuration/firebaseDatabaseServer';
+  writeToIndividualData,
+  writeToHouseData,
+  fetchAllHouses,
+  fetchAllIndividuals,
+} from '@/firebase-configuration/firebaseDb';
 import { toTitleCase } from '@/config/globalFuncs';
 
-const getAllIndividualData = async () => {
+const getAllIndividualData = async (): Promise<IndividualDocument[] | null> => {
   try {
-    const response = await axios.get('/api/data/students');
-
-    if (response.status !== 200) {
-      throw new Error(`Error: ${response.statusText}`);
-    }
-
-    return response.data.data;
+    const data = await fetchAllIndividuals();
+    return data;
   } catch (error) {
     console.error('Failed to fetch individual data:', error);
 
@@ -35,15 +33,10 @@ const getAllIndividualData = async () => {
   }
 };
 
-const getAllHousesLeaderboardData = async () => {
+const getAllHousesLeaderboardData = async (): Promise<HouseDocument[] | null> => {
   try {
-    const response = await axios.get('/api/data/houses');
-
-    if (response.status !== 200) {
-      throw new Error(`Error: ${response.statusText}`);
-    }
-
-    return response.data.data;
+    const data = await fetchAllHouses();
+    return data;
   } catch (error) {
     console.error('Failed to fetch houses leaderboard data:', error);
 
@@ -66,21 +59,30 @@ const AdminPointsForm = () => {
   );
 
   useEffect(() => {
-    getAllIndividualData().then((data) => setIndividualData(data));
-    getAllHousesLeaderboardData().then((data) => setHousesData(data));
+    const fetchIndividualData = async () => {
+      const data = await getAllIndividualData();
+      if (data) {
+        setIndividualData(data);
+      }
+    };
+    const fetchHousesData = async () => {
+      const data = await getAllHousesLeaderboardData();
+      if (data) {
+        setHousesData(data);
+      }
+    };
+    const fetchData = async () => {
+      await fetchHousesData();
+      await fetchIndividualData();
+    };
+    fetchData();
   }, []);
+
 
   const handleAddStudentPoints = async () => {
     try {
-      const response = await axios.post('api/data/students/', {
-        points: pointsToAdd,
-        id: selectedStudent,
-        category: selectedCategory,
-      });
+      await writeToIndividualData(selectedCategory, selectedStudent, pointsToAdd);
 
-      if (response.status !== 200) {
-        throw new Error(`Error: ${response.statusText}`);
-      }
       setMessage({ text: 'Points added successfully!', type: 'success' });
     } catch (error) {
       setMessage({ text: 'Failed to add points.', type: 'error' });
@@ -90,15 +92,8 @@ const AdminPointsForm = () => {
 
   const handleAddHousePoints = async () => {
     try {
-      const response = await axios.post('api/data/houses', {
-        points: pointsToAdd,
-        category: selectedCategory,
-        id: selectedHouse,
-      });
+      await writeToHouseData(selectedCategory, selectedHouse, pointsToAdd);
 
-      if (response.status !== 200) {
-        throw new Error(`Error: ${response.statusText}`);
-      }
       setMessage({ text: 'Points added successfully!', type: 'success' });
     } catch (error) {
       setMessage({ text: 'Failed to add points.', type: 'error' });
@@ -116,7 +111,6 @@ const AdminPointsForm = () => {
     if (addBy === 'house') {
       handleAddHousePoints();
     }
-    // setTimeout(() => window.location.reload(), 1000);
   };
 
   return (

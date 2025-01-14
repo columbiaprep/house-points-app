@@ -9,12 +9,12 @@ import {
 } from '@firebase/auth';
 import { useRouter } from 'next/navigation';
 
-import { auth } from '@/firebase-configuration/firebaseAppClient';
+import { auth } from '@/firebase-configuration/firebaseApp';
 import {
   getUserAccountType,
   checkIfUserExists,
   addToDb,
-} from '@/firebase-configuration/firebaseDbAuthClient';
+} from '@/firebase-configuration/firebaseDb';
 
 interface AuthContextType {
   user: User | null;

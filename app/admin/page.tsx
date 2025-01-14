@@ -10,10 +10,11 @@ export default function AdminPage() {
   const auth = useAuth();
   const router = useRouter();
 
-  auth.setLoading(true);
-  if (!auth.user || auth.accountType !== 'admin') {
-    auth.setLoading(false);
-    router.push('/dashboard');
+  const accountType = auth.accountType;
+  console.log(accountType)
+  
+  if (accountType != 'admin') {
+    // router.push('/dashboard');
   }
 
   return (

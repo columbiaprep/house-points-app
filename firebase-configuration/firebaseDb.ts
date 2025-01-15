@@ -34,10 +34,14 @@ export interface Student {
 
 // House Data
 
-export async function fetchAllIndividuals(): Promise<Array<IndividualDocument>> {
+export async function fetchAllIndividuals(): Promise<
+  Array<IndividualDocument>
+> {
   const individualsQuery = await getDocs(collection(db, 'individuals'));
+
   return individualsQuery.docs.map((doc) => {
     const data = doc.data();
+
     return {
       id: doc.id,
       name: data.name,
@@ -48,13 +52,14 @@ export async function fetchAllIndividuals(): Promise<Array<IndividualDocument>> 
       sportsTeamPts: data.sportsTeamPts,
     } as IndividualDocument;
   });
-  }
+}
 
 export async function fetchAllHouses(): Promise<Array<HouseDocument>> {
   const housesQuery = await getDocs(collection(db, 'houses'));
 
   return housesQuery.docs.map((doc) => {
     const data = doc.data();
+
     return {
       id: doc.id,
       name: data.name,
@@ -153,7 +158,6 @@ export async function resetDatabase(roster: Array<Student>) {
   await Promise.all(batch);
 }
 
-
 // Authentication Data
 async function getAdmins() {
   const adminsQuery = await getDocs(collection(db, 'admins'));
@@ -197,7 +201,9 @@ export async function checkIfUserExists(email: string) {
   return userDocSnapshot.exists();
 }
 
-export async function getUserAccountType(email: string): Promise<string | null> {
+export async function getUserAccountType(
+  email: string,
+): Promise<string | null> {
   const userDoc = doc(db, 'users', email);
   const userDocSnapshot = await getDoc(userDoc);
 
@@ -208,4 +214,17 @@ export async function getUserAccountType(email: string): Promise<string | null> 
   }
 
   return null;
+}
+
+export async function getUserPhoto(email: string): Promise<string> {
+  const userDoc = doc(db, 'users', email);
+  const userDocSnapshot = await getDoc(userDoc);
+
+  if (userDocSnapshot.exists()) {
+    const data = userDocSnapshot.data();
+
+    return data?.photoURL;
+  }
+
+  return '';
 }

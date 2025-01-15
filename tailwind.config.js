@@ -1,4 +1,5 @@
 const { nextui } = require("@nextui-org/react");
+const { Quicksand, Ledger } = require("next/font/google");
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
@@ -8,11 +9,39 @@ module.exports = {
     './node_modules/@nextui-org/theme/dist/**/*.{js,ts,jsx,tsx}'
   ],
   darkMode: "class",
+  theme: {
+    extend: {
+      // fontFamily: {
+      //   sans: [Quicksand, "sans-serif"],
+      // }
+    }
+  },
   plugins: [
     nextui({
+      defaultTheme: "light",
+      themes: {
+        light: {
+          colors: {
+            foreground: "rgb(4, 11, 15)",
+            background: "rgb(243, 243, 243)",
+          },
+          layout: {
+            fontSize: {
+              small: "14px",
+              medium: "16px",
+              large: "18px",
+            },
+            
+          }
+        },
+        dark: {
+          colors: {
+            foreground: "rgb(202, 203, 203)",
+            background: "rgb(4, 11, 15)",
+          }
+        }
+      },
       colors: {
-        background: "rgb(4, 11, 15)",
-        foreground: "rgb(211, 213, 215)",
         primary: {
           50: "rgb(12, 116, 174)",
           100: "rgb(15, 127, 189)",
@@ -25,10 +54,9 @@ module.exports = {
           800: "rgb(108, 172, 204)",
           900: "rgb(108, 172, 204)",
           DEFAULT: "rgb(20, 155, 235)",
-          foreground: "rgb(211, 213, 215)",
         },
         focus: "rgb(20, 155, 235)",
-      },
+      }, 
       layout: {
         disabledOpacity: "0.3",
         radius: {

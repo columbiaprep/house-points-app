@@ -7,6 +7,7 @@ import {
   DropdownMenu,
   DropdownItem,
   Image,
+  Switch,
 } from '@nextui-org/react';
 
 import { useAuth } from '@/contexts/AuthContext';
@@ -55,6 +56,17 @@ const UserProfile = () => {
           onPress={async () => await userData.signOutUser()}
         >
           Logout
+        </DropdownItem>
+        <DropdownItem key="dark-mode" closeOnSelect={false}>
+          <Switch
+            checked={userData.theme === userData.theme}
+            size="sm"
+            onChange={(e) =>
+              userData.changeTheme(e.target.checked ? 'dark' : 'light')
+            }
+          >
+            Toggle Dark Mode
+          </Switch>
         </DropdownItem>
       </DropdownMenu>
     </Dropdown>

@@ -11,10 +11,9 @@ export default function AdminPage() {
   const router = useRouter();
 
   const accountType = auth.accountType;
-  console.log(accountType)
   
   if (accountType != 'admin') {
-    // router.push('/dashboard');
+    router.push('/dashboard');
   }
 
   return (

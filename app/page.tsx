@@ -1,8 +1,9 @@
-"use client"
-import { Snippet } from "@nextui-org/snippet";
-import { Code } from "@nextui-org/code";
-import { Shout } from "@/components/shout";
-import { AchievementsContainer } from "@/components/achievements"
+'use client';
+import { Snippet } from '@nextui-org/snippet';
+import { Code } from '@nextui-org/code';
+
+import { Shout } from '@/components/shout';
+import { AchievementsContainer } from '@/components/achievements';
 
 export default function Home() {
   return (

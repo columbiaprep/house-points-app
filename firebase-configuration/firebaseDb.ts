@@ -10,6 +10,7 @@ export interface IndividualDocument {
   beingGoodPts: number;
   attendingEventsPts: number;
   sportsTeamPts: number;
+  totalPoints: number;
   id: string;
 }
 
@@ -17,6 +18,8 @@ export interface HouseDocument {
   name: string;
   beingGoodPts: number;
   attendingEventsPts: number;
+  sportsTeamPts: number;
+  totalPoints: number;
   id: string;
 }
 
@@ -50,6 +53,7 @@ export async function fetchAllIndividuals(): Promise<
       beingGoodPts: data.beingGoodPts,
       attendingEventsPts: data.attendingEventsPts,
       sportsTeamPts: data.sportsTeamPts,
+      totalPoints: data.beingGoodPts + data.attendingEventsPts + data.sportsTeamPts,
     } as IndividualDocument;
   });
 }
@@ -65,15 +69,27 @@ export async function fetchAllHouses(): Promise<Array<HouseDocument>> {
       name: data.name,
       beingGoodPts: data.beingGoodPts,
       attendingEventsPts: data.attendingEventsPts,
+      sportsTeamPts: data.sportsTeamPts,
+      totalPoints: data.beingGoodPts + data.attendingEventsPts + data.sportsTeamPts,
     } as HouseDocument;
   });
 }
 
 export async function fetchIndividual(id: string): Promise<IndividualDocument> {
   const individualsQuery = await getDocs(collection(db, 'individuals'));
-  const individualsData = individualsQuery.docs.map(
-    (doc) => ({ id: doc.id, ...doc.data() }) as IndividualDocument,
-  );
+  const individualsData = individualsQuery.docs.map((doc) => {
+    const data = doc.data();
+    return {
+      id: doc.id,
+      name: data.name,
+      grade: data.grade,
+      house: data.house,
+      beingGoodPts: data.beingGoodPts,
+      attendingEventsPts: data.attendingEventsPts,
+      sportsTeamPts: data.sportsTeamPts,
+      totalPoints: data.beingGoodPts + data.attendingEventsPts + data.sportsTeamPts,
+    } as IndividualDocument;
+  });
   const individual = individualsData.find((individual) => individual.id === id);
 
   if (!individual) {

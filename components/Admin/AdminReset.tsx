@@ -11,6 +11,7 @@ import {
   ModalBody,
 } from '@nextui-org/react';
 import Papa from 'papaparse';
+
 import { resetDatabase, Student } from '@/firebase-configuration/firebaseDb';
 
 const AdminReset = () => {
@@ -40,11 +41,11 @@ const AdminReset = () => {
         header: true,
         skipEmptyLines: true,
         dynamicTyping: true,
-    });
+      });
 
-    const students: Array<Student> = parseResult.data;
+      const students: Array<Student> = parseResult.data;
 
-    await resetDatabase(students);
+      await resetDatabase(students);
     } catch (error) {
       console.error('Failed to reset all house rosters:', error);
     }

@@ -31,15 +31,15 @@ export default function RootLayout({
       <head />
       <body
         className={clsx(
-          'min-h-screen bg-background font-sans antialiased',
+          'min-h-screen w-full font-sans antialiased',
           fontSans.variable,
         )}
       >
         <AuthProvider>
           <Providers themeProps={{ attribute: 'class' }}>
-            <div className="relative flex flex-col h-screen">
+            <div className="relative w-full flex flex-col h-screen">
               <Navbar />
-              <main className="container mx-auto max-w-7xl pt-16 px-6 flex-grow">
+              <main className="bg-background text-foreground container pt-16 px-6 flex-grow max-w-full">
                 {children}
               </main>
               <footer className="w-full flex items-center justify-center py-3">

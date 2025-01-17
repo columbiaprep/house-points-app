@@ -17,14 +17,17 @@ const AuthPage = () => {
     <>
       <div className="flex items-center justify-center h-screen bg-background">
         <Card
-          className="bg-gray-800"
+          className="bg-foreground"
           style={{ minWidth: '400px', padding: '20px' }}
         >
-          <h1 style={{ textAlign: 'center', marginBottom: '20px' }}>
+          <h1
+            className="text-background"
+            style={{ textAlign: 'center', marginBottom: '20px' }}
+          >
             Auth Page
           </h1>
           <Button
-            color="primary"
+            color="secondary"
             style={{ width: '100%', marginBottom: '20px' }}
             onPress={auth.authWithGoogle}
           >

@@ -24,6 +24,8 @@ interface AuthContextType {
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
   signOutUser: () => Promise<void>;
   authWithGoogle: () => Promise<void>;
+  theme: string;
+  changeTheme: (theme: string) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -35,21 +37,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [loading, setLoading] = useState(true);
   const [accountType, setAccountType] = useState<string | null>(null);
   const [photoURL, setPhotoURL] = useState<string>('');
+  const [theme, setTheme] = useState<string>('light');
   const router = useRouter();
 
   useEffect(() => {
     setLoading(true);
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
+      if (user && user.email) {
+        if (user.photoURL) {
+          setPhotoURL(user.photoURL);
+        }
         setUser(user);
         const accountType = user.email
           ? await getUserAccountType(user.email)
           : null;
 
         setAccountType(accountType);
-        if (user.photoURL) {
-          setPhotoURL(user.photoURL);
-        }
+
         setLoading(false);
       } else {
         setUser(null);
@@ -102,6 +106,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     router.push('/dashboard');
     setLoading(false);
   };
+  // Change the theme of the app
+  const changeTheme = (theme: string) => {
+    setTheme(theme);
+    const main = document.querySelector('main');
+
+    main?.classList.remove('dark', 'light');
+    main?.classList.add(theme);
+  };
+
+  useEffect(() => {
+    changeTheme(theme);
+  }, [theme]);
 
   return (
     <AuthContext.Provider
@@ -113,6 +129,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         setLoading,
         signOutUser,
         authWithGoogle,
+        theme,
+        changeTheme,
       }}
     >
       {children}

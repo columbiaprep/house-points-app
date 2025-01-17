@@ -1,4 +1,3 @@
-import { writeToIndividualData } from '@/firebase-configuration/firebaseDb';
 import {
   Button,
   Card,
@@ -8,6 +7,8 @@ import {
   SelectItem,
 } from '@nextui-org/react';
 import { useState } from 'react';
+
+import { writeToIndividualData } from '@/firebase-configuration/firebaseDb';
 
 const AdminMassPointsForm = () => {
   const [fileContents, setFileContents] = useState<string>('');
@@ -38,10 +39,10 @@ const AdminMassPointsForm = () => {
   };
 
   return (
-    <div className="flex w-[900px]">
+    <div className="flex">
       <Card
         isBlurred
-        className="point-form-card border-none bg-background/60 dark:bg-default-100/50 shadow-lg p-6 w-3/6"
+        className="point-form-card border-none shadow-lg p-6 w-5/6 h-full"
       >
         <CardBody>
           <div className="flex flex-col gap-2">

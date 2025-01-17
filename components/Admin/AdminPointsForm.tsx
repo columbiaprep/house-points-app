@@ -25,6 +25,7 @@ import { toTitleCase } from '@/config/globalFuncs';
 const getAllIndividualData = async (): Promise<IndividualDocument[] | null> => {
   try {
     const data = await fetchAllIndividuals();
+
     return data;
   } catch (error) {
     console.error('Failed to fetch individual data:', error);
@@ -33,9 +34,12 @@ const getAllIndividualData = async (): Promise<IndividualDocument[] | null> => {
   }
 };
 
-const getAllHousesLeaderboardData = async (): Promise<HouseDocument[] | null> => {
+const getAllHousesLeaderboardData = async (): Promise<
+  HouseDocument[] | null
+> => {
   try {
     const data = await fetchAllHouses();
+
     return data;
   } catch (error) {
     console.error('Failed to fetch houses leaderboard data:', error);
@@ -61,12 +65,14 @@ const AdminPointsForm = () => {
   useEffect(() => {
     const fetchIndividualData = async () => {
       const data = await getAllIndividualData();
+
       if (data) {
         setIndividualData(data);
       }
     };
     const fetchHousesData = async () => {
       const data = await getAllHousesLeaderboardData();
+
       if (data) {
         setHousesData(data);
       }
@@ -75,13 +81,17 @@ const AdminPointsForm = () => {
       await fetchHousesData();
       await fetchIndividualData();
     };
+
     fetchData();
   }, []);
 
-
   const handleAddStudentPoints = async () => {
     try {
-      await writeToIndividualData(selectedCategory, selectedStudent, pointsToAdd);
+      await writeToIndividualData(
+        selectedCategory,
+        selectedStudent,
+        pointsToAdd,
+      );
 
       setMessage({ text: 'Points added successfully!', type: 'success' });
     } catch (error) {
@@ -114,10 +124,10 @@ const AdminPointsForm = () => {
   };
 
   return (
-    <div className="flex w-[900px]">
+    <div className="flex">
       <Card
         isBlurred
-        className="point-form-card border-none bg-background/60 dark:bg-default-100/50 shadow-lg p-6 w-3/6"
+        className="point-form-card border-none bg-background/60 dark:bg-default-100/50 shadow-lg p-6 w-5/6"
       >
         <CardBody>
           <div className="flex flex-col gap-6">
@@ -210,7 +220,7 @@ const AdminPointsForm = () => {
                 />
               </div>
             )}
-            <Button className="mt-6 w-full" onClick={handleAddPoints}>
+            <Button className="mt-6 w-full" onPress={handleAddPoints}>
               Add Points
             </Button>
           </div>

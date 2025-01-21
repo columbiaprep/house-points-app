@@ -38,13 +38,52 @@ const AdminReset = () => {
     const handleFullReset = async () => {
         setLoading(true);
         try {
-            const parseResult = Papa.parse<Student>(fileContents, {
+            const parseResult = Papa.parse(fileContents, {
                 header: true,
                 skipEmptyLines: true,
                 dynamicTyping: true,
             });
 
-            const students: Array<Student> = parseResult.data;
+            const headers: string[] = ["STUDENT: First Name",	"STUDENT: Last Name",	"STUDENT: Email 1",	"Class", "Grade"]
+            const students: Array<Student> = parseResult.data.map((row: any) => {
+                return {
+                    id: row[headers[2]],
+                    name: `${row[headers[0]]} ${row[headers[1]]}`,
+                    firstName: row[headers[0]],
+                    lastName: row[headers[1]],
+                    email: row[headers[2]],
+                    house: row[headers[3]],
+                    grade: row[headers[4]],
+                };
+            });
+            students.forEach((student) => {
+                if (student.house.includes("Green")) {
+                    student.house = "Green Ivy";
+                }
+                if (student.house.includes("Red")) {
+                    student.house = "Red Phoenix";
+                }
+                if (student.house.includes("Blue")) {
+                    student.house = "Blue Thunder";
+                }
+                if (student.house.includes("Gold")) {
+                    student.house = "Gold Hearts";
+                }
+                if (student.house.includes("Orange")) {
+                    student.house = "Orange Supernova";
+                }
+                if (student.house.includes("Purple")) {
+                    student.house = "Purple Reign";
+                }
+                if (student.house.includes("Silver")) {
+                    student.house = "Silver Knights";
+                }
+                if (student.house.includes("Pink")) {
+                    student.house = "Pink Panthers";
+                }
+            });
+            
+            
 
             await resetDatabase(students);
         } catch (error) {

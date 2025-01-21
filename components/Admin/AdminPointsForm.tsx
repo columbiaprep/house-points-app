@@ -230,15 +230,13 @@ const AdminPointsForm = () => {
                                         )
                                     }
                                 >
-                                    <SelectItem key="beingGoodPts">
-                                        Caught Being Good
-                                    </SelectItem>
-                                    <SelectItem key="attendingEventsPts">
-                                        Attending Events
-                                    </SelectItem>
-                                    <SelectItem key="sportsTeamPts">
-                                        Sports Team
-                                    </SelectItem>
+                                    {Object.entries(pointsCategories).map(
+                                        ([key, value]) => (
+                                            <SelectItem key={key} value={key}>
+                                                {value.name}
+                                            </SelectItem>
+                                        ),
+                                    )}
                                 </Select>
 
                                 <Input

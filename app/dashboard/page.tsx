@@ -23,7 +23,7 @@ const Dashboard = () => {
                 <CardBody>
                     {/* Buttons with links, different for account tiers */}
                     <>
-                        {accountType == "admin" && (
+                        {accountType == "student" && (
                             <div className="flex flex-row gap-2">
                                 <Card className="p-6 h-auto">
                                     <h2 className="text-xl font-bold">
@@ -58,6 +58,14 @@ const Dashboard = () => {
                                     </Button>
                                 </div>
                             </div>
+                        )}
+                        {accountType == "admin" && (
+                            <Button
+                                color="primary"
+                                onPress={() => router.push("/admin")}
+                            >
+                                Admin Dashboard
+                            </Button>
                         )}
                     </>
                 </CardBody>

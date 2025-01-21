@@ -1,26 +1,20 @@
-"use client";
 import { collection, doc, getDoc, getDocs, setDoc } from "@firebase/firestore";
 
+import { pointsCategories } from "./pointsCategoriesConfig";
 import { db } from "./firebaseApp";
 
 export interface IndividualDocument {
+    id: string;
     name: string;
     grade: number;
     house: string;
-    beingGoodPts: number;
-    attendingEventsPts: number;
-    sportsTeamPts: number;
-    totalPoints: number;
-    id: string;
+    [key: string]: any; // Allows for dynamic point categories
 }
 
 export interface HouseDocument {
-    name: string;
-    beingGoodPts: number;
-    attendingEventsPts: number;
-    sportsTeamPts: number;
-    totalPoints: number;
     id: string;
+    name: string;
+    [key: string]: any; // Allows for dynamic point categories
 }
 
 export interface FirestoreDataProps {
@@ -35,8 +29,7 @@ export interface Student {
     house: string;
 }
 
-// House Data
-
+// Fetch all individuals
 export async function fetchAllIndividuals(): Promise<
     Array<IndividualDocument>
 > {
@@ -47,20 +40,12 @@ export async function fetchAllIndividuals(): Promise<
 
         return {
             id: doc.id,
-            name: data.name,
-            grade: data.grade,
-            house: data.house,
-            beingGoodPts: data.beingGoodPts,
-            attendingEventsPts: data.attendingEventsPts,
-            sportsTeamPts: data.sportsTeamPts,
-            totalPoints:
-                data.beingGoodPts +
-                data.attendingEventsPts +
-                data.sportsTeamPts,
+            ...data,
         } as IndividualDocument;
     });
 }
 
+// Fetch all houses
 export async function fetchAllHouses(): Promise<Array<HouseDocument>> {
     const housesQuery = await getDocs(collection(db, "houses"));
 
@@ -69,120 +54,109 @@ export async function fetchAllHouses(): Promise<Array<HouseDocument>> {
 
         return {
             id: doc.id,
-            name: data.name,
-            beingGoodPts: data.beingGoodPts,
-            attendingEventsPts: data.attendingEventsPts,
-            sportsTeamPts: data.sportsTeamPts,
-            totalPoints:
-                data.beingGoodPts +
-                data.attendingEventsPts +
-                data.sportsTeamPts,
+            ...data,
         } as HouseDocument;
     });
 }
 
+// Fetch individual
 export async function fetchIndividual(id: string): Promise<IndividualDocument> {
-    const individualsQuery = await getDocs(collection(db, "individuals"));
-    const individualsData = individualsQuery.docs.map((doc) => {
-        const data = doc.data();
+    const docRef = doc(db, "individuals", id);
+    const docSnap = await getDoc(docRef);
 
-        return {
-            id: doc.id,
-            name: data.name,
-            grade: data.grade,
-            house: data.house,
-            beingGoodPts: data.beingGoodPts,
-            attendingEventsPts: data.attendingEventsPts,
-            sportsTeamPts: data.sportsTeamPts,
-            totalPoints:
-                data.beingGoodPts +
-                data.attendingEventsPts +
-                data.sportsTeamPts,
-        } as IndividualDocument;
-    });
-    const individual = individualsData.find(
-        (individual) => individual.id === id,
-    );
-
-    if (!individual) {
-        throw new Error(`Individual with id ${id} not found`);
+    if (!docSnap.exists()) {
+        throw new Error(`No individual found with id: ${id}`);
     }
+
+    const data = docSnap.data();
+    const individual: IndividualDocument = {
+        id: docSnap.id,
+        name: data.name,
+        grade: data.grade,
+        house: data.house,
+    };
+
+    Object.values(pointsCategories).forEach((category) => {
+        individual[category.key] = data[category.key] || 0;
+    });
+
+    individual.totalPoints = Object.values(pointsCategories).reduce(
+        (total, category) => total + (individual[category.key] || 0),
+        0,
+    );
 
     return individual;
 }
 
+// Write to individual data
 export async function writeToIndividualData(
     ptsCategory: string,
     id: string,
     points: number,
 ) {
-    let updateData = {};
-
-    switch (ptsCategory) {
-        case "beingGoodPts":
-            updateData = { beingGoodPts: points };
-            break;
-        case "attendingEventsPts":
-            updateData = { attendingEventsPts: points };
-            break;
-        default:
-            throw new Error(`Unknown points category: ${ptsCategory}`);
+    if (
+        !Object.values(pointsCategories).some(
+            (category) => category.key === ptsCategory,
+        )
+    ) {
+        throw new Error(`Unknown points category: ${ptsCategory}`);
     }
+
+    const updateData = { [ptsCategory]: points };
+
     await setDoc(doc(db, "individuals", id), updateData, { merge: true });
 }
 
+// Write to house data
 export async function writeToHouseData(
     ptsCategory: string,
     id: string,
     points: number,
 ) {
-    let updateData = {};
-
-    switch (ptsCategory) {
-        case "beingGoodPts":
-            updateData = { beingGoodPts: points };
-            break;
-        case "attendingEventsPts":
-            updateData = { attendingEventsPts: points };
-            break;
-        default:
-            throw new Error(`Unknown points category: ${ptsCategory}`);
+    if (
+        !Object.values(pointsCategories).some(
+            (category) => category.key === ptsCategory,
+        )
+    ) {
+        throw new Error(`Unknown points category: ${ptsCategory}`);
     }
+
+    const updateData = { [ptsCategory]: points };
+
     await setDoc(doc(db, "houses", id), updateData, { merge: true });
 }
 
+// Get saved house roster data
 export async function getSavedHouseRosterData(): Promise<Array<Student>> {
     const studentsQuery = await getDocs(collection(db, "futureHouseRoster"));
 
     return studentsQuery.docs.map((doc) => {
         const data = doc.data();
 
-        return {
-            id: doc.id,
-            name: data.name,
-            grade: data.grade,
-            house: data.house,
-        } as Student;
+        return data as Student;
     });
 }
 
+// Reset database
 export async function resetDatabase(roster: Array<Student>) {
     const batch: Array<Promise<void>> = [];
 
     roster.forEach((student) => {
         const studentDoc = doc(db, "individuals", student.id);
 
-        batch.push(
-            setDoc(studentDoc, {
-                name: student.name,
-                grade: student.grade,
-                house: student.house,
-                beingGoodPts: 0,
-                attendingEventsPts: 0,
-                sportsTeamPts: 0,
-            }),
-        );
+        const resetData: { [key: string]: any } = {
+            name: student.name,
+            grade: student.grade,
+            house: student.house,
+        };
+
+        Object.values(pointsCategories).forEach((category) => {
+            resetData[category.key] = 0;
+        });
+
+        batch.push(setDoc(studentDoc, resetData));
     });
+
     await Promise.all(batch);
 }
 

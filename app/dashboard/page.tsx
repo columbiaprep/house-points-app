@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 
 import { AchievementsContainer } from "@/components/achievements";
 import { useAuth } from "@/contexts/AuthContext";
+import HousePoints from "@/components/house_points";
 
 const Dashboard = () => {
     const user = useAuth();
@@ -48,6 +49,7 @@ const Dashboard = () => {
                                     </p>
                                 </Card>
                                 <AchievementsContainer />
+                                <HousePoints />
                                 <div className="flex flex-wrap flex-row gap-2">
                                     <Button
                                         className="w-max"

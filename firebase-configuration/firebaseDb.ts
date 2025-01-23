@@ -1,4 +1,4 @@
-import { collection, doc, getDoc, getDocs, setDoc } from "@firebase/firestore";
+import { collection, doc, getDoc, getDocs, orderBy, query, setDoc } from "@firebase/firestore";
 
 import { pointsCategories } from "./pointsCategoriesConfig";
 import { db } from "./firebaseApp";
@@ -14,6 +14,7 @@ export interface IndividualDocument {
 export interface HouseDocument {
     id: string;
     name: string;
+    totalPoints: number;
     [key: string]: any; // Allows for dynamic point categories
 }
 
@@ -47,17 +48,17 @@ export async function fetchAllIndividuals(): Promise<
 
 // Fetch all houses
 export async function fetchAllHouses(): Promise<Array<HouseDocument>> {
-    const housesQuery = await getDocs(collection(db, "houses"));
-
-    return housesQuery.docs.map((doc) => {
-        const data = doc.data();
-
-        return {
-            id: doc.id,
-            ...data,
-        } as HouseDocument;
+    const housesQuery = query(collection(db, 'houses'), orderBy('totalPoints', 'desc'));
+    const querySnapshot = await getDocs(housesQuery);
+  
+    return querySnapshot.docs.map((doc) => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        ...data,
+      } as HouseDocument;
     });
-}
+  }
 
 // Fetch individual
 export async function fetchIndividual(id: string): Promise<IndividualDocument> {

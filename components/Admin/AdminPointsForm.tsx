@@ -21,7 +21,7 @@ import {
     fetchAllIndividuals,
 } from "@/firebase-configuration/firebaseDb";
 import { toTitleCase } from "@/config/globalFuncs";
-import { pointsCategories } from "@/firebase-configuration/pointsCategoriesConfig";
+import { pointsCategories } from "@/firebase-configuration/firebaseDb";
 
 const getAllIndividualData = async (): Promise<IndividualDocument[] | null> => {
     try {
@@ -110,7 +110,7 @@ const AdminPointsForm = () => {
                 pointsToAdd,
             );
 
-            setMessage({ text: "Points added successfully!", type: "success" });
+            setMessage({ text: `Points added successfully! ${selectedCategory}`, type: "success" });
         } catch (error) {
             setMessage({ text: "Failed to add points.", type: "error" });
             console.error("Failed to add points:", error);
@@ -127,6 +127,12 @@ const AdminPointsForm = () => {
         if (addBy === "house") {
             handleAddHousePoints();
         }
+        // nullify all inputs
+        setSelectedStudent("");
+        setSelectedHouse("");
+        setPointsToAdd(0);
+        setSelectedCategory("");
+        setAddBy("student");
     };
 
     return (
@@ -176,7 +182,7 @@ const AdminPointsForm = () => {
                                     label="Select a category"
                                     onSelectionChange={(value) =>
                                         setSelectedCategory(
-                                            value.currentKey as string,
+                                            pointsCategories[value.currentKey as unknown as number].key
                                         )
                                     }
                                 >
@@ -226,7 +232,7 @@ const AdminPointsForm = () => {
                                     label="Select a category"
                                     onSelectionChange={(value) =>
                                         setSelectedCategory(
-                                            value.currentKey as string,
+                                            pointsCategories[value.currentKey as unknown as number].key
                                         )
                                     }
                                 >

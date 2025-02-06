@@ -9,7 +9,7 @@ import {
 import { useState } from "react";
 
 import { writeToIndividualData } from "@/firebase-configuration/firebaseDb";
-import { pointsCategories } from "@/firebase-configuration/pointsCategoriesConfig";
+import { pointsCategories } from "@/firebase-configuration/firebaseDb";
 
 const AdminMassPointsForm = () => {
     const [fileContents, setFileContents] = useState<string>("");

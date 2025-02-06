@@ -1,27 +1,18 @@
-/**
- * Import function triggers from their respective submodules:
- *
- * import {onCall} from "firebase-functions/v2/https";
- * import {onDocumentWritten} from "firebase-functions/v2/firestore";
- *
- * See a full list of supported triggers at https://firebase.google.com/docs/functions
- */
-// Start writing functions
-// https://firebase.google.com/docs/functions/typescript
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
-import * as simpleGit from "simple-git";
-import * as fs from "fs";
-import * as path from "path";
 import {onSchedule} from "firebase-functions/v2/scheduler";
-
-
-const git = simpleGit.default();
 
 admin.initializeApp();
 
-// Get data from firestore function:
+interface IndividualDocument {
+  id: string;
+  name: string;
+  grade: number;
+  house: string;
+  totalPoints: number;
+}
 
+// Get data from Firestore function:
 async function getDataFromFirestore() {
   const db = admin.firestore();
   const houses = await db.collection("houses").get();
@@ -34,20 +25,40 @@ async function getDataFromFirestore() {
   return data;
 }
 
-// Firebase function to get data from firestore and write it to a file:
-// Need personal access token to push to github
-export const generateJSONFile = onSchedule("every 3 days", async () => {
+// Function to set leaderboards
+async function setLeaderboardsLogic() {
+  const db = admin.firestore();
   try {
+    functions.logger.info("Setting leaderboards");
     const data = await getDataFromFirestore();
-    const filePath = path.join(__dirname, "data.json");
-    fs.writeFileSync(filePath, JSON.stringify(data));
-    await git.add(filePath);
-    await git.commit("Updated data.json");
-    await git.push("origin", "main");
-    await git.mergeFromTo("origin/main", "origin/production");
-    await git.push("origin", "production");
-    functions.logger.log("Successfully updated data.json");
+    // set leaderboards for each house's top 4 individuals
+    // and top 4 individuals overall
+    const topOverall = data.individuals
+      .filter((individual) => individual.totalPoints > 0)
+      .sort((a, b) => b.totalPoints - a.totalPoints)
+      // tiebreaker logic
+      .filter((individual, index, arr) => index < 4)
+      .slice(0, 4);
+    functions.logger.info("Wrote top overall leaderboard.... Writing to database now....");
+    const topOverallRef = db.collection("leaderboards").doc("topOverall");
+    topOverallRef.set({topOverall});
+    functions.logger.info("Succesfully wrote top overall leaderboard to database... Writing house leaderboards now....");
+    data.houses.forEach((house) => {
+      const houseIndividuals: Array<IndividualDocument> = data.individuals.filter((individual) => individual.house === house.name) as IndividualDocument[];
+      const houseLeaderboard = houseIndividuals.sort((a, b) => b.totalPoints - a.totalPoints).slice(0, 4);
+      const houseLeaderboardRef = db.collection("leaderboards").doc(house.name);
+
+      houseLeaderboardRef.set({houseLeaderboard});
+    });
+    functions.logger.info("Successfully wrote house leaderboards to database... Completing operation now...");
+    functions.logger.info("Operation completed successfully - Created by Sam Zack");
   } catch (error) {
     functions.logger.error(error);
   }
+}
+
+// Scheduled function to set leaderboards
+export const setLeaderboards = onSchedule("every sunday 23:59", async () => {
+  await setLeaderboardsLogic();
 });
+

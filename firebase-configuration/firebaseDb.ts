@@ -1,6 +1,4 @@
 import { collection, doc, getDoc, getDocs, setDoc } from "@firebase/firestore";
-
-import { pointsCategories } from "./pointsCategoriesConfig";
 import { db } from "./firebaseApp";
 
 export interface IndividualDocument {
@@ -28,6 +26,29 @@ export interface Student {
     grade: number;
     house: string;
 }
+
+export async function getPointsData(email: string) {
+    const userDocRef = doc(db, "individuals", email);
+    const userPoints = await getDoc(userDocRef);
+    const myHouseLb = doc(db, "leaderboards", userPoints.data()?.house);
+    const houseLb = await getDoc(myHouseLb);
+    const topOverallLb = doc(db, "leaderboards", "topOverall");
+    const topOverall = await getDoc(topOverallLb);
+    return {
+        userPoints: userPoints.data(),
+        houseLb: houseLb.data(),
+        topOverall: topOverall.data(),
+    };
+}
+
+export let pointsCategories: any[] = [];
+
+async function initializePointsCategories() {
+    const pointsCategoriesSnapshot = await getDocs(collection(db, "pointCategories"));
+    pointsCategories = pointsCategoriesSnapshot.docs.map(doc => doc.data());
+}
+
+initializePointsCategories();
 
 // Fetch all individuals
 export async function fetchAllIndividuals(): Promise<
@@ -94,17 +115,32 @@ export async function writeToIndividualData(
     id: string,
     points: number,
 ) {
-    if (
-        !Object.values(pointsCategories).some(
-            (category) => category.key === ptsCategory,
-        )
-    ) {
-        throw new Error(`Unknown points category: ${ptsCategory}`);
+    // Fetch the existing individual document
+    const individualDocRef = doc(db, "individuals", id);
+    const individualDoc = await getDoc(individualDocRef);
+
+    let updateData = { [ptsCategory]: points };
+
+    if (individualDoc.exists()) {
+        const individualData = individualDoc.data();
+        // Check if the point category exists in the document
+        if (individualData && !individualData.hasOwnProperty(ptsCategory)) {
+            // Add the point category if it doesn't exist
+            updateData = { ...individualData, [ptsCategory]: points };
+        } else {
+            // Update the existing point category
+            updateData = { ...individualData, [ptsCategory]: (individualData[ptsCategory] || 0) + points };
+        }
+        if (ptsCategory !== "totalPoints") {
+            updateData.totalPoints = (individualDoc.data().totalPoints || 0) + points;
+        }
     }
+    
 
-    const updateData = { [ptsCategory]: points };
+    const houseId = await fetchIndividual(id).then((individual) => individual.house);
 
-    await setDoc(doc(db, "individuals", id), updateData, { merge: true });
+    await setDoc(individualDocRef, updateData, { merge: true });
+    await writeToHouseData(ptsCategory, houseId, points);
 }
 
 // Write to house data
@@ -113,17 +149,28 @@ export async function writeToHouseData(
     id: string,
     points: number,
 ) {
-    if (
-        !Object.values(pointsCategories).some(
-            (category) => category.key === ptsCategory,
-        )
-    ) {
-        throw new Error(`Unknown points category: ${ptsCategory}`);
+    // Fetch the existing house document
+    const houseDocRef = doc(db, "houses", id);
+    const houseDoc = await getDoc(houseDocRef);
+
+    let updateData = { [ptsCategory]: points };
+
+    if (houseDoc.exists()) {
+        const houseData = houseDoc.data();
+        // Check if the point category exists in the document
+        if (houseData && !houseData.hasOwnProperty(ptsCategory)) {
+            // Add the point category if it doesn't exist
+            updateData = { ...houseData, [ptsCategory]: points };
+        } else {
+            // Update the existing point category
+            updateData = { ...houseData, [ptsCategory]: (houseData[ptsCategory] || 0) + points };
+        }
+        if (ptsCategory !== "totalPoints") {
+            updateData.totalPoints = (houseData.totalPoints || 0) + points;
+        }
     }
 
-    const updateData = { [ptsCategory]: points };
-
-    await setDoc(doc(db, "houses", id), updateData, { merge: true });
+    await setDoc(houseDocRef, updateData, { merge: true });
 }
 
 // Get saved house roster data
@@ -141,8 +188,22 @@ export async function getSavedHouseRosterData(): Promise<Array<Student>> {
 export async function resetDatabase(roster: Array<Student>) {
     const batch: Array<Promise<void>> = [];
 
+    // compile all houses data to reset 
+    const housesQuery = await getDocs(collection(db, "houses"));
+    // if house of student is not in the houses collection, add it
+
     roster.forEach((student) => {
         const studentDoc = doc(db, "individuals", student.id);
+        const houseDoc = doc(db, "houses", student.house);
+        const studentHouse = student.house
+        const houseResetData: { [key: string]: any } = {
+            name: studentHouse
+        };
+        Object.values(pointsCategories).forEach((category) => {
+            houseResetData[category.key] = 0;
+        });
+        batch.push(setDoc(houseDoc, houseResetData));
+
 
         const resetData: { [key: string]: any } = {
             name: student.name,
@@ -156,6 +217,7 @@ export async function resetDatabase(roster: Array<Student>) {
 
         batch.push(setDoc(studentDoc, resetData));
     });
+   
 
     await Promise.all(batch);
 }

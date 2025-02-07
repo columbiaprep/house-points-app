@@ -1,13 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Button, Card, Input } from "@nextui-org/react";
+import { pointsCategories, type PointCategory, editPointCategory, addPointCategory, deletePointCategory } from "@/firebase-configuration/firebaseDb";
 
-import {
-    fetchPointCategories,
-    addPointCategory,
-    editPointCategory,
-    deletePointCategory,
-    PointCategory,
-} from "@/firebase-configuration/firebaseDb";
+// Outline of component, not finished
 
 const AdminPointCategories = () => {
     const [categories, setCategories] = useState<PointCategory[]>([]);
@@ -19,7 +14,7 @@ const AdminPointCategories = () => {
 
     useEffect(() => {
         const loadCategories = async () => {
-            const fetchedCategories = await fetchPointCategories();
+            const fetchedCategories = pointsCategories;
 
             setCategories(fetchedCategories);
         };
@@ -37,7 +32,7 @@ const AdminPointCategories = () => {
         id: string,
         updatedCategory: Partial<PointCategory>,
     ) => {
-        await editPointCategory(id, updatedCategory);
+        await editPointCategory(id, { ...categories.find(cat => cat.key === id), ...updatedCategory } as PointCategory);
         setCategories(
             categories.map((cat) =>
                 cat.key === id ? { ...cat, ...updatedCategory } : cat,
@@ -51,8 +46,8 @@ const AdminPointCategories = () => {
     };
 
     return (
-        <Card>
-            <h1>Manage Point Categories</h1>
+        <Card className="p-4">
+            <h1 className="text-2xl font-bold mb-4">Manage Point Categories</h1>
             <div>
                 <Input
                     placeholder="Key"
@@ -81,7 +76,7 @@ const AdminPointCategories = () => {
                         })
                     }
                 />
-                <Button onClick={handleAddCategory}>Add Category</Button>
+                <Button onPress={handleAddCategory}>Add Category</Button>
             </div>
             <ul>
                 {categories.map((category) => (
@@ -105,7 +100,7 @@ const AdminPointCategories = () => {
                             }
                         />
                         <Button
-                            onClick={() => handleDeleteCategory(category.key)}
+                            onPress={() => handleDeleteCategory(category.key)}
                         >
                             Delete
                         </Button>

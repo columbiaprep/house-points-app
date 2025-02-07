@@ -1,6 +1,12 @@
 
-import { collection, doc, getDoc, getDocs, orderBy, query, setDoc } from "@firebase/firestore";
+import { collection, deleteDoc, doc, getDoc, getDocs, orderBy, query, setDoc } from "@firebase/firestore";
 import { db } from "./firebaseApp";
+
+export interface PointCategory {
+    key: string;
+    name: string;
+    description: string;
+}
 
 export interface IndividualDocument {
     id: string;
@@ -51,6 +57,21 @@ async function initializePointsCategories() {
 }
 
 initializePointsCategories();
+
+export async function editPointCategory(id: string, updatedCategory: PointCategory) {
+    const categoryDoc = doc(db, "pointCategories", id);
+    await setDoc(categoryDoc, updatedCategory, { merge: true });
+}
+
+export async function addPointCategory(newCategory: PointCategory) {
+    const categoryDoc = doc(db, "pointCategories", newCategory.key);
+    await setDoc(categoryDoc, newCategory);
+}
+
+export async function deletePointCategory(id: string) {
+    const categoryDoc = doc(db, "pointCategories", id);
+    await deleteDoc(categoryDoc);
+}
 
 // Fetch all individuals
 export async function fetchAllIndividuals(): Promise<

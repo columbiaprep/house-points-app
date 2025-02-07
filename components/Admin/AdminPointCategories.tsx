@@ -2,12 +2,14 @@ import React, { useState, useEffect } from "react";
 import { Button, Card, Input } from "@nextui-org/react";
 
 import {
-    fetchPointCategories,
-    addPointCategory,
+    pointsCategories,
+    type PointCategory,
     editPointCategory,
+    addPointCategory,
     deletePointCategory,
-    PointCategory,
 } from "@/firebase-configuration/firebaseDb";
+
+// Outline of component, not finished
 
 const AdminPointCategories = () => {
     const [categories, setCategories] = useState<PointCategory[]>([]);
@@ -19,7 +21,7 @@ const AdminPointCategories = () => {
 
     useEffect(() => {
         const loadCategories = async () => {
-            const fetchedCategories = await fetchPointCategories();
+            const fetchedCategories = pointsCategories;
 
             setCategories(fetchedCategories);
         };
@@ -37,7 +39,10 @@ const AdminPointCategories = () => {
         id: string,
         updatedCategory: Partial<PointCategory>,
     ) => {
-        await editPointCategory(id, updatedCategory);
+        await editPointCategory(id, {
+            ...categories.find((cat) => cat.key === id),
+            ...updatedCategory,
+        } as PointCategory);
         setCategories(
             categories.map((cat) =>
                 cat.key === id ? { ...cat, ...updatedCategory } : cat,

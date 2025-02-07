@@ -1,6 +1,21 @@
+import {
+    collection,
+    deleteDoc,
+    doc,
+    getDoc,
+    getDocs,
+    orderBy,
+    query,
+    setDoc,
+} from "@firebase/firestore";
 
-import { collection, doc, getDoc, getDocs, orderBy, query, setDoc } from "@firebase/firestore";
 import { db } from "./firebaseApp";
+
+export interface PointCategory {
+    key: string;
+    name: string;
+    description: string;
+}
 
 export interface IndividualDocument {
     id: string;
@@ -36,6 +51,7 @@ export async function getPointsData(email: string) {
     const houseLb = await getDoc(myHouseLb);
     const topOverallLb = doc(db, "leaderboards", "topOverall");
     const topOverall = await getDoc(topOverallLb);
+
     return {
         userPoints: userPoints.data(),
         houseLb: houseLb.data(),
@@ -46,11 +62,35 @@ export async function getPointsData(email: string) {
 export let pointsCategories: any[] = [];
 
 async function initializePointsCategories() {
-    const pointsCategoriesSnapshot = await getDocs(collection(db, "pointCategories"));
-    pointsCategories = pointsCategoriesSnapshot.docs.map(doc => doc.data());
+    const pointsCategoriesSnapshot = await getDocs(
+        collection(db, "pointCategories"),
+    );
+
+    pointsCategories = pointsCategoriesSnapshot.docs.map((doc) => doc.data());
 }
 
 initializePointsCategories();
+
+export async function editPointCategory(
+    id: string,
+    updatedCategory: PointCategory,
+) {
+    const categoryDoc = doc(db, "pointCategories", id);
+
+    await setDoc(categoryDoc, updatedCategory, { merge: true });
+}
+
+export async function addPointCategory(newCategory: PointCategory) {
+    const categoryDoc = doc(db, "pointCategories", newCategory.key);
+
+    await setDoc(categoryDoc, newCategory);
+}
+
+export async function deletePointCategory(id: string) {
+    const categoryDoc = doc(db, "pointCategories", id);
+
+    await deleteDoc(categoryDoc);
+}
 
 // Fetch all individuals
 export async function fetchAllIndividuals(): Promise<
@@ -70,17 +110,21 @@ export async function fetchAllIndividuals(): Promise<
 
 // Fetch all houses
 export async function fetchAllHouses(): Promise<Array<HouseDocument>> {
-    const housesQuery = query(collection(db, 'houses'), orderBy('totalPoints', 'desc'));
+    const housesQuery = query(
+        collection(db, "houses"),
+        orderBy("totalPoints", "desc"),
+    );
     const querySnapshot = await getDocs(housesQuery);
-  
+
     return querySnapshot.docs.map((doc) => {
-      const data = doc.data();
-      return {
-        id: doc.id,
-        ...data,
-      } as HouseDocument;
+        const data = doc.data();
+
+        return {
+            id: doc.id,
+            ...data,
+        } as HouseDocument;
     });
-  }
+}
 
 // Fetch individual
 export async function fetchIndividual(id: string): Promise<IndividualDocument> {
@@ -125,21 +169,27 @@ export async function writeToIndividualData(
 
     if (individualDoc.exists()) {
         const individualData = individualDoc.data();
+
         // Check if the point category exists in the document
         if (individualData && !individualData.hasOwnProperty(ptsCategory)) {
             // Add the point category if it doesn't exist
             updateData = { ...individualData, [ptsCategory]: points };
         } else {
             // Update the existing point category
-            updateData = { ...individualData, [ptsCategory]: (individualData[ptsCategory] || 0) + points };
+            updateData = {
+                ...individualData,
+                [ptsCategory]: (individualData[ptsCategory] || 0) + points,
+            };
         }
         if (ptsCategory !== "totalPoints") {
-            updateData.totalPoints = (individualDoc.data().totalPoints || 0) + points;
+            updateData.totalPoints =
+                (individualDoc.data().totalPoints || 0) + points;
         }
     }
-    
 
-    const houseId = await fetchIndividual(id).then((individual) => individual.house);
+    const houseId = await fetchIndividual(id).then(
+        (individual) => individual.house,
+    );
 
     await setDoc(individualDocRef, updateData, { merge: true });
     await writeToHouseData(ptsCategory, houseId, points);
@@ -159,13 +209,17 @@ export async function writeToHouseData(
 
     if (houseDoc.exists()) {
         const houseData = houseDoc.data();
+
         // Check if the point category exists in the document
         if (houseData && !houseData.hasOwnProperty(ptsCategory)) {
             // Add the point category if it doesn't exist
             updateData = { ...houseData, [ptsCategory]: points };
         } else {
             // Update the existing point category
-            updateData = { ...houseData, [ptsCategory]: (houseData[ptsCategory] || 0) + points };
+            updateData = {
+                ...houseData,
+                [ptsCategory]: (houseData[ptsCategory] || 0) + points,
+            };
         }
         if (ptsCategory !== "totalPoints") {
             updateData.totalPoints = (houseData.totalPoints || 0) + points;
@@ -190,22 +244,22 @@ export async function getSavedHouseRosterData(): Promise<Array<Student>> {
 export async function resetDatabase(roster: Array<Student>) {
     const batch: Array<Promise<void>> = [];
 
-    // compile all houses data to reset 
+    // compile all houses data to reset
     const housesQuery = await getDocs(collection(db, "houses"));
     // if house of student is not in the houses collection, add it
 
     roster.forEach((student) => {
         const studentDoc = doc(db, "individuals", student.id);
         const houseDoc = doc(db, "houses", student.house);
-        const studentHouse = student.house
+        const studentHouse = student.house;
         const houseResetData: { [key: string]: any } = {
-            name: studentHouse
+            name: studentHouse,
         };
+
         Object.values(pointsCategories).forEach((category) => {
             houseResetData[category.key] = 0;
         });
         batch.push(setDoc(houseDoc, houseResetData));
-
 
         const resetData: { [key: string]: any } = {
             name: student.name,
@@ -219,7 +273,6 @@ export async function resetDatabase(roster: Array<Student>) {
 
         batch.push(setDoc(studentDoc, resetData));
     });
-   
 
     await Promise.all(batch);
 }

@@ -110,7 +110,10 @@ const AdminPointsForm = () => {
                 pointsToAdd,
             );
 
-            setMessage({ text: `Points added successfully! ${selectedCategory}`, type: "success" });
+            setMessage({
+                text: `Points added successfully! ${selectedCategory}`,
+                type: "success",
+            });
         } catch (error) {
             setMessage({ text: "Failed to add points.", type: "error" });
             console.error("Failed to add points:", error);
@@ -182,7 +185,9 @@ const AdminPointsForm = () => {
                                     label="Select a category"
                                     onSelectionChange={(value) =>
                                         setSelectedCategory(
-                                            pointsCategories[value.currentKey as unknown as number].key
+                                            pointsCategories[
+                                                value.currentKey as unknown as number
+                                            ].key,
                                         )
                                     }
                                 >
@@ -232,7 +237,9 @@ const AdminPointsForm = () => {
                                     label="Select a category"
                                     onSelectionChange={(value) =>
                                         setSelectedCategory(
-                                            pointsCategories[value.currentKey as unknown as number].key
+                                            pointsCategories[
+                                                value.currentKey as unknown as number
+                                            ].key,
                                         )
                                     }
                                 >

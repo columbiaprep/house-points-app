@@ -1,246 +1,296 @@
-'use client';
-import { collection, doc, getDoc, getDocs, setDoc } from '@firebase/firestore';
 
-import { db } from './firebaseApp';
+import { collection, doc, getDoc, getDocs, orderBy, query, setDoc } from "@firebase/firestore";
+import { db } from "./firebaseApp";
 
 export interface IndividualDocument {
-  name: string;
-  grade: number;
-  house: string;
-  beingGoodPts: number;
-  attendingEventsPts: number;
-  sportsTeamPts: number;
-  totalPoints: number;
-  id: string;
+    id: string;
+    name: string;
+    grade: number;
+    house: string;
+    [key: string]: any; // Allows for dynamic point categories
 }
 
 export interface HouseDocument {
-  name: string;
-  beingGoodPts: number;
-  attendingEventsPts: number;
-  sportsTeamPts: number;
-  totalPoints: number;
-  id: string;
+    id: string;
+    name: string;
+    totalPoints: number;
+    [key: string]: any; // Allows for dynamic point categories
 }
 
 export interface FirestoreDataProps {
-  individualsData: Array<IndividualDocument>;
-  housesData: Array<HouseDocument>;
+    individualsData: Array<IndividualDocument>;
+    housesData: Array<HouseDocument>;
 }
 
 export interface Student {
-  id: string;
-  name: string;
-  grade: number;
-  house: string;
+    id: string;
+    name: string;
+    grade: number;
+    house: string;
 }
 
-// House Data
+export async function getPointsData(email: string) {
+    const userDocRef = doc(db, "individuals", email);
+    const userPoints = await getDoc(userDocRef);
+    const myHouseLb = doc(db, "leaderboards", userPoints.data()?.house);
+    const houseLb = await getDoc(myHouseLb);
+    const topOverallLb = doc(db, "leaderboards", "topOverall");
+    const topOverall = await getDoc(topOverallLb);
+    return {
+        userPoints: userPoints.data(),
+        houseLb: houseLb.data(),
+        topOverall: topOverall.data(),
+    };
+}
 
+export let pointsCategories: any[] = [];
+
+async function initializePointsCategories() {
+    const pointsCategoriesSnapshot = await getDocs(collection(db, "pointCategories"));
+    pointsCategories = pointsCategoriesSnapshot.docs.map(doc => doc.data());
+}
+
+initializePointsCategories();
+
+// Fetch all individuals
 export async function fetchAllIndividuals(): Promise<
-  Array<IndividualDocument>
+    Array<IndividualDocument>
 > {
-  const individualsQuery = await getDocs(collection(db, 'individuals'));
+    const individualsQuery = await getDocs(collection(db, "individuals"));
 
-  return individualsQuery.docs.map((doc) => {
-    const data = doc.data();
+    return individualsQuery.docs.map((doc) => {
+        const data = doc.data();
 
-    return {
-      id: doc.id,
-      name: data.name,
-      grade: data.grade,
-      house: data.house,
-      beingGoodPts: data.beingGoodPts,
-      attendingEventsPts: data.attendingEventsPts,
-      sportsTeamPts: data.sportsTeamPts,
-      totalPoints: data.beingGoodPts + data.attendingEventsPts + data.sportsTeamPts,
-    } as IndividualDocument;
-  });
+        return {
+            id: doc.id,
+            ...data,
+        } as IndividualDocument;
+    });
 }
 
+// Fetch all houses
 export async function fetchAllHouses(): Promise<Array<HouseDocument>> {
-  const housesQuery = await getDocs(collection(db, 'houses'));
+    const housesQuery = query(collection(db, 'houses'), orderBy('totalPoints', 'desc'));
+    const querySnapshot = await getDocs(housesQuery);
+  
+    return querySnapshot.docs.map((doc) => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        ...data,
+      } as HouseDocument;
+    });
+  }
 
-  return housesQuery.docs.map((doc) => {
-    const data = doc.data();
-
-    return {
-      id: doc.id,
-      name: data.name,
-      beingGoodPts: data.beingGoodPts,
-      attendingEventsPts: data.attendingEventsPts,
-      sportsTeamPts: data.sportsTeamPts,
-      totalPoints: data.beingGoodPts + data.attendingEventsPts + data.sportsTeamPts,
-    } as HouseDocument;
-  });
-}
-
+// Fetch individual
 export async function fetchIndividual(id: string): Promise<IndividualDocument> {
-  const individualsQuery = await getDocs(collection(db, 'individuals'));
-  const individualsData = individualsQuery.docs.map((doc) => {
-    const data = doc.data();
-    return {
-      id: doc.id,
-      name: data.name,
-      grade: data.grade,
-      house: data.house,
-      beingGoodPts: data.beingGoodPts,
-      attendingEventsPts: data.attendingEventsPts,
-      sportsTeamPts: data.sportsTeamPts,
-      totalPoints: data.beingGoodPts + data.attendingEventsPts + data.sportsTeamPts,
-    } as IndividualDocument;
-  });
-  const individual = individualsData.find((individual) => individual.id === id);
+    const docRef = doc(db, "individuals", id);
+    const docSnap = await getDoc(docRef);
 
-  if (!individual) {
-    throw new Error(`Individual with id ${id} not found`);
-  }
+    if (!docSnap.exists()) {
+        throw new Error(`No individual found with id: ${id}`);
+    }
 
-  return individual;
-}
+    const data = docSnap.data();
+    const individual: IndividualDocument = {
+        id: docSnap.id,
+        name: data.name,
+        grade: data.grade,
+        house: data.house,
+    };
 
-export async function writeToIndividualData(
-  ptsCategory: string,
-  id: string,
-  points: number,
-) {
-  let updateData = {};
+    Object.values(pointsCategories).forEach((category) => {
+        individual[category.key] = data[category.key] || 0;
+    });
 
-  switch (ptsCategory) {
-    case 'beingGoodPts':
-      updateData = { beingGoodPts: points };
-      break;
-    case 'attendingEventsPts':
-      updateData = { attendingEventsPts: points };
-      break;
-    default:
-      throw new Error(`Unknown points category: ${ptsCategory}`);
-  }
-  await setDoc(doc(db, 'individuals', id), updateData, { merge: true });
-}
-
-export async function writeToHouseData(
-  ptsCategory: string,
-  id: string,
-  points: number,
-) {
-  let updateData = {};
-
-  switch (ptsCategory) {
-    case 'beingGoodPts':
-      updateData = { beingGoodPts: points };
-      break;
-    case 'attendingEventsPts':
-      updateData = { attendingEventsPts: points };
-      break;
-    default:
-      throw new Error(`Unknown points category: ${ptsCategory}`);
-  }
-  await setDoc(doc(db, 'houses', id), updateData, { merge: true });
-}
-
-export async function getSavedHouseRosterData(): Promise<Array<Student>> {
-  const studentsQuery = await getDocs(collection(db, 'futureHouseRoster'));
-
-  return studentsQuery.docs.map((doc) => {
-    const data = doc.data();
-
-    return {
-      id: doc.id,
-      name: data.name,
-      grade: data.grade,
-      house: data.house,
-    } as Student;
-  });
-}
-
-export async function resetDatabase(roster: Array<Student>) {
-  const batch: Array<Promise<void>> = [];
-
-  roster.forEach((student) => {
-    const studentDoc = doc(db, 'individuals', student.id);
-
-    batch.push(
-      setDoc(studentDoc, {
-        name: student.name,
-        grade: student.grade,
-        house: student.house,
-        beingGoodPts: 0,
-        attendingEventsPts: 0,
-        sportsTeamPts: 0,
-      }),
+    individual.totalPoints = Object.values(pointsCategories).reduce(
+        (total, category) => total + (individual[category.key] || 0),
+        0,
     );
-  });
-  await Promise.all(batch);
+
+    return individual;
+}
+
+// Write to individual data
+export async function writeToIndividualData(
+    ptsCategory: string,
+    id: string,
+    points: number,
+) {
+    // Fetch the existing individual document
+    const individualDocRef = doc(db, "individuals", id);
+    const individualDoc = await getDoc(individualDocRef);
+
+    let updateData = { [ptsCategory]: points };
+
+    if (individualDoc.exists()) {
+        const individualData = individualDoc.data();
+        // Check if the point category exists in the document
+        if (individualData && !individualData.hasOwnProperty(ptsCategory)) {
+            // Add the point category if it doesn't exist
+            updateData = { ...individualData, [ptsCategory]: points };
+        } else {
+            // Update the existing point category
+            updateData = { ...individualData, [ptsCategory]: (individualData[ptsCategory] || 0) + points };
+        }
+        if (ptsCategory !== "totalPoints") {
+            updateData.totalPoints = (individualDoc.data().totalPoints || 0) + points;
+        }
+    }
+    
+
+    const houseId = await fetchIndividual(id).then((individual) => individual.house);
+
+    await setDoc(individualDocRef, updateData, { merge: true });
+    await writeToHouseData(ptsCategory, houseId, points);
+}
+
+// Write to house data
+export async function writeToHouseData(
+    ptsCategory: string,
+    id: string,
+    points: number,
+) {
+    // Fetch the existing house document
+    const houseDocRef = doc(db, "houses", id);
+    const houseDoc = await getDoc(houseDocRef);
+
+    let updateData = { [ptsCategory]: points };
+
+    if (houseDoc.exists()) {
+        const houseData = houseDoc.data();
+        // Check if the point category exists in the document
+        if (houseData && !houseData.hasOwnProperty(ptsCategory)) {
+            // Add the point category if it doesn't exist
+            updateData = { ...houseData, [ptsCategory]: points };
+        } else {
+            // Update the existing point category
+            updateData = { ...houseData, [ptsCategory]: (houseData[ptsCategory] || 0) + points };
+        }
+        if (ptsCategory !== "totalPoints") {
+            updateData.totalPoints = (houseData.totalPoints || 0) + points;
+        }
+    }
+
+    await setDoc(houseDocRef, updateData, { merge: true });
+}
+
+// Get saved house roster data
+export async function getSavedHouseRosterData(): Promise<Array<Student>> {
+    const studentsQuery = await getDocs(collection(db, "futureHouseRoster"));
+
+    return studentsQuery.docs.map((doc) => {
+        const data = doc.data();
+
+        return data as Student;
+    });
+}
+
+// Reset database
+export async function resetDatabase(roster: Array<Student>) {
+    const batch: Array<Promise<void>> = [];
+
+    // compile all houses data to reset 
+    const housesQuery = await getDocs(collection(db, "houses"));
+    // if house of student is not in the houses collection, add it
+
+    roster.forEach((student) => {
+        const studentDoc = doc(db, "individuals", student.id);
+        const houseDoc = doc(db, "houses", student.house);
+        const studentHouse = student.house
+        const houseResetData: { [key: string]: any } = {
+            name: studentHouse
+        };
+        Object.values(pointsCategories).forEach((category) => {
+            houseResetData[category.key] = 0;
+        });
+        batch.push(setDoc(houseDoc, houseResetData));
+
+
+        const resetData: { [key: string]: any } = {
+            name: student.name,
+            grade: student.grade,
+            house: student.house,
+        };
+
+        Object.values(pointsCategories).forEach((category) => {
+            resetData[category.key] = 0;
+        });
+
+        batch.push(setDoc(studentDoc, resetData));
+    });
+   
+
+    await Promise.all(batch);
 }
 
 // Authentication Data
 async function getAdmins() {
-  const adminsQuery = await getDocs(collection(db, 'admins'));
+    const adminsQuery = await getDocs(collection(db, "admins"));
 
-  return adminsQuery.docs.map((doc) => doc.get('email'));
+    return adminsQuery.docs.map((doc) => doc.get("email"));
 }
 
 export async function addToDb(
-  email: string,
-  uid: string,
-  displayName: string,
-  photoURL: string,
+    email: string,
+    uid: string,
+    displayName: string,
+    photoURL: string,
 ) {
-  const userDoc = doc(db, 'users', email);
-  let accountType = 'teacher';
+    const userDoc = doc(db, "users", email);
+    let accountType = "teacher";
 
-  if ((await getAdmins()).includes(email)) {
-    accountType = 'admin';
-  } else {
-    for (let i = 0; i < 10; i++) {
-      if (email.includes(i.toString())) {
-        accountType = 'student';
-        break;
-      }
+    if ((await getAdmins()).includes(email)) {
+        accountType = "admin";
+    } else {
+        for (let i = 0; i < 10; i++) {
+            if (email.includes(i.toString())) {
+                accountType = "student";
+                break;
+            }
+        }
     }
-  }
 
-  await setDoc(userDoc, {
-    uid,
-    displayName,
-    photoURL,
-    email,
-    accountType,
-  });
+    await setDoc(userDoc, {
+        uid,
+        displayName,
+        photoURL,
+        email,
+        accountType,
+    });
 }
 
 export async function checkIfUserExists(email: string) {
-  const userDoc = doc(db, 'users', email);
-  const userDocSnapshot = await getDoc(userDoc);
+    const userDoc = doc(db, "users", email);
+    const userDocSnapshot = await getDoc(userDoc);
 
-  return userDocSnapshot.exists();
+    return userDocSnapshot.exists();
 }
 
 export async function getUserAccountType(
-  email: string,
+    email: string,
 ): Promise<string | null> {
-  const userDoc = doc(db, 'users', email);
-  const userDocSnapshot = await getDoc(userDoc);
+    const userDoc = doc(db, "users", email);
+    const userDocSnapshot = await getDoc(userDoc);
 
-  if (userDocSnapshot.exists()) {
-    const data = userDocSnapshot.data();
+    if (userDocSnapshot.exists()) {
+        const data = userDocSnapshot.data();
 
-    return data?.accountType;
-  }
+        return data?.accountType;
+    }
 
-  return null;
+    return null;
 }
 
 export async function getUserPhoto(email: string): Promise<string> {
-  const userDoc = doc(db, 'users', email);
-  const userDocSnapshot = await getDoc(userDoc);
+    const userDoc = doc(db, "users", email);
+    const userDocSnapshot = await getDoc(userDoc);
 
-  if (userDocSnapshot.exists()) {
-    const data = userDocSnapshot.data();
+    if (userDocSnapshot.exists()) {
+        const data = userDocSnapshot.data();
 
-    return data?.photoURL;
-  }
+        return data?.photoURL;
+    }
 
-  return '';
+    return "";
 }

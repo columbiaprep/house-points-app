@@ -28,7 +28,7 @@ const Dashboard = () => {
                             <div className="flex flex-row gap-2">
                                 <Card className="p-6 h-auto">
                                     <h2 className="text-xl font-bold">
-                                        {userData?.displayName}'s Points
+                                        {userData?.displayName}&apos;s Points
                                         Breakdown
                                     </h2>
                                     <Divider />

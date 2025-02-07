@@ -44,18 +44,27 @@ const AdminReset = () => {
                 dynamicTyping: true,
             });
 
-            const headers: string[] = ["STUDENT: First Name",	"STUDENT: Last Name",	"STUDENT: Email 1",	"Class", "Grade"]
-            const students: Array<Student> = parseResult.data.map((row: any) => {
-                return {
-                    id: row[headers[2]],
-                    name: `${row[headers[0]]} ${row[headers[1]]}`,
-                    firstName: row[headers[0]],
-                    lastName: row[headers[1]],
-                    email: row[headers[2]],
-                    house: row[headers[3]],
-                    grade: row[headers[4]],
-                };
-            });
+            const headers: string[] = [
+                "STUDENT: First Name",
+                "STUDENT: Last Name",
+                "STUDENT: Email 1",
+                "Class",
+                "Grade",
+            ];
+            const students: Array<Student> = parseResult.data.map(
+                (row: any) => {
+                    return {
+                        id: row[headers[2]],
+                        name: `${row[headers[0]]} ${row[headers[1]]}`,
+                        firstName: row[headers[0]],
+                        lastName: row[headers[1]],
+                        email: row[headers[2]],
+                        house: row[headers[3]],
+                        grade: row[headers[4]],
+                    };
+                },
+            );
+
             students.forEach((student) => {
                 if (student.house.includes("Green")) {
                     student.house = "Green Ivy";
@@ -82,8 +91,6 @@ const AdminReset = () => {
                     student.house = "Pink Panthers";
                 }
             });
-            
-            
 
             await resetDatabase(students);
         } catch (error) {

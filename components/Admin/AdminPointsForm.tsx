@@ -16,38 +16,14 @@ import {
     type IndividualDocument,
     type HouseDocument,
     writeToIndividualData,
-    writeToHouseData,
-    fetchAllHouses,
-    fetchAllIndividuals,
+    writeToHouseData
 } from "@/firebase-configuration/firebaseDb";
 import { toTitleCase } from "@/config/globalFuncs";
 import { pointsCategories } from "@/firebase-configuration/firebaseDb";
-
-const getAllIndividualData = async (): Promise<IndividualDocument[] | null> => {
-    try {
-        const data = await fetchAllIndividuals();
-
-        return data;
-    } catch (error) {
-        console.error("Failed to fetch individual data:", error);
-
-        return null;
-    }
-};
-
-const getAllHousesLeaderboardData = async (): Promise<
-    HouseDocument[] | null
-> => {
-    try {
-        const data = await fetchAllHouses();
-
-        return data;
-    } catch (error) {
-        console.error("Failed to fetch houses leaderboard data:", error);
-
-        return null;
-    }
-};
+import { getDownloadURL, getStorage, ref } from "firebase/storage";
+import app from "@/firebase-configuration/firebaseApp";
+import { useAuth } from "@/contexts/AuthContext";
+import { useRouter } from "next/navigation";
 
 const AdminPointsForm = () => {
     const [individualData, setIndividualData] = useState<IndividualDocument[]>(
@@ -63,28 +39,27 @@ const AdminPointsForm = () => {
         text: string;
         type: string;
     } | null>(null);
+    
+    const storage = getStorage(app, `${process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET}`);
+    const loadData = async () => {
+        const dataRef = ref(storage, "data.json")
+        // Read json file
+        const url = await getDownloadURL(dataRef);
+        const response = await fetch(url, {
+            headers: {
+                "Content-Type": "application/json",
+                "email": useAuth().user?.email || ""
+            }
+        });
+        const data = await response.json();
+        const students = data.individuals;
+        const houses = data.houses;
+        setIndividualData(students);
+        setHousesData(houses);
+    }
 
     useEffect(() => {
-        const fetchIndividualData = async () => {
-            const data = await getAllIndividualData();
-
-            if (data) {
-                setIndividualData(data);
-            }
-        };
-        const fetchHousesData = async () => {
-            const data = await getAllHousesLeaderboardData();
-
-            if (data) {
-                setHousesData(data);
-            }
-        };
-        const fetchData = async () => {
-            await fetchHousesData();
-            await fetchIndividualData();
-        };
-
-        fetchData();
+        loadData();
     }, []);
 
     const handleAddStudentPoints = async () => {
@@ -130,12 +105,7 @@ const AdminPointsForm = () => {
         if (addBy === "house") {
             handleAddHousePoints();
         }
-        // nullify all inputs
-        setSelectedStudent("");
-        setSelectedHouse("");
-        setPointsToAdd(0);
-        setSelectedCategory("");
-        setAddBy("student");
+        useRouter().refresh();
     };
 
     return (

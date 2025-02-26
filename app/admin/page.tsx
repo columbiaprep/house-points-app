@@ -29,7 +29,7 @@ export default function AdminPage() {
                     </h1>
                     <div className="flex w-full flex-wrap justify-around flex-col md:flex-row">
                         <div className="md:w-5/12 w-full p-2">
-                            <AdminPointsForm />
+                            {/* <AdminPointsForm /> */}
                             <AddAdmins />
                         </div>
                         <div className="md:w-5/12 w-full p-2">

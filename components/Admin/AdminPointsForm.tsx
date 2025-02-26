@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import axios from "axios";
 import {
     Autocomplete,
     AutocompleteItem,
@@ -22,7 +23,6 @@ import { toTitleCase } from "@/config/globalFuncs";
 import { pointsCategories } from "@/firebase-configuration/firebaseDb";
 import { getDownloadURL, getStorage, ref } from "firebase/storage";
 import app from "@/firebase-configuration/firebaseApp";
-import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 
 const AdminPointsForm = () => {
@@ -45,13 +45,12 @@ const AdminPointsForm = () => {
         const dataRef = ref(storage, "data.json")
         // Read json file
         const url = await getDownloadURL(dataRef);
-        const response = await fetch(url, {
+        const response = await axios.get(url, {
             headers: {
                 "Content-Type": "application/json",
-                "email": useAuth().user?.email || ""
             }
         });
-        const data = await response.json();
+        const data = response.data;
         const students = data.individuals;
         const houses = data.houses;
         setIndividualData(students);

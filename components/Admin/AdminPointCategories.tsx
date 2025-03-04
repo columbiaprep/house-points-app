@@ -110,7 +110,7 @@ const AdminPointCategories = () => {
                             }
                         />
                         <Button
-                            onClick={() => handleDeleteCategory(category.key)}
+                            onPress={() => handleDeleteCategory(category.key)}
                         >
                             Delete
                         </Button>

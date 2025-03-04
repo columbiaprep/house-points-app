@@ -100,9 +100,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
         if (user) {
             if (!user.email?.includes("@cgps.org")) {
-                alert("Please sign in with your CGPS email");
                 await signOutUser();
+                alert("Please sign in with your CGPS email.");
                 router.push("/auth");
+
+                return;
             }
             const exists = user.email
                 ? await checkIfUserExists(user.email)

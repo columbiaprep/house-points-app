@@ -11,43 +11,18 @@ import {
     Radio,
 } from "@nextui-org/react";
 import { Card, CardBody } from "@nextui-org/card";
+import { getDownloadURL, getStorage, ref } from "firebase/storage";
+import { useRouter } from "next/navigation";
 
 import {
     type IndividualDocument,
     type HouseDocument,
     writeToIndividualData,
     writeToHouseData,
-    fetchAllHouses,
-    fetchAllIndividuals,
 } from "@/firebase-configuration/firebaseDb";
 import { toTitleCase } from "@/config/globalFuncs";
 import { pointsCategories } from "@/firebase-configuration/firebaseDb";
-
-const getAllIndividualData = async (): Promise<IndividualDocument[] | null> => {
-    try {
-        const data = await fetchAllIndividuals();
-
-        return data;
-    } catch (error) {
-        console.error("Failed to fetch individual data:", error);
-
-        return null;
-    }
-};
-
-const getAllHousesLeaderboardData = async (): Promise<
-    HouseDocument[] | null
-> => {
-    try {
-        const data = await fetchAllHouses();
-
-        return data;
-    } catch (error) {
-        console.error("Failed to fetch houses leaderboard data:", error);
-
-        return null;
-    }
-};
+import app from "@/firebase-configuration/firebaseApp";
 
 const AdminPointsForm = () => {
     const [individualData, setIndividualData] = useState<IndividualDocument[]>(
@@ -64,27 +39,26 @@ const AdminPointsForm = () => {
         type: string;
     } | null>(null);
 
+    const router = useRouter();
+
+    const storage = getStorage(app);
+    const loadData = async () => {
+        const dataRef = ref(storage, "data.json");
+
+        try {
+            const url = await getDownloadURL(dataRef);
+            const response = await fetch(url);
+            const data = await response.json();
+
+            setIndividualData(data.individuals);
+            setHousesData(data.houses);
+        } catch (error) {
+            console.error("Failed to load data:", error);
+        }
+    };
+
     useEffect(() => {
-        const fetchIndividualData = async () => {
-            const data = await getAllIndividualData();
-
-            if (data) {
-                setIndividualData(data);
-            }
-        };
-        const fetchHousesData = async () => {
-            const data = await getAllHousesLeaderboardData();
-
-            if (data) {
-                setHousesData(data);
-            }
-        };
-        const fetchData = async () => {
-            await fetchHousesData();
-            await fetchIndividualData();
-        };
-
-        fetchData();
+        loadData();
     }, []);
 
     const handleAddStudentPoints = async () => {
@@ -130,12 +104,7 @@ const AdminPointsForm = () => {
         if (addBy === "house") {
             handleAddHousePoints();
         }
-        // nullify all inputs
-        setSelectedStudent("");
-        setSelectedHouse("");
-        setPointsToAdd(0);
-        setSelectedCategory("");
-        setAddBy("student");
+        router.refresh();
     };
 
     return (
@@ -164,6 +133,7 @@ const AdminPointsForm = () => {
                                     By Student
                                 </h3>
                                 <Autocomplete
+                                    key={selectedStudent}
                                     className="w-full"
                                     label="Student Name"
                                     value={selectedStudent}

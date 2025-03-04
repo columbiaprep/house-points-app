@@ -1,6 +1,5 @@
 "use client";
 import { useEffect, useState } from "react";
-import axios from "axios";
 import {
     Autocomplete,
     AutocompleteItem,
@@ -21,7 +20,7 @@ import {
 } from "@/firebase-configuration/firebaseDb";
 import { toTitleCase } from "@/config/globalFuncs";
 import { pointsCategories } from "@/firebase-configuration/firebaseDb";
-import { getDownloadURL, getStorage, ref } from "firebase/storage";
+import { getBytes, getDownloadURL, getStorage, ref } from "firebase/storage";
 import app from "@/firebase-configuration/firebaseApp";
 import { useRouter } from "next/navigation";
 
@@ -40,22 +39,19 @@ const AdminPointsForm = () => {
         type: string;
     } | null>(null);
     
-    const storage = getStorage(app, `${process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET}`);
+    const storage = getStorage(app);
     const loadData = async () => {
-        const dataRef = ref(storage, "data.json")
-        // Read json file
-        const url = await getDownloadURL(dataRef);
-        const response = await axios.get(url, {
-            headers: {
-                "Content-Type": "application/json",
-            }
-        });
-        const data = response.data;
-        const students = data.individuals;
-        const houses = data.houses;
-        setIndividualData(students);
-        setHousesData(houses);
-    }
+        const dataRef = ref(storage, "data.json");
+        try {
+            const url = await getDownloadURL(dataRef);
+            const response = await fetch(url);
+            const data = await response.json();
+            setIndividualData(data.individuals);
+            setHousesData(data.houses);
+        } catch (error) {
+            console.error("Failed to load data:", error);
+        }
+    };
 
     useEffect(() => {
         loadData();
@@ -136,6 +132,7 @@ const AdminPointsForm = () => {
                                     className="w-full"
                                     label="Student Name"
                                     value={selectedStudent}
+                                    key={selectedStudent}
                                     onSelectionChange={(value) =>
                                         setSelectedStudent(value as string)
                                     }

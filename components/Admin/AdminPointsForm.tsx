@@ -11,18 +11,18 @@ import {
     Radio,
 } from "@nextui-org/react";
 import { Card, CardBody } from "@nextui-org/card";
+import { getDownloadURL, getStorage, ref } from "firebase/storage";
+import { useRouter } from "next/navigation";
 
 import {
     type IndividualDocument,
     type HouseDocument,
     writeToIndividualData,
-    writeToHouseData
+    writeToHouseData,
 } from "@/firebase-configuration/firebaseDb";
 import { toTitleCase } from "@/config/globalFuncs";
 import { pointsCategories } from "@/firebase-configuration/firebaseDb";
-import { getBytes, getDownloadURL, getStorage, ref } from "firebase/storage";
 import app from "@/firebase-configuration/firebaseApp";
-import { useRouter } from "next/navigation";
 
 const AdminPointsForm = () => {
     const [individualData, setIndividualData] = useState<IndividualDocument[]>(
@@ -38,14 +38,18 @@ const AdminPointsForm = () => {
         text: string;
         type: string;
     } | null>(null);
-    
+
+    const router = useRouter();
+
     const storage = getStorage(app);
     const loadData = async () => {
         const dataRef = ref(storage, "data.json");
+
         try {
             const url = await getDownloadURL(dataRef);
             const response = await fetch(url);
             const data = await response.json();
+
             setIndividualData(data.individuals);
             setHousesData(data.houses);
         } catch (error) {
@@ -100,7 +104,7 @@ const AdminPointsForm = () => {
         if (addBy === "house") {
             handleAddHousePoints();
         }
-        useRouter().refresh();
+        router.refresh();
     };
 
     return (
@@ -129,10 +133,10 @@ const AdminPointsForm = () => {
                                     By Student
                                 </h3>
                                 <Autocomplete
+                                    key={selectedStudent}
                                     className="w-full"
                                     label="Student Name"
                                     value={selectedStudent}
-                                    key={selectedStudent}
                                     onSelectionChange={(value) =>
                                         setSelectedStudent(value as string)
                                     }

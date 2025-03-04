@@ -1,8 +1,13 @@
-import { getCurrentAdmins, removeAdmin, User } from "@/firebase-configuration/firebaseDb";
 import { Button, Card, CircularProgress, Input } from "@nextui-org/react";
 import { useEffect, useState } from "react";
-import { addAdmin } from "@/firebase-configuration/firebaseDb";
 import { useRouter } from "next/navigation";
+
+import { addAdmin } from "@/firebase-configuration/firebaseDb";
+import {
+    getCurrentAdmins,
+    removeAdmin,
+    User,
+} from "@/firebase-configuration/firebaseDb";
 
 const Loading = () => {
     return (
@@ -10,7 +15,7 @@ const Loading = () => {
             <CircularProgress color="primary" size={"sm"} />
         </div>
     );
-}
+};
 
 const AddAdmins = () => {
     const [errorMess, setErrorMess] = useState<string>("");
@@ -19,15 +24,15 @@ const AddAdmins = () => {
     const router = useRouter();
     const fetchedAdmins = async (): Promise<User[]> => {
         return getCurrentAdmins();
-    }
+    };
 
     const [admins, setAdmins] = useState<User[]>([]);
-   
+
     useEffect(() => {
         fetchedAdmins().then((admins) => {
             setAdmins(admins);
         });
-    }, [])
+    }, []);
 
     const addAdminHandler = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -36,20 +41,24 @@ const AddAdmins = () => {
         setSuccessMess("");
         const formData = new FormData(event.currentTarget);
         const email = formData.get("email") as string;
+
         try {
             await addAdmin(email);
             setSuccessMess("Admin added successfully.");
             setAdmins(await fetchedAdmins());
         } catch (error) {
-            setErrorMess("Failed to add admin. Make sure the new admin has signed into the app with their CGPS email.");
+            setErrorMess(
+                "Failed to add admin. Make sure the new admin has signed into the app with their CGPS email.",
+            );
         } finally {
             setLoading(false);
         }
-    }
+    };
 
     const removeAdminHandler = async (email: string) => {
         if (admins.length == 1) {
             setErrorMess("You must have at least one admin.");
+
             return;
         }
         setLoading(true);
@@ -64,36 +73,65 @@ const AddAdmins = () => {
         } finally {
             setLoading(false);
         }
-    }
+    };
 
     return (
-        <Card isBlurred className="point-form-card border-none shadow-lg p-6 w-5/6 h-fit">
+        <Card
+            isBlurred
+            className="point-form-card border-none shadow-lg p-6 w-5/6 h-fit"
+        >
             <div>
                 <h2 className="text-2xl font-bold text-center">Add Admins</h2>
                 <span className="text-center">
-                    <form onSubmit={addAdminHandler} className="flex flex-col items-center gap-4">
-                        <Input type="text" name="email" placeholder="Enter email address" />
-                        <Button type="submit" className="btn-primary" disabled={loading}>
+                    <form
+                        className="flex flex-col items-center gap-4"
+                        onSubmit={addAdminHandler}
+                    >
+                        <Input
+                            name="email"
+                            placeholder="Enter email address"
+                            type="text"
+                        />
+                        <Button
+                            className="btn-primary"
+                            disabled={loading}
+                            type="submit"
+                        >
                             {loading ? <Loading /> : "Add Admin"}
                         </Button>
                     </form>
                     <div className="flex flex-col gap-4">
-                        <h3 className="text-xl font-bold text-left mt-4">Current Admins</h3>
+                        <h3 className="text-xl font-bold text-left mt-4">
+                            Current Admins
+                        </h3>
                         {admins.map((admin) => (
-                            <div key={admin.email} className="flex justify-between items-center">
+                            <div
+                                key={admin.email}
+                                className="flex justify-between items-center"
+                            >
                                 <p>{admin.email}</p>
-                                <Button onPress={() => removeAdminHandler(admin.email)} color="danger" disabled={loading}>
+                                <Button
+                                    color="danger"
+                                    disabled={loading}
+                                    onPress={() =>
+                                        removeAdminHandler(admin.email)
+                                    }
+                                >
                                     {loading ? <Loading /> : "Remove"}
                                 </Button>
                             </div>
                         ))}
                     </div>
                 </span>
-                {errorMess && <p className="text-center text-red-500">{errorMess}</p>}
-                {successMess && <p className="text-center text-green-500">{successMess}</p>}
+                {errorMess && (
+                    <p className="text-center text-red-500">{errorMess}</p>
+                )}
+                {successMess && (
+                    <p className="text-center text-green-500">{successMess}</p>
+                )}
             </div>
         </Card>
-    )
-}
+    );
+};
 
 export default AddAdmins;

@@ -103,6 +103,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
                 await signOutUser();
                 alert("Please sign in with your CGPS email.");
                 router.push("/auth");
+
                 return;
             }
             const exists = user.email

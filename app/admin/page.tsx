@@ -6,6 +6,7 @@ import AdminMassPointsForm from "@/components/Admin/AdminMassPointsForm";
 import AdminPointsForm from "@/components/Admin/AdminPointsForm";
 import AdminReset from "@/components/Admin/AdminReset";
 import { useAuth } from "@/contexts/AuthContext";
+import AddAdmins from "@/components/Admin/AddAdmins";
 
 export default function AdminPage() {
     const auth = useAuth();
@@ -27,10 +28,11 @@ export default function AdminPage() {
                         Admin Dashboard
                     </h1>
                     <div className="flex w-full flex-wrap justify-around flex-col md:flex-row">
-                        <div className="md:w-5/12 ">
+                        <div className="md:w-5/12 w-full p-2">
                             <AdminPointsForm />
+                            <AddAdmins />
                         </div>
-                        <div className="md:w-5/12">
+                        <div className="md:w-5/12 w-full p-2">
                             <AdminMassPointsForm />
                             <AdminReset />
                         </div>

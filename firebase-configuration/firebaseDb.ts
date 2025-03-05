@@ -7,6 +7,7 @@ import {
     orderBy,
     query,
     setDoc,
+    where,
 } from "@firebase/firestore";
 
 import { db } from "./firebaseApp";
@@ -42,6 +43,11 @@ export interface Student {
     name: string;
     grade: number;
     house: string;
+}
+
+export interface User {
+    displayName: string;
+    email: string;
 }
 
 export async function getPointsData(email: string) {
@@ -277,9 +283,64 @@ export async function resetDatabase(roster: Array<Student>) {
     await Promise.all(batch);
 }
 
+// Admins data
+export async function getCurrentAdmins(): Promise<Array<User>> {
+    const adminsQuery = query(
+        collection(db, "users"),
+        where("accountType", "==", "admin"),
+    );
+    const querySnapshot = await getDocs(adminsQuery);
+
+    return querySnapshot.docs.map((doc) => doc.data() as User);
+}
+
+export async function addAdmin(email: string) {
+    const userDoc = doc(db, "users", email);
+    const userDocSnapshot = await getDoc(userDoc);
+
+    if (userDocSnapshot.exists()) {
+        const data = userDocSnapshot.data();
+
+        await setDoc(doc(db, "users", email), {
+            ...data,
+            accountType: "admin",
+        });
+    } else {
+        return Promise.reject("User does not exist");
+    }
+}
+
+export async function removeAdmin(email: string) {
+    const userDoc = doc(db, "users", email);
+    const userDocSnapshot = await getDoc(userDoc);
+
+    if (userDocSnapshot.exists()) {
+    }
+    // if email contains number, it is a student
+    for (let i = 0; i < 10; i++) {
+        if (email.includes(i.toString())) {
+            await setDoc(doc(db, "users", email), {
+                ...userDocSnapshot.data(),
+                accountType: "student",
+            });
+
+            return;
+        }
+    }
+    // if email is not a student, it is a teacher
+    await setDoc(userDoc, {
+        ...userDocSnapshot.data(),
+        accountType: "teacher",
+    });
+}
+
 // Authentication Data
 async function getAdmins() {
     const adminsQuery = await getDocs(collection(db, "admins"));
+
+    if (adminsQuery.empty) {
+        return [];
+    }
 
     return adminsQuery.docs.map((doc) => doc.get("email"));
 }

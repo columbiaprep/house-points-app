@@ -6,7 +6,7 @@ import {
     HouseDocument,
 } from "@/firebase-configuration/firebaseDb";
 
-const HousePoints = () => {
+export const HousePoints = () => {
     const [houses, setHouses] = useState<HouseDocument[]>([]);
 
     useEffect(() => {
@@ -38,4 +38,3 @@ const HousePoints = () => {
     );
 };
 
-export default HousePoints;

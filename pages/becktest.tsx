@@ -40,7 +40,7 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ //React Functional Component 
             leaderboardData.map((item, index) => (
               <div
                 key={index}
-                className={`leaderboard-item ${hoveredIndex === index ? 'hovered' : ''}`}
+                className={`leaderboard-item ${hoveredIndex === index ? 'hovered' : ''}`} // Checks whether two values are equal both in value and type
                 onMouseEnter={() => setHoveredIndex(index)} // Change hover state when mouse enters item -> This part is still a WIP
                 onMouseLeave={() => setHoveredIndex(null)} // Reset hover state when mouse leaves item -> This part is still a WIP
               >

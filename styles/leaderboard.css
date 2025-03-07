@@ -68,25 +68,35 @@
   }
 }
 
-/* Cool Snappy Pop-out Hover Effect */
+/* Cool Snappy Pop-out Hover Effect -> Also a WIP */
 .leaderboard-item:hover {
   transform: scale(1.1) rotate(2deg) translateY(-5px);
   box-shadow: 0 15px 30px rgba(255, 255, 255, 0.5);
 }
 
-/* Bounce Back Animation */
+/* Bounce Back Animation -> Also a WIP */
 .leaderboard-item:active {
   transform: scale(0.95);
   transition: transform 0.1s ease-in-out;
 }
 
+/* https://react.dev/reference/react/Children */
 /* Color Assignments */
+/* First leaderboard item (1st position) */
 .leaderboard-item:nth-child(1) { background-color: #007bff; box-shadow: 0 0 20px #007bff; --delay: 0.2s; }
+/* Second leaderboard item (2nd position) */
 .leaderboard-item:nth-child(2) { background-color: #ff7f00; box-shadow: 0 0 20px #ff7f00; --delay: 0.4s; }
+/* Third leaderboard item (3rd position) */
 .leaderboard-item:nth-child(3) { background-color: #800080; box-shadow: 0 0 20px #800080; --delay: 0.6s; }
+/* Fourth leaderboard item (4th position) */
 .leaderboard-item:nth-child(4) { background-color: #28a745; box-shadow: 0 0 20px #28a745; --delay: 0.8s; }
+/* Fifth leaderboard item (5th position) */
 .leaderboard-item:nth-child(5) { background-color: #ffd700; box-shadow: 0 0 20px #ffd700; --delay: 1s; }
+/* Sixth leaderboard item (6th position) */
 .leaderboard-item:nth-child(6) { background-color: #dc3545; box-shadow: 0 0 20px #dc3545; --delay: 1.2s; }
+/* Seventh leaderboard item (7th position) */
 .leaderboard-item:nth-child(7) { background-color: #c0c0c0; box-shadow: 0 0 20px #c0c0c0; --delay: 1.4s; }
+/* Eighth leaderboard item (8th position) */
 .leaderboard-item:nth-child(8) { background-color: #ff1493; box-shadow: 0 0 20px #ff1493; --delay: 1.6s; }
+/* Ninth leaderboard item (9th position) */
 .leaderboard-item:nth-child(9) { background-color: #ff69b4; box-shadow: 0 0 20px #ff69b4; --delay: 1.8s; }

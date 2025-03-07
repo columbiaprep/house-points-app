@@ -14,7 +14,7 @@ interface LeaderboardProps { // Had some help from https://www.w3schools.com/rea
   loadingTime?: number; // Loading Time -> Defualts to 3000ms
 }
 
-const Leaderboard: React.FC<LeaderboardProps> = ({
+const Leaderboard: React.FC<LeaderboardProps> = ({ //React Functional Component For Leaderboard Props
   title = 'Leaderboard',
   leaderboardData,
   loadingTime = 3000,
@@ -56,7 +56,7 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
   );
 };
 
-const TestPage: React.FC = () => {
+const TestPage: React.FC = () => { //React Functional Component For Individual Houses
   const leaderboardData = [
     { name: 'Blue Thunder', points: 1200 },
     { name: 'Orange Supernova', points: 1100 },

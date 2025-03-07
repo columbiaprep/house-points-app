@@ -39,6 +39,7 @@ html, body {
   overflow-y: auto;
 
   /* Remove box shadow or outline */
-  box-shadow: none; /* Ensure no box-shadow is applied */
+  box-shadow: none; /* Ensure no box-shadow is applied around the leaderboard*/
   outline: none; /* Remove any outline */
 }
+ 

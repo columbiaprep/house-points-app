@@ -1,0 +1,92 @@
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap'); 
+
+/* Leaderboard Container */
+.leaderboard-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: black;
+  padding: 40px;
+  width: 80%;
+  max-width: 800px;
+  margin: 0 auto;
+  border-radius: 16px;
+  /* Remove box-shadow */
+  box-shadow: none; 
+  min-height: 500px;
+  overflow-y: auto;
+
+  /* Fade-in animation */
+  opacity: 0;
+  animation: fadeInContainer 3s ease-in-out forwards;
+}
+
+/* Fade-in animation for the whole leaderboard */
+@keyframes fadeInContainer {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Leaderboard Items */
+.leaderboard-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 25px;
+  border-radius: 8px;
+  margin: 12px 0;
+  color: white;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 1.5rem;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease-in-out;
+  width: 100%;
+  position: relative;
+  --delay: 0s;
+  
+  /* Staggered fade-in */
+  opacity: 0;
+  animation: fadeInItem 0.6s ease-out forwards;
+  animation-delay: var(--delay);
+}
+
+/* Fade-in animation with slight movement */
+@keyframes fadeInItem {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Cool Snappy Pop-out Hover Effect */
+.leaderboard-item:hover {
+  transform: scale(1.1) rotate(2deg) translateY(-5px);
+  box-shadow: 0 15px 30px rgba(255, 255, 255, 0.5);
+}
+
+/* Bounce Back Animation */
+.leaderboard-item:active {
+  transform: scale(0.95);
+  transition: transform 0.1s ease-in-out;
+}
+
+/* Color Assignments */
+.leaderboard-item:nth-child(1) { background-color: #007bff; box-shadow: 0 0 20px #007bff; --delay: 0.2s; }
+.leaderboard-item:nth-child(2) { background-color: #ff7f00; box-shadow: 0 0 20px #ff7f00; --delay: 0.4s; }
+.leaderboard-item:nth-child(3) { background-color: #800080; box-shadow: 0 0 20px #800080; --delay: 0.6s; }
+.leaderboard-item:nth-child(4) { background-color: #28a745; box-shadow: 0 0 20px #28a745; --delay: 0.8s; }
+.leaderboard-item:nth-child(5) { background-color: #ffd700; box-shadow: 0 0 20px #ffd700; --delay: 1s; }
+.leaderboard-item:nth-child(6) { background-color: #dc3545; box-shadow: 0 0 20px #dc3545; --delay: 1.2s; }
+.leaderboard-item:nth-child(7) { background-color: #c0c0c0; box-shadow: 0 0 20px #c0c0c0; --delay: 1.4s; }
+.leaderboard-item:nth-child(8) { background-color: #ff1493; box-shadow: 0 0 20px #ff1493; --delay: 1.6s; }
+.leaderboard-item:nth-child(9) { background-color: #ff69b4; box-shadow: 0 0 20px #ff69b4; --delay: 1.8s; }

@@ -7,7 +7,8 @@ interface LeaderboardItem {
   points: number; // House's score
 }
 
-interface LeaderboardProps {
+
+interface LeaderboardProps { // Had some help from https://www.w3schools.com/react/react_props.asp for everything below this line 
   title?: string; // Leaderboard Title -> Defualts to Leaderboard
   leaderboardData: LeaderboardItem[]; // Data to display in leaderboard on webpage
   loadingTime?: number; // Loading Time -> Defualts to 3000ms

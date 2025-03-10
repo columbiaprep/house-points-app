@@ -5,7 +5,7 @@ import {
     Input,
     Select,
     SelectItem,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { useState } from "react";
 
 import { writeToIndividualData } from "@/firebase-configuration/firebaseDb";

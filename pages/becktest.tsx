@@ -1,6 +1,6 @@
 "use client";
-import { Snippet } from "@nextui-org/snippet";
-import { Code } from "@nextui-org/code";
+import { Snippet } from "@heroui/snippet";
+import { Code } from "@heroui/code";
 
 import { HousePoints } from '@/components/house_points'
 import { AchievementsContainer } from "@/components/achievements";

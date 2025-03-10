@@ -1,5 +1,5 @@
 "use client";
-import { NavbarBrand, Navbar as NextUINavbar } from "@nextui-org/navbar";
+import { NavbarBrand, Navbar as NextUINavbar } from "@heroui/navbar";
 import {
     Avatar,
     Dropdown,
@@ -7,7 +7,7 @@ import {
     DropdownMenu,
     DropdownItem,
     Image,
-} from "@nextui-org/react";
+} from "@heroui/react";
 
 import { useAuth } from "@/contexts/AuthContext";
 import BrandImage from "@/public/cgps-houses-logo.png";

@@ -1,4 +1,4 @@
-import { Button, Card, CircularProgress, Input } from "@nextui-org/react";
+import { Button, Card, CircularProgress, Input } from "@heroui/react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 

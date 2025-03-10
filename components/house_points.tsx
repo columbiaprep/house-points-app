@@ -1,4 +1,4 @@
-import { Card, Divider } from "@nextui-org/react";
+import { Card, Divider } from "@heroui/react";
 import { useEffect, useState } from "react";
 
 import {

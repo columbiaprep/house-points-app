@@ -9,8 +9,8 @@ import {
     Button,
     RadioGroup,
     Radio,
-} from "@nextui-org/react";
-import { Card, CardBody } from "@nextui-org/card";
+} from "@heroui/react";
+import { Card, CardBody } from "@heroui/card";
 import { getDownloadURL, getStorage, ref } from "firebase/storage";
 import { useRouter } from "next/navigation";
 

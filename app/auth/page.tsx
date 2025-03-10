@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { useRouter } from "next/navigation";
-import { Card, Button } from "@nextui-org/react";
+import { Card, Button } from "@heroui/react";
 
 import { useAuth } from "@/contexts/AuthContext";
 

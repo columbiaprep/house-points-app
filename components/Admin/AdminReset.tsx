@@ -100,7 +100,7 @@ const AdminReset = () => {
     };
 
     return (
-        <Card className="container mt-4 p-4 bg-background w-5/6">
+        <Card className="container mt-4 p-4 bg-background md:w-5/6 w-full">
             <h2 className="text-2xl font-bold text-center">Yearly Reset</h2>
             <div>
                 <Modal

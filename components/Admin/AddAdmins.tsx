@@ -78,7 +78,7 @@ const AddAdmins = () => {
     return (
         <Card
             isBlurred
-            className="point-form-card border-none shadow-lg p-6 w-5/6 h-fit"
+            className="point-form-card border-none shadow-lg p-6 h-fit md:w-5/6 w-full"
         >
             <div>
                 <h2 className="text-2xl font-bold text-center">Add Admins</h2>

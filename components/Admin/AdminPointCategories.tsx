@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Button, Card, Input } from "@nextui-org/react";
+import { Button, Card, Input } from "@heroui/react";
 
 import {
     pointsCategories,

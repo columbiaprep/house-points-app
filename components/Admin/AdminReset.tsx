@@ -1,7 +1,7 @@
-import { Button } from "@nextui-org/button";
-import { Input } from "@nextui-org/input";
+import { Button } from "@heroui/button";
+import { Input } from "@heroui/input";
 import React, { useState } from "react";
-import { Spinner } from "@nextui-org/spinner";
+import { Spinner } from "@heroui/spinner";
 import {
     Modal,
     ModalContent,
@@ -10,7 +10,7 @@ import {
     ModalHeader,
     ModalBody,
     Card,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import Papa from "papaparse";
 
 import { resetDatabase, Student } from "@/firebase-configuration/firebaseDb";
@@ -100,7 +100,7 @@ const AdminReset = () => {
     };
 
     return (
-        <Card className="container mt-4 p-4 bg-background w-5/6">
+        <Card className="container mt-4 p-4 bg-background md:w-5/6 w-full">
             <h2 className="text-2xl font-bold text-center">Yearly Reset</h2>
             <div>
                 <Modal

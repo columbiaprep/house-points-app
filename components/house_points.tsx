@@ -1,4 +1,4 @@
-import { Card, Divider } from "@nextui-org/react";
+import { Card, Divider } from "@heroui/react";
 import { useEffect, useState } from "react";
 
 import {
@@ -6,7 +6,7 @@ import {
     HouseDocument,
 } from "@/firebase-configuration/firebaseDb";
 
-const HousePoints = () => {
+export const HousePoints = () => {
     const [houses, setHouses] = useState<HouseDocument[]>([]);
 
     useEffect(() => {
@@ -38,4 +38,3 @@ const HousePoints = () => {
     );
 };
 
-export default HousePoints;

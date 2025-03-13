@@ -69,7 +69,7 @@ const AdminMassPointsForm = () => {
                         >
                             {Object.entries(pointsCategories).map(
                                 ([key, value]) => (
-                                    <SelectItem key={key} value={key}>
+                                    <SelectItem key={key} id={key}>
                                         {value.name}
                                     </SelectItem>
                                 ),

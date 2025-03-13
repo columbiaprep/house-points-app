@@ -56,8 +56,8 @@ const UserProfile = () => {
                 <DropdownItem key="settings">Settings</DropdownItem> */}
                 <DropdownItem
                     key="logout"
-                    onPress={async () => await userData.signOutUser()}
                     color="danger"
+                    onPress={async () => await userData.signOutUser()}
                 >
                     Logout
                 </DropdownItem>

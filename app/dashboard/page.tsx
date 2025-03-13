@@ -32,14 +32,24 @@ const Dashboard = () => {
                                         Breakdown
                                     </h2>
                                     <Divider />
-                                    {userDbData && pointsCategories.map((category) => (
-                                        <div
-                                            key={category.id}
-                                            className="flex flex-row justify-between"
-                                        >
-                                            <p key={category.id}>{category.name}: <span>{userDbData[category.key]}</span> </p>
-                                        </div>
-                                    ))}
+                                    {userDbData &&
+                                        pointsCategories.map((category) => (
+                                            <div
+                                                key={category.id}
+                                                className="flex flex-row justify-between"
+                                            >
+                                                <p key={category.id}>
+                                                    {category.name}:{" "}
+                                                    <span>
+                                                        {
+                                                            userDbData[
+                                                                category.key
+                                                            ]
+                                                        }
+                                                    </span>{" "}
+                                                </p>
+                                            </div>
+                                        ))}
                                 </Card>
                                 <AchievementsContainer />
                                 <div className="flex flex-wrap flex-row gap-2">

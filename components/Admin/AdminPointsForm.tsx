@@ -144,7 +144,7 @@ const AdminPointsForm = () => {
                                     {individualData.map((student) => (
                                         <AutocompleteItem
                                             key={student.id}
-                                            value={student.id}
+                                            id={student.id}
                                         >
                                             {student.name}
                                         </AutocompleteItem>
@@ -163,7 +163,7 @@ const AdminPointsForm = () => {
                                 >
                                     {Object.entries(pointsCategories).map(
                                         ([key, value]) => (
-                                            <SelectItem key={key} value={key}>
+                                            <SelectItem key={key} id={key}>
                                                 {value.name}
                                             </SelectItem>
                                         ),
@@ -196,7 +196,7 @@ const AdminPointsForm = () => {
                                         <SelectItem
                                             key={house.id}
                                             textValue={toTitleCase(house.name)}
-                                            value={house.id}
+                                            id={house.id}
                                         >
                                             {toTitleCase(house.name)} House
                                         </SelectItem>
@@ -215,7 +215,7 @@ const AdminPointsForm = () => {
                                 >
                                     {Object.entries(pointsCategories).map(
                                         ([key, value]) => (
-                                            <SelectItem key={key} value={key}>
+                                            <SelectItem key={key} id={key}>
                                                 {value.name}
                                             </SelectItem>
                                         ),

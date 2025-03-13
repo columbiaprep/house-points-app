@@ -1,14 +1,16 @@
 "use client";
 import { Snippet } from "@heroui/snippet";
 import { Code } from "@heroui/code";
+import { useRouter } from "next/navigation";
 
 import { Shout } from "@/components/shout";
 import { AchievementsContainer } from "@/components/achievements";
-import { useRouter } from "next/navigation";
 
 export default function Home() {
     const router = useRouter();
+
     router.push("/dashboard");
+
     return (
         <section className="flex flex-col items-center justify-center gap-4 py-8 md:py-10">
             <Shout />

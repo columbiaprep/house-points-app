@@ -1,5 +1,5 @@
 "use client";
-import { NavbarBrand, Navbar as NextUINavbar } from "@nextui-org/navbar";
+import { NavbarBrand, Navbar as NextUINavbar } from "@heroui/navbar";
 import {
     Avatar,
     Dropdown,
@@ -7,7 +7,7 @@ import {
     DropdownMenu,
     DropdownItem,
     Image,
-} from "@nextui-org/react";
+} from "@heroui/react";
 
 import { useAuth } from "@/contexts/AuthContext";
 import BrandImage from "@/public/cgps-houses-logo.png";
@@ -52,24 +52,14 @@ const UserProfile = () => {
                 </div>
             </DropdownTrigger>
             <DropdownMenu>
-                <DropdownItem key="profile">Profile</DropdownItem>
-                <DropdownItem key="settings">Settings</DropdownItem>
+                {/* <DropdownItem key="profile">Profile</DropdownItem>
+                <DropdownItem key="settings">Settings</DropdownItem> */}
                 <DropdownItem
                     key="logout"
                     onPress={async () => await userData.signOutUser()}
+                    color="danger"
                 >
                     Logout
-                </DropdownItem>
-                <DropdownItem key="dark-mode" closeOnSelect={false}>
-                    {/* <Switch
-            value={userData.theme}
-            size="sm"
-            onChange={(e) =>
-              userData.changeTheme(e.target.checked ? 'dark' : 'light')
-            }
-          >
-            Toggle Dark Mode
-          </Switch> */}
                 </DropdownItem>
             </DropdownMenu>
         </Dropdown>

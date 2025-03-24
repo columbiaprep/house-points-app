@@ -195,8 +195,8 @@ const AdminPointsForm = () => {
                                     {housesData.map((house) => (
                                         <SelectItem
                                             key={house.id}
-                                            textValue={toTitleCase(house.name)}
                                             id={house.id}
+                                            textValue={toTitleCase(house.name)}
                                         >
                                             {toTitleCase(house.name)} House
                                         </SelectItem>

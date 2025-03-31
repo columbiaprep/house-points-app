@@ -62,12 +62,13 @@ const AdminPointsForm = () => {
     }, []);
 
     const handleAddStudentPoints = async () => {
+        if (!selectedStudent || !selectedCategory) {
+            setMessage({ text: "Please select a student and category.", type: "error" });
+            return;
+        }
+
         try {
-            await writeToIndividualData(
-                selectedCategory,
-                selectedStudent,
-                pointsToAdd,
-            );
+            await writeToIndividualData(selectedCategory, selectedStudent, pointsToAdd);
 
             setMessage({ text: "Points added successfully!", type: "success" });
         } catch (error) {
@@ -85,7 +86,7 @@ const AdminPointsForm = () => {
             );
 
             setMessage({
-                text: `Points added successfully! ${selectedCategory}`,
+                text: `Points added successfully!`,
                 type: "success",
             });
         } catch (error) {
@@ -133,15 +134,12 @@ const AdminPointsForm = () => {
                                     By Student
                                 </h3>
                                 <Autocomplete
-                                    key={selectedStudent}
                                     className="w-full"
                                     label="Student Name"
                                     value={selectedStudent}
-                                    onSelectionChange={(value) =>
-                                        setSelectedStudent(value as string)
-                                    }
+                                    onSelectionChange={(key) => setSelectedStudent(key ? String(key) : "")} // Update selectedStudent
                                 >
-                                    {individualData.map((student) => (
+                                    {individualData.map((student: IndividualDocument) => (
                                         <AutocompleteItem
                                             key={student.id}
                                             id={student.id}
@@ -151,6 +149,7 @@ const AdminPointsForm = () => {
                                     ))}
                                 </Autocomplete>
                                 <Select
+
                                     className="w-full mt-4"
                                     label="Select a category"
                                     onSelectionChange={(value) =>
@@ -188,17 +187,17 @@ const AdminPointsForm = () => {
                                     className="w-full"
                                     label="Select a House"
                                     value={selectedHouse}
-                                    onChange={(e) =>
-                                        setSelectedHouse(e.target.value)
-                                    }
+                                    onSelectionChange={(key) => {
+                                        const selectedValue = Array.from(key)[0];
+                                        setSelectedHouse(selectedValue ? String(selectedValue) : ""); 
+                                    }}
                                 >
                                     {housesData.map((house) => (
                                         <SelectItem
-                                            key={house.id}
-                                            id={house.id}
-                                            textValue={toTitleCase(house.name)}
+                                            key={house.name}
+                                            id={house.name}
                                         >
-                                            {toTitleCase(house.name)} House
+                                            {toTitleCase(house.name)}
                                         </SelectItem>
                                     ))}
                                 </Select>

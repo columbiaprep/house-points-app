@@ -13,6 +13,7 @@ export interface IndividualDocument {
   id: string;
 }
 
+// TODO: Do we still need HouseDocument? 
 export interface HouseDocument {
   name: string;
   beingGoodPts: number;
@@ -40,6 +41,16 @@ export async function fetchAllIndividuals() {
 export async function fetchAllHouses() {
   const housesQuery = await getDocs(collection(db, 'houses'));
   return housesQuery.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+}
+
+export async function fetchIndividualHouse(id: string): Promise<IndividualDocument> {
+  const individualsQuery = await getDocs(collection(db, 'houses'));
+  const individualsData = individualsQuery.docs.map((doc) => ({ id: doc.id, ...doc.data() } as IndividualDocument));
+  const individual = individualsData.find((individual) => individual.id === id);
+  if (!individual) {
+    throw new Error(`House with id ${id} not found`);
+  }
+  return individual;
 }
 
 export async function fetchIndividual(id: string): Promise<IndividualDocument> {

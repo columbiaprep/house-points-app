@@ -8,18 +8,7 @@ import { writeDummyDataForIndividuals } from "@/firebase-configuration/firebaseD
 export default function Home() {
   return (
     <section className="flex flex-col items-center justify-center gap-4 py-8 md:py-10">
-      <Shout />
-
-      <AchievementsContainer />
-
-      <div className="mt-8">
-        <Snippet hideCopyButton hideSymbol variant="bordered">
-          <span>
-            Get started by editing <Code color="primary">app/page.tsx</Code>
-          </span>
-        </Snippet>
-        <button onClick={() => writeDummyDataForIndividuals()} className="btn btn-primary">Button</button>
-      </div>
+      
     </section>
   );
 }

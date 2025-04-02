@@ -2,7 +2,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap'); 
 
 /* Leaderboard Container */
-.leaderboard-container {
+.leaderboard-container {    
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -22,7 +22,7 @@
   opacity: 0;
   animation: fadeInContainer 3s ease-in-out forwards;
 }
-
+  
 /* Fade-in animation for the whole leaderboard */
 @keyframes fadeInContainer {
   0% {

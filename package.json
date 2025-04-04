@@ -16,6 +16,7 @@
     "@react-aria/visually-hidden": "3.8.12",
     "@tailwindcss/vite": "^4.0.9",
     "clsx": "2.1.1",
+    "dotenv": "^16.4.7",
     "firebase": "^11.0.1",
     "framer-motion": "^11.13.1",
     "intl-messageformat": "^10.5.0",

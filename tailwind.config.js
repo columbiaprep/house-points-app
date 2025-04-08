@@ -1,12 +1,12 @@
-const { nextui } = require("@nextui-org/react");
+const { heroui } = require("@heroui/react");
 const { Quicksand, Ledger } = require("next/font/google");
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
-    './app/**/*.{js,ts,jsx,tsx,mdx}', // Includes app components
-    './components/**/*.{js,ts,jsx,tsx,mdx}', // Includes any components
-    './node_modules/@nextui-org/theme/dist/**/*.{js,ts,jsx,tsx}', // Include NextUI theme components
+    './app/**/*.{js,ts,jsx,tsx,mdx}',
+    './components/**/*.{js,ts,jsx,tsx,mdx}',
+    "./node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}"
   ],
   darkMode: "class", // This enables dark mode support
   theme: {
@@ -34,7 +34,7 @@ module.exports = {
     },
   },
   plugins: [
-    nextui({
+    heroui({
       defaultTheme: "light",
       themes: {
         light: {

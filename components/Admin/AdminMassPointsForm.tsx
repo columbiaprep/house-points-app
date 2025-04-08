@@ -5,7 +5,7 @@ import {
     Input,
     Select,
     SelectItem,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { useState } from "react";
 
 import { writeToIndividualData } from "@/firebase-configuration/firebaseDb";
@@ -43,7 +43,7 @@ const AdminMassPointsForm = () => {
         <div className="flex">
             <Card
                 isBlurred
-                className="point-form-card border-none shadow-lg p-6 w-5/6 h-full"
+                className="point-form-card border-none shadow-lg p-6  h-full md:w-5/6 w-full"
             >
                 <CardBody>
                     <div className="flex flex-col gap-2">
@@ -69,7 +69,7 @@ const AdminMassPointsForm = () => {
                         >
                             {Object.entries(pointsCategories).map(
                                 ([key, value]) => (
-                                    <SelectItem key={key} value={key}>
+                                    <SelectItem key={key} id={key}>
                                         {value.name}
                                     </SelectItem>
                                 ),

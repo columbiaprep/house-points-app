@@ -1,10 +1,10 @@
 "use client";
-import { Button, Card, CardBody, CardHeader, Divider } from "@nextui-org/react";
+import { Button, Card, CardBody, CardHeader, Divider } from "@heroui/react";
 import { useRouter } from "next/navigation";
 
 import { AchievementsContainer } from "@/components/achievements";
 import { useAuth } from "@/contexts/AuthContext";
-import HousePoints from "@/components/house_points";
+import { pointsCategories } from "@/firebase-configuration/firebaseDb";
 
 const Dashboard = () => {
     const user = useAuth();
@@ -32,24 +32,26 @@ const Dashboard = () => {
                                         Breakdown
                                     </h2>
                                     <Divider />
-                                    <p>
-                                        Attending Events Points:{" "}
-                                        {userDbData?.attendingEventsPts}
-                                    </p>
-                                    <p>
-                                        Caught Being Good Points:{" "}
-                                        {userDbData?.beingGoodPts}
-                                    </p>
-                                    <p>
-                                        Sports Team Points:{" "}
-                                        {userDbData?.sportsTeamPts}
-                                    </p>
-                                    <p>
-                                        Total Points: {userDbData?.totalPoints}
-                                    </p>
+                                    {userDbData &&
+                                        pointsCategories.map((category) => (
+                                            <div
+                                                key={category.id}
+                                                className="flex flex-row justify-between"
+                                            >
+                                                <p key={category.id}>
+                                                    {category.name}:{" "}
+                                                    <span>
+                                                        {
+                                                            userDbData[
+                                                                category.key
+                                                            ]
+                                                        }
+                                                    </span>{" "}
+                                                </p>
+                                            </div>
+                                        ))}
                                 </Card>
                                 <AchievementsContainer />
-                                <HousePoints />
                                 <div className="flex flex-wrap flex-row gap-2">
                                     <Button
                                         className="w-max"

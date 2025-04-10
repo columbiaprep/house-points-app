@@ -1,45 +1,10 @@
-/* Ensure global font is applied */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap'); 
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-/* Apply black background to the whole webpage */
-html, body {
-  font-family: 'Poppins', sans-serif;
-  background-color: #000000; /* Full black background */
-  color: white;
-  margin: 0;
-  padding: 0;
-  height: 100%; 
-}
-
-/* Global animations */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+/* Optional: HeroUI-specific global styles (if any custom layer is used) */
+@layer base {
+  html {
+    font-family: theme('fontFamily.sans');
   }
 }
-
-/* Leaderboard Container */
-.leaderboard-container {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  background-color: black; /* Keep the leaderboard background black */
-  padding: 40px;
-  width: 80%;
-  max-width: 700px;
-  margin: 0 auto;
-  border-radius: 16px;
-  min-height: 600px;
-  overflow-y: auto;
-
-  /* Remove box shadow or outline */
-  box-shadow: none; /* Ensure no box-shadow is applied around the leaderboard*/
-  outline: none; /* Remove any outline */
-}
- 

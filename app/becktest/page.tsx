@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import IndividualHouseComponent from "/components/IndividualHouseComponent.tsx";
+import IndividualHouseComponent from "../components/IndividualHouseComponent.tsx";
 
 const BeckTest = () => {
     const router = useRouter();

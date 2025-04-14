@@ -12,6 +12,7 @@
     "@firebase/auth": "^1.9.1",
     "@firebase/firestore": "^4.7.9",
     "@heroui/react": "2.7.5",
+    "@questlabs/react-sdk": "^2.1.7",
     "@react-aria/ssr": "3.9.4",
     "@react-aria/visually-hidden": "3.8.12",
     "@tailwindcss/vite": "^4.0.9",

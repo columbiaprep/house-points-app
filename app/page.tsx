@@ -16,6 +16,7 @@ export default function Home() {
             <Shout />
 
             <individualHouseSpreadComp />
+            
         </section>
     );
 }

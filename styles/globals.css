@@ -2,9 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Optional: HeroUI-specific global styles (if any custom layer is used) */
-@layer base {
-  html {
-    font-family: theme('fontFamily.sans');
-  }
-}
+
+ /* import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableColumn,
+  TableRow,
+  TableCell
+} from "@heroui/react"; */

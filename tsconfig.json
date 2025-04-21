@@ -16,7 +16,7 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve", // Change this from "preserve" to "react-jsx"
+    "jsx": "preserve", // NOTE: Change this from "preserve" to "react-jsx"
     "incremental": true,
     "plugins": [
       {

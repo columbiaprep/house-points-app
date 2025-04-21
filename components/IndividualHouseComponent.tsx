@@ -18,61 +18,61 @@ export type IconSvgProps = SVGProps<SVGSVGElement> & {
 
 export const columns = [
   {name: "NAME", uid: "name"},
-  {name: "HOUSE", uid: "house"},
-  {name: "GRADE", uid: "grade"},
   {name: "POINTS", uid: "points"},
+  {name: "GRADE", uid: "grade"},
+  {name: "HOUSE", uid: "house"},
 ];
 
 export const users = [
   {
     id: 1,
-    Name: "Beck Neigut",
-    Role: "Student",
-    House: "Gold House",
-    Points: "125",
-    Grade: "11th",
-    Avatar: "https://i.pravatar.cc/150?u=a042581f4e29026024d",
-    Email: "tony.reichert@example.com",
+    name: "Beck Neigut",
+    role: "Student",
+    house: "Gold House",
+    points: "125",
+    grade: "11th",
+    avatar: "https://i.pravatar.cc/150?u=a042581f4e29026024d",
+    email: "tony.reichert@example.com",
   },
   {
-    id: 1,
+    id: 2,
     Name: "Sebastian Rosado",
     Role: "Student",
     House: "Green House",
     Points: "90",
     Grade: "11th",
-    Avatar: "https://i.pravatar.cc/150?u=a042581f4e29026024d",
-    Email: "tony.reichert@example.com",
+    avatar: "https://i.pravatar.cc/150?u=a042581f4e29026024d",
+    email: "tony.reichert@example.com",
   },
   {
-    id: 1,
+    id: 3,
     Name: "Maximillian Ising",
     Role: "Student",
     House: "Gold House",
     Points: "260",
     Grade: "11th",
-    Avatar: "https://i.pravatar.cc/150?u=a042581f4e29026024d",
-    Email: "tony.reichert@example.com",
+    avatar: "https://i.pravatar.cc/150?u=a042581f4e29026024d",
+    email: "tony.reichert@example.com",
   },
   {
     id: 4,
-    name: "William Howard",
-    role: "Community Manager",
-    team: "Marketing",
-    status: "vacation",
-    age: "28",
-    avatar: "https://i.pravatar.cc/150?u=a048581f4e29026701d",
-    email: "william.howard@example.com",
+    Name: "Logan Rogers",
+    Role: "Student",
+    House: "Silver House",
+    Points: "40",
+    Grade: "11th",
+    avatar: "https://i.pravatar.cc/150?u=a042581f4e29026024d",
+    email: "tony.reichert@example.com",
   },
   {
     id: 5,
-    name: "Kristen Copper",
-    role: "Sales Manager",
-    team: "Sales",
-    status: "active",
-    age: "24",
-    avatar: "https://i.pravatar.cc/150?u=a092581d4ef9026700d",
-    email: "kristen.cooper@example.com",
+    Name: "Aime Wan",
+    Role: "Student",
+    House: "Gold House",
+    Points: "100",
+    Grade: "11th",
+    avatar: "https://i.pravatar.cc/150?u=a042581f4e29026024d",
+    email: "tony.reichert@example.com",
   },
 ];
 
@@ -204,7 +204,7 @@ const statusColorMap: Record<string, ChipProps["color"]> = {
 
 type User = (typeof users)[0];
 
-export default function App() {
+export default function Leaderboard() {
   const renderCell = React.useCallback((user: User, columnKey: React.Key) => {
     const cellValue = user[columnKey as keyof User];
 
@@ -223,12 +223,12 @@ export default function App() {
         return (
           <div className="flex flex-col">
             <p className="text-bold text-sm capitalize">{cellValue}</p>
-            <p className="text-bold text-sm capitalize text-default-400">{user.team}</p>
+            <p className="text-bold text-sm capitalize text-default-400">{user.house}</p>
           </div>
         );
       case "status":
         return (
-          <Chip className="capitalize" color={statusColorMap[user.status]} size="sm" variant="flat">
+          <Chip className="capitalize" color={statusColorMap["default"]} size="sm" variant="flat">
             {cellValue}
           </Chip>
         );

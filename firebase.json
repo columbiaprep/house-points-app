@@ -10,5 +10,37 @@
       "**/.*",
       "**/node_modules/**"
     ]
+  },
+  "functions": [
+    {
+      "source": "house-points-funcs",
+      "codebase": "house-points-funcs",
+      "ignore": [
+        "node_modules",
+        ".git",
+        "firebase-debug.log",
+        "firebase-debug.*.log",
+        "*.local"
+      ],
+      "predeploy": [
+        "npm --prefix \"house-points-funcs\" run lint",
+        "npm --prefix \"house-points-funcs\" run build"
+      ]
+    }
+  ],
+  "emulators": {
+    "functions": {
+      "port": 5001
+    },
+    "firestore": {
+      "port": 8080
+    },
+    "hosting": {
+      "port": 5005
+    },
+    "ui": {
+      "enabled": false
+    },
+    "singleProjectMode": true
   }
 }

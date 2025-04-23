@@ -1,11 +1,20 @@
-import { getAuth, GoogleAuthProvider, signInWithRedirect } from 'firebase/auth';
-import app from './firebaseApp';
+"use client";
+import { onAuthStateChanged, signOut, User } from "@firebase/auth";
 
-const auth = getAuth(app);
+import { auth } from "./firebaseApp";
 
-export const authWithGoogle = async () => {
-    const provider = new GoogleAuthProvider();
-    return await signInWithRedirect(auth, provider);
-}
+export const handleAuthStateChange = (
+    onUserAuthenticated: (user: User | null) => void,
+) => {
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            onUserAuthenticated(user);
+        } else {
+            onUserAuthenticated(null);
+        }
+    });
+};
 
-// Need to create a way to limit google account access to only the accounts that are part of the organization
+export const signOutUser = async () => {
+    await signOut(auth);
+};

@@ -1,9 +1,22 @@
-rules_version = '2';
-
 service cloud.firestore {
   match /databases/{database}/documents {
+
+    // Match all documents in the "users" collection
+    match /users/{userId} {
+      // Allow read access only if the user is authenticated and the userId matches the authenticated user's email
+      allow read: if request.auth != null;
+      
+      // Allow write access only if the user is authenticated and the userId matches the authenticated user's email
+      allow write: if request.auth != null && request.auth.token.email == userId;
+    }
+
+    // Match all documents in any other collection (e.g., data collection)
     match /{document=**} {
-      allow read, write: if true;
+      // Allow read access only if the user is authenticated
+      allow read: if request.auth != null;
+
+      // Allow write access only if the user is authenticated and their accountType is "admin"
+      allow write: if request.auth.token.email!= null && get(/databases/$(database)/documents/users/$(request.auth.token.email)).data.accountType == "admin";
     }
   }
 }

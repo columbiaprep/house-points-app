@@ -21,26 +21,20 @@ export const housePointsSpread = {
         display: true,
         text: 'House Points Spread'
     },
-    labels: ['Good Points', 'House Events', 'School Events', "My Points", "Others Points"],
+    labels: ['School Events', 'House Challenges', 'House Drives', "My Points", "Others Points"],
     datasets: [
       {
         label: '# of Ponts',
-        data: [12, 19, 3, 5, 2],
+        data: [12, 19, 3, 5, 50],
         backgroundColor: [
-            'rgba(108, 245, 136, 0.86)',
-            'rgba(40, 213, 75, 0.91)',
-            'rgba(26, 187, 8, 0.7)',
-            'rgba(17, 136, 21, 0.7)',
-            'rgba(6, 61, 5, 0.7)',
-            'rgba(255, 159, 64, 0.2)',
+            'rgb(255, 102, 102)', 
+            'rgba(255, 50, 50, 0.91)', 
+            'rgba(200, 0, 0, 0.7)', 
+            'rgba(150, 0, 0, 0.7)', 
+            'rgba(80, 0, 0, 0.7)',
           ],
           borderColor: [
-            'rgb(7, 68, 12)',
-            'rgb(7, 68, 12)',
-            'rgb(7, 68, 12)',
-            'rgb(7, 68, 12)',
-            'rgb(7, 68, 12)',
-            'rgb(7, 68, 12)',        
+            'rgba(100, 20, 20, 1)',    
         ],
         borderWidth: 3,
       },
@@ -51,26 +45,21 @@ export const housePointsSpread = {
         display: true,
         text: 'Personal Points Spread'
     },
-    labels: ['Good Points', 'House Events', 'School Events'],
+    labels: ["Caught Being Good", "Support (attending events)", "Participation (season long extracurriculars)","Attendance","Community Service", "Events"],
     datasets: [
       {
         label: '# of Points',
-        data: [30,5,9],
+        data: [30,5,9,16,20,22],
         backgroundColor: [
-            'rgba(22, 236, 64, 0.6)',
-            'rgba(1, 170, 35, 0.6)',
-            'rgba(10, 94, 27, 0.6)',
-            'rgba(17, 136, 25, 0.5)',
-            'rgba(6, 61, 5, 0.5)',
-            'rgba(255, 159, 64, 0.2)',
+            'rgba(255, 80, 80, 0.95)',
+            'rgba(235, 60, 60, 0.9)', 
+            'rgba(210, 40, 40, 0.85)', 
+            'rgba(180, 20, 20, 0.8)', 
+            'rgba(150, 10, 10, 0.75)', 
+            'rgba(120, 5, 5, 0.7)',
           ],
           borderColor: [
-            'rgb(7, 68, 12)',
-            'rgb(7, 68, 12)',
-            'rgb(7, 68, 12)',
-            'rgb(7, 68, 12)',
-            'rgb(7, 68, 12)',
-            'rgb(7, 68, 12)',        
+            'rgba(100, 20, 20, 1)',     
         ],
         borderWidth: 3,
       },
@@ -82,7 +71,7 @@ export const housePointsSpread = {
   export default function Home() {
     const router = useRouter();
     return (
-        <div className="bg-green-200 grid place-items-center font-stretch-150% font-mono font-bold text-3xl"> {/* Changing the hight of it, most likely will do this later when adding the different componets and not here*/}
+        <div className="bg-red-200 grid place-items-center font-stretch-150% font-mono font-bold text-3xl"> {/* Changing the hight of it, most likely will do this later when adding the different componets and not here*/}
 <div>
 <p className="grid place-items-center">
         HOUSE SPREAD
@@ -107,12 +96,9 @@ export const housePointsSpread = {
 />
 </div>
 <div>
-    
-</div>
-<div>
 <p className="grid place-items-center mt-10">  {/* mt-10 adds space between the two graphs*/}
         Personal Spread
-</p>
+</p> 
 <Pie 
   data={personalPointsSpread} 
   options={{ 

@@ -1,0 +1,78 @@
+{
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --turbopack",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint . --ext .ts,.tsx -c .eslintrc.json --fix"
+  },
+  "dependencies": {
+    "@firebase/app": "^0.11.2",
+    "@firebase/auth": "^1.9.1",
+    "@firebase/firestore": "^4.7.9",
+    "@heroui/react": "2.7.5",
+    "@react-aria/ssr": "3.9.4",
+    "@react-aria/visually-hidden": "3.8.12",
+    "@tailwindcss/vite": "^4.0.9",
+    "@tanstack/react-table": "^8.21.3",
+    "clsx": "2.1.1",
+    "firebase": "^11.0.1",
+    "framer-motion": "^11.13.1",
+    "intl-messageformat": "^10.5.0",
+    "next": "^15.3.1",
+    "next-app-template": "file:",
+    "next-themes": "^0.2.1",
+    "papaparse": "5.4.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "sharp": "^0.33.5",
+    "simple-git": "^3.27.0"
+  },
+  "devDependencies": {
+    "@types/node": "20.5.7",
+    "@types/papaparse": "^5.3.15",
+    "@types/react": "19.0.6",
+    "@types/react-dom": "19.0.3",
+    "@typescript-eslint/eslint-plugin": "7.2.0",
+    "@typescript-eslint/parser": "7.2.0",
+    "autoprefixer": "^10.4.19",
+    "eslint": "^8.57.1",
+    "eslint-config-next": "15.1.4",
+    "eslint-config-prettier": "^8.10.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-jsx-a11y": "^6.4.1",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "eslint-plugin-react": "^7.37.3",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-unused-imports": "^3.2.0",
+    "postcss": "^8.4.38",
+    "prettier": "^3.4.2",
+    "tailwind-variants": "0.1.20",
+    "tailwindcss": "^3.4.17",
+    "typescript": "5.0.4"
+  },
+  "engines": {
+    "node": "23.4.0",
+    "npm": "11.2.0"
+  },
+  "name": "cgps-houses",
+  "description": "To establish a connection to firebase, follow the following steps:",
+  "main": "next.config.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/columbiaprep/house-points-app.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/columbiaprep/house-points-app/issues"
+  },
+  "homepage": "https://github.com/columbiaprep/house-points-app#readme",
+  "overrides": {
+    "@types/react": "19.0.6",
+    "@types/react-dom": "19.0.3"
+  }
+}

@@ -27,14 +27,14 @@ export const housePointsSpread = {
         label: '# of Ponts',
         data: [12, 19, 3, 5, 50],
         backgroundColor: [
-            'rgba(220, 220, 220, 0.86)', 
-            'rgba(200, 200, 200, 0.91)', 
-            'rgba(170, 170, 170, 0.7)', 
-            'rgba(140, 140, 140, 0.7)', 
-            'rgba(100, 100, 100, 0.7)',
+            'rgba(255, 208, 65, 0.86)', 'rgba(255, 191, 0, 0.91)', 'rgba(224, 171, 0, 0.95)', 'rgb(200, 159, 10)', 'rgba(164, 123, 0, 0.95)',
+
           ],
           borderColor: [
-            'rgba(80, 80, 80, 1)',
+            'rgba(130, 90, 0, 1)',
+
+
+   
         ],
         borderWidth: 3,
       },
@@ -51,15 +51,19 @@ export const housePointsSpread = {
         label: '# of Points',
         data: [30,5,9,16,20,22],
         backgroundColor: [
-            'rgba(240, 240, 240, 0.97)', 
-            'rgba(220, 220, 220, 0.91)', 
-            'rgba(200, 200, 200, 0.86)', 
-            'rgba(170, 170, 170, 0.81)', 
-            'rgba(140, 140, 140, 0.76)', 
-            'rgba(110, 110, 110, 0.7)',
+            'rgba(255, 210, 70, 0.93)', 
+            'rgba(245, 190, 50, 0.88)', 
+            'rgba(230, 170, 30, 0.83)', 
+            'rgba(200, 150, 20, 0.78)', 
+            'rgba(170, 120, 15, 0.74)', 
+            'rgba(140, 90, 10, 0.7)',
           ],
           borderColor: [
-            'rgba(80, 80, 80, 1)',
+            'rgba(130, 90, 0, 1)',
+
+
+
+      
         ],
         borderWidth: 3,
       },
@@ -71,7 +75,7 @@ export const housePointsSpread = {
   export default function Home() {
     const router = useRouter();
     return (
-        <div className="bg-gray-200 grid place-items-center font-stretch-150% font-mono font-bold text-3xl"> {/* Changing the hight of it, most likely will do this later when adding the different componets and not here*/}
+        <div className="bg-yellow-100 grid place-items-center font-stretch-150% font-mono font-bold text-3xl"> {/* Changing the hight of it, most likely will do this later when adding the different componets and not here*/}
 <div>
 <p className="grid place-items-center">
         HOUSE SPREAD
@@ -113,4 +117,4 @@ export const housePointsSpread = {
 </div>            
 </div>
     )
-}    
+}

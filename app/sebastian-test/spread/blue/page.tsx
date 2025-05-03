@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { Doughnut } from "react-chartjs-2";
 import { Pie } from 'react-chartjs-2';
+import { fetchIndividual } from "@/firebase-configuration/firebaseDb";
 
 
 
@@ -73,6 +74,10 @@ export const housePointsSpread = {
 
   export default function Home() {
     const router = useRouter();
+
+    const individualData = fetchIndividual("srosado26@cgps.org")
+    console.log(individualData)
+
     return (
         <div className="bg-blue-200 grid place-items-center font-stretch-150% font-mono font-bold text-3xl"> {/* Changing the hight of it, most likely will do this later when adding the different componets and not here*/}
 <div>

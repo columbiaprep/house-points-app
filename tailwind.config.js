@@ -4,9 +4,58 @@ const { Quicksand, Ledger } = require("next/font/google");
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
+    "./node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}",
     './app/**/*.{js,ts,jsx,tsx,mdx}',
-    './components/**/*.{js,ts,jsx,tsx,mdx}',
-    "./node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}"
+    './components/**/*.{js,ts,jsx,tsx,mdx}'
+  ],
+  safelist: [
+    // Green Ivy
+    'from-green-400',
+    'to-emerald-700',
+    'outline-emerald-900',
+    'shadow-green-500/50',
+
+    // Pink Panthers
+    'from-pink-400',
+    'to-fuchsia-700',
+    'outline-fuchsia-900',
+    'shadow-pink-500/50',
+
+    // Blue Thunder
+    'from-cyan-400',
+    'to-blue-700',
+    'outline-blue-900',
+    'shadow-cyan-500/50',
+
+    // Red Phoenix
+    'from-red-400',
+    'to-rose-700',
+    'outline-rose-900',
+    'shadow-red-500/50',
+
+    // Purple Reign
+    'from-purple-400',
+    'to-violet-700',
+    'outline-violet-900',
+    'shadow-purple-500/50',
+
+    // Golden Hearts
+    'from-yellow-400',
+    'to-yellow-700',
+    'outline-yellow-900',
+    'shadow-yellow-500/50',
+
+    // Orange Supernova
+    'from-orange-400',
+    'to-amber-700',
+    'outline-amber-900',
+    'shadow-orange-500/50',
+
+    // Silver Knights
+    'from-gray-400',
+    'to-slate-700',
+    'outline-slate-900',
+    'shadow-gray-500/50',
   ],
   darkMode: "class",
   theme: {

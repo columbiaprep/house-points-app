@@ -13,15 +13,19 @@ interface IndependentHouseProps{
 }
 
 export const HousePointsRow: React.FC<IndependentHouseProps> = ({colorName, houseImage, amountPoints, houseName, accentColor, fontSize}) => {
+    const houseImageDefaultSrc = "./placeholder.svg"
+    const gradientClasses = `from-${colorName}-400 to-${accentColor}-700 outline-${accentColor}-900 shadow-${colorName}-500/50`
+    console.log(gradientClasses)
     return (
+        
         <div className="grid place-items-center min-w-screen">
-            <div className={`shadow-lg flex flex-row h-14 w-full rounded-xl bg-gradient-to-r hover:outline outline-4 from-${colorName}-400 to-${accentColor}-700 outline-${accentColor}-900 shadow-${colorName}-500/50 outline-${accentColor}-900"}`}>
+            <div className={`${gradientClasses}  shadow-lg flex flex-row h-14 w-full rounded-xl bg-gradient-to-r hover:outline outline-4`}>
             {/* Div above will be a button later to take you to the houses page */}
             
             {/* Also the distance between House name and Points would change once I could get it to be smaller then the whole page */}
             <Image
             className=" object-center dark:invert flex-initial"
-            src= {houseImage}
+            src= {houseImageDefaultSrc}
             alt= {houseName}
             width={180}
             height={38}

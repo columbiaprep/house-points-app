@@ -8,7 +8,6 @@ export default function Home() {
     //moving us into /dashboard anyway
     const router = useRouter();
 
-
     useEffect(() => {
         router.push("/dashboard")
     }, [])

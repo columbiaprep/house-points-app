@@ -19,24 +19,24 @@ export const HousePointsRow: React.FC<IndependentHouseProps> = ({colorName, hous
     return (
         
         <div className="grid place-items-center min-w-screen">
-            <div className={`${gradientClasses}  shadow-lg flex flex-row h-14 w-full rounded-xl bg-gradient-to-r hover:outline outline-4`}>
+            <div className={`${gradientClasses}  shadow-lg items-center flex flex-row h-14 w-full rounded-xl bg-gradient-to-r hover:outline outline-4`}>
             {/* Div above will be a button later to take you to the houses page */}
             
             {/* Also the distance between House name and Points would change once I could get it to be smaller then the whole page */}
             <Image
-            className=" object-center dark:invert flex-initial"
+            className="ms-2 me-2 object-center object-contain dark:invert flex-initial"
             src= {houseImageDefaultSrc}
             alt= {houseName}
-            width={180}
-            height={38}
+            width={50}
+            height={50}
             priority
             />
         
-            <p className ={`basis-3/5 font-stretch-150% font-mono font-bold text-${fontSize}xl flex-1 basis-16`}>
+            <p className ={`text-xl align-middle basis-3/5 font-stretch-150% font-mono font-bold flex-1 basis-16`}>
             {houseName}
             </p>
 
-            <p className ="basis-2/5 font-stretch-100% font-mono font-medium text-4xl flex-1 basis-16">
+            <p className ="me-2 text-xl basis-2/5 font-stretch-100% font-mono font-medium flex-1 basis-16">
             Points: {amountPoints}
             </p>
             

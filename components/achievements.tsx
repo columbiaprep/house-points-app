@@ -7,7 +7,7 @@ import {
     Divider,
     Tooltip,
     Image,
-} from "@nextui-org/react";
+} from "@heroui/react";
 
 interface TrophyIconProps {
     achievementName: string;

@@ -1,7 +1,7 @@
-import { Button } from "@nextui-org/button";
-import { Input } from "@nextui-org/input";
+import { Button } from "@heroui/button";
+import { Input } from "@heroui/input";
 import React, { useState } from "react";
-import { Spinner } from "@nextui-org/spinner";
+import { Spinner } from "@heroui/spinner";
 import {
     Modal,
     ModalContent,
@@ -10,7 +10,7 @@ import {
     ModalHeader,
     ModalBody,
     Card,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import Papa from "papaparse";
 
 import { resetDatabase, Student } from "@/firebase-configuration/firebaseDb";
@@ -44,18 +44,27 @@ const AdminReset = () => {
                 dynamicTyping: true,
             });
 
-            const headers: string[] = ["STUDENT: First Name",	"STUDENT: Last Name",	"STUDENT: Email 1",	"Class", "Grade"]
-            const students: Array<Student> = parseResult.data.map((row: any) => {
-                return {
-                    id: row[headers[2]],
-                    name: `${row[headers[0]]} ${row[headers[1]]}`,
-                    firstName: row[headers[0]],
-                    lastName: row[headers[1]],
-                    email: row[headers[2]],
-                    house: row[headers[3]],
-                    grade: row[headers[4]],
-                };
-            });
+            const headers: string[] = [
+                "STUDENT: First Name",
+                "STUDENT: Last Name",
+                "STUDENT: Email 1",
+                "Class",
+                "Grade",
+            ];
+            const students: Array<Student> = parseResult.data.map(
+                (row: any) => {
+                    return {
+                        id: row[headers[2]],
+                        name: `${row[headers[0]]} ${row[headers[1]]}`,
+                        firstName: row[headers[0]],
+                        lastName: row[headers[1]],
+                        email: row[headers[2]],
+                        house: row[headers[3]],
+                        grade: row[headers[4]],
+                    };
+                },
+            );
+
             students.forEach((student) => {
                 if (student.house.includes("Green")) {
                     student.house = "Green Ivy";
@@ -82,8 +91,6 @@ const AdminReset = () => {
                     student.house = "Pink Panthers";
                 }
             });
-            
-            
 
             await resetDatabase(students);
         } catch (error) {
@@ -93,7 +100,7 @@ const AdminReset = () => {
     };
 
     return (
-        <Card className="container mt-4 p-4 bg-background w-5/6">
+        <Card className="container mt-4 p-4 bg-background md:w-5/6 w-full">
             <h2 className="text-2xl font-bold text-center">Yearly Reset</h2>
             <div>
                 <Modal

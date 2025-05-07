@@ -52,6 +52,8 @@ export interface PointCategories {
     description: string;
     key: string;
     name: string;
+}
+
 export interface User {
     displayName: string;
     email: string;
@@ -83,27 +85,6 @@ async function initializePointsCategories() {
 }
 
 initializePointsCategories();
-
-export async function editPointCategory(
-    id: string,
-    updatedCategory: PointCategory,
-) {
-    const categoryDoc = doc(db, "pointCategories", id);
-
-    await setDoc(categoryDoc, updatedCategory, { merge: true });
-}
-
-export async function addPointCategory(newCategory: PointCategory) {
-    const categoryDoc = doc(db, "pointCategories", newCategory.key);
-
-    await setDoc(categoryDoc, newCategory);
-}
-
-export async function deletePointCategory(id: string) {
-    const categoryDoc = doc(db, "pointCategories", id);
-
-    await deleteDoc(categoryDoc);
-}
 
 // Fetch all individuals
 export async function fetchAllIndividuals(): Promise<

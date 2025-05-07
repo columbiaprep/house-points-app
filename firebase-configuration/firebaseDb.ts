@@ -47,6 +47,11 @@ export interface Student {
     house: string;
 }
 
+export interface PointCategories {
+    id: string;
+    description: string;
+    key: string;
+    name: string;
 export interface User {
     displayName: string;
     email: string;
@@ -409,4 +414,38 @@ export async function getUserPhoto(email: string): Promise<string> {
     }
 
     return "";
+}
+
+export async function getPointCategories() {
+    const pointCategoriesQuery = await getDocs(
+        collection(db, "pointCategories"),
+    );
+
+    return pointCategoriesQuery.docs.map((doc) => {
+        const data = doc.data();
+        const pointCategory: PointCategories = {
+            id: doc.id,
+            description: data.description,
+            key: data.key,
+            name: data.name,
+        };
+        return pointCategory;
+    });
+}
+
+export async function updatePointCategory(
+    id: string,
+    updatedCategory: PointCategories,
+) {
+    const pointCategoryDoc = doc(db, "pointCategories", id);
+    await setDoc(pointCategoryDoc, updatedCategory);
+}
+export async function addPointCategory(newCategory: PointCategories) {
+    const pointCategoryDoc = doc(collection(db, "pointCategories"));
+    await setDoc(pointCategoryDoc, newCategory);
+}
+
+export async function deletePointCategory(id: string) {
+    const pointCategoryDoc = doc(db, "pointCategories", id);
+    await setDoc(pointCategoryDoc, { deleted: true }, { merge: true });
 }

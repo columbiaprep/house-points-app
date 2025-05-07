@@ -9,45 +9,20 @@ import {
     Button,
     RadioGroup,
     Radio,
-} from "@nextui-org/react";
-import { Card, CardBody } from "@nextui-org/card";
+} from "@heroui/react";
+import { Card, CardBody } from "@heroui/card";
+import { getDownloadURL, getStorage, ref } from "firebase/storage";
+import { useRouter } from "next/navigation";
 
 import {
     type IndividualDocument,
     type HouseDocument,
     writeToIndividualData,
     writeToHouseData,
-    fetchAllHouses,
-    fetchAllIndividuals,
 } from "@/firebase-configuration/firebaseDb";
 import { toTitleCase } from "@/config/globalFuncs";
-import { pointsCategories } from "@/firebase-configuration/pointsCategoriesConfig";
-
-const getAllIndividualData = async (): Promise<IndividualDocument[] | null> => {
-    try {
-        const data = await fetchAllIndividuals();
-
-        return data;
-    } catch (error) {
-        console.error("Failed to fetch individual data:", error);
-
-        return null;
-    }
-};
-
-const getAllHousesLeaderboardData = async (): Promise<
-    HouseDocument[] | null
-> => {
-    try {
-        const data = await fetchAllHouses();
-
-        return data;
-    } catch (error) {
-        console.error("Failed to fetch houses leaderboard data:", error);
-
-        return null;
-    }
-};
+import { pointsCategories } from "@/firebase-configuration/firebaseDb";
+import app from "@/firebase-configuration/firebaseApp";
 
 const AdminPointsForm = () => {
     const [individualData, setIndividualData] = useState<IndividualDocument[]>(
@@ -64,36 +39,36 @@ const AdminPointsForm = () => {
         type: string;
     } | null>(null);
 
+    const router = useRouter();
+
+    const storage = getStorage(app);
+    const loadData = async () => {
+        const dataRef = ref(storage, "data.json");
+
+        try {
+            const url = await getDownloadURL(dataRef);
+            const response = await fetch(url);
+            const data = await response.json();
+
+            setIndividualData(data.individuals);
+            setHousesData(data.houses);
+        } catch (error) {
+            console.error("Failed to load data:", error);
+        }
+    };
+
     useEffect(() => {
-        const fetchIndividualData = async () => {
-            const data = await getAllIndividualData();
-
-            if (data) {
-                setIndividualData(data);
-            }
-        };
-        const fetchHousesData = async () => {
-            const data = await getAllHousesLeaderboardData();
-
-            if (data) {
-                setHousesData(data);
-            }
-        };
-        const fetchData = async () => {
-            await fetchHousesData();
-            await fetchIndividualData();
-        };
-
-        fetchData();
+        loadData();
     }, []);
 
     const handleAddStudentPoints = async () => {
+        if (!selectedStudent || !selectedCategory) {
+            setMessage({ text: "Please select a student and category.", type: "error" });
+            return;
+        }
+
         try {
-            await writeToIndividualData(
-                selectedCategory,
-                selectedStudent,
-                pointsToAdd,
-            );
+            await writeToIndividualData(selectedCategory, selectedStudent, pointsToAdd);
 
             setMessage({ text: "Points added successfully!", type: "success" });
         } catch (error) {
@@ -110,7 +85,10 @@ const AdminPointsForm = () => {
                 pointsToAdd,
             );
 
-            setMessage({ text: "Points added successfully!", type: "success" });
+            setMessage({
+                text: `Points added successfully!`,
+                type: "success",
+            });
         } catch (error) {
             setMessage({ text: "Failed to add points.", type: "error" });
             console.error("Failed to add points:", error);
@@ -127,13 +105,14 @@ const AdminPointsForm = () => {
         if (addBy === "house") {
             handleAddHousePoints();
         }
+        router.refresh();
     };
 
     return (
         <div className="flex">
             <Card
                 isBlurred
-                className="point-form-card border-none bg-background/60 dark:bg-default-100/50 shadow-lg p-6 w-5/6"
+                className="point-form-card border-none bg-background/60 dark:bg-default-100/50 shadow-lg p-6 md:w-5/6 w-full"
             >
                 <CardBody>
                     <div className="flex flex-col gap-6">
@@ -158,31 +137,32 @@ const AdminPointsForm = () => {
                                     className="w-full"
                                     label="Student Name"
                                     value={selectedStudent}
-                                    onSelectionChange={(value) =>
-                                        setSelectedStudent(value as string)
-                                    }
+                                    onSelectionChange={(key) => setSelectedStudent(key ? String(key) : "")} // Update selectedStudent
                                 >
-                                    {individualData.map((student) => (
+                                    {individualData.map((student: IndividualDocument) => (
                                         <AutocompleteItem
                                             key={student.id}
-                                            value={student.id}
+                                            id={student.id}
                                         >
                                             {student.name}
                                         </AutocompleteItem>
                                     ))}
                                 </Autocomplete>
                                 <Select
+
                                     className="w-full mt-4"
                                     label="Select a category"
                                     onSelectionChange={(value) =>
                                         setSelectedCategory(
-                                            value.currentKey as string,
+                                            pointsCategories[
+                                                value.currentKey as unknown as number
+                                            ].key,
                                         )
                                     }
                                 >
                                     {Object.entries(pointsCategories).map(
                                         ([key, value]) => (
-                                            <SelectItem key={key} value={key}>
+                                            <SelectItem key={key} id={key}>
                                                 {value.name}
                                             </SelectItem>
                                         ),
@@ -207,17 +187,17 @@ const AdminPointsForm = () => {
                                     className="w-full"
                                     label="Select a House"
                                     value={selectedHouse}
-                                    onChange={(e) =>
-                                        setSelectedHouse(e.target.value)
-                                    }
+                                    onSelectionChange={(key) => {
+                                        const selectedValue = Array.from(key)[0];
+                                        setSelectedHouse(selectedValue ? String(selectedValue) : ""); 
+                                    }}
                                 >
                                     {housesData.map((house) => (
                                         <SelectItem
-                                            key={house.id}
-                                            textValue={toTitleCase(house.name)}
-                                            value={house.id}
+                                            key={house.name}
+                                            id={house.name}
                                         >
-                                            {toTitleCase(house.name)} House
+                                            {toTitleCase(house.name)}
                                         </SelectItem>
                                     ))}
                                 </Select>
@@ -226,13 +206,15 @@ const AdminPointsForm = () => {
                                     label="Select a category"
                                     onSelectionChange={(value) =>
                                         setSelectedCategory(
-                                            value.currentKey as string,
+                                            pointsCategories[
+                                                value.currentKey as unknown as number
+                                            ].key,
                                         )
                                     }
                                 >
                                     {Object.entries(pointsCategories).map(
                                         ([key, value]) => (
-                                            <SelectItem key={key} value={key}>
+                                            <SelectItem key={key} id={key}>
                                                 {value.name}
                                             </SelectItem>
                                         ),

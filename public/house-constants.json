@@ -1,0 +1,51 @@
+[
+    {
+      "colorName": "green",
+      "accentColor": "emerald",
+      "houseImage": "/globe.svg",
+      "houseName": "Green Ivy"
+    },
+    {
+      "colorName": "pink",
+      "accentColor": "fuchsia",
+      "houseImage": "/globe.svg",
+      "houseName": "Pink Panthers"
+    },
+    {
+      "colorName": "cyan",
+      "accentColor": "blue",
+      "houseImage": "/globe.svg",
+      "houseName": "Blue Thunder"
+    },
+    {
+      "colorName": "red",
+      "accentColor": "rose",
+      "houseImage": "/globe.svg",
+      "houseName": "Red Phoenix"
+    },
+    {
+      "colorName": "purple",
+      "accentColor": "violet",
+      "houseImage": "/globe.svg",
+      "houseName": "Purple Reign"
+    },
+    {
+      "colorName": "yellow",
+      "accentColor": "yellow",
+      "houseImage": "/globe.svg",
+      "houseName": "Golden Hearts"
+    },
+    {
+      "colorName": "orange",
+      "accentColor": "amber",
+      "houseImage": "/globe.svg",
+      "houseName": "Orange Supernova"
+    },
+    {
+      "colorName": "gray",
+      "accentColor": "slate",
+      "houseImage": "/globe.svg",
+      "houseName": "Silver Knights"
+      
+    }
+  ]

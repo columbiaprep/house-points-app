@@ -8,11 +8,16 @@
     "lint": "eslint . --ext .ts,.tsx -c .eslintrc.json --fix"
   },
   "dependencies": {
-    "@nextui-org/react": "^2.6.5",
+    "@firebase/app": "^0.11.2",
+    "@firebase/auth": "^1.9.1",
+    "@firebase/firestore": "^4.7.9",
+    "@heroui/react": "2.7.5",
     "@react-aria/ssr": "3.9.4",
     "@react-aria/visually-hidden": "3.8.12",
-    "axios": "^1.7.8",
+    "@tailwindcss/vite": "^4.0.9",
+    "@tanstack/react-table": "^8.21.3",
     "clsx": "2.1.1",
+    "dotenv": "^16.4.7",
     "firebase": "^11.0.1",
     "framer-motion": "^11.13.1",
     "intl-messageformat": "^10.5.0",
@@ -22,6 +27,7 @@
     "papaparse": "5.4.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "sharp": "^0.33.5",
     "simple-git": "^3.27.0"
   },
   "devDependencies": {
@@ -45,11 +51,12 @@
     "postcss": "^8.4.38",
     "prettier": "^3.4.2",
     "tailwind-variants": "0.1.20",
-    "tailwindcss": "^3.4.12",
+    "tailwindcss": "^3.4.17",
     "typescript": "5.0.4"
   },
   "engines": {
-    "node": "22.x"
+    "node": "23.4.0",
+    "npm": "11.2.0"
   },
   "name": "cgps-houses",
   "description": "To establish a connection to firebase, follow the following steps:",

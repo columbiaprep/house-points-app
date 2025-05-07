@@ -1,5 +1,5 @@
 import { getPointCategories, updatePointCategory, PointCategories } from "@/firebase-configuration/firebaseDb";
-import { Card, Table, TableHeader, TableBody, TableRow, TableCell, Button, Input, Modal, ModalHeader, ModalBody, ModalFooter, TableColumn, ModalContent } from "@nextui-org/react";
+import { Card, Table, TableHeader, TableBody, TableRow, TableCell, Button, Input, Modal, ModalHeader, ModalBody, ModalFooter, TableColumn, ModalContent } from "@heroui/react";
 import { useEffect, useState } from "react";
 import { FaPenToSquare } from "react-icons/fa6";
 

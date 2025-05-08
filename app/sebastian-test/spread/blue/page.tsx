@@ -5,6 +5,7 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { Doughnut } from "react-chartjs-2";
 import { Pie } from 'react-chartjs-2';
 import { fetchIndividual } from "@/firebase-configuration/firebaseDb";
+import { useEffect, useState } from "react";
 
 
 
@@ -74,9 +75,24 @@ export const housePointsSpread = {
 
   export default function Home() {
     const router = useRouter();
+    //async delays the code that needs the data from running so it runs later while the other code runs
+    //TODO: Finish fetchIndividual function
+    //Need to ensure we get the Promise data correctly
 
-    const individualData = fetchIndividual("srosado26@cgps.org")
-    console.log(individualData)
+    const [leaderboard, setLeaderboard] = useState();
+    
+    useEffect(() => {
+      const setLeaderboard = async () => {
+        const data = fetchIndividual("srosado26@cgps.org")
+        console.log("FETCHING...")
+        console.log(data)
+        return data
+    };
+        }, []);
+    
+  
+
+
 
     return (
         <div className="bg-blue-200 grid place-items-center font-stretch-150% font-mono font-bold text-3xl"> {/* Changing the hight of it, most likely will do this later when adding the different componets and not here*/}

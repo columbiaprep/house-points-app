@@ -11,6 +11,15 @@ module.exports = {
   darkMode: "class",
   theme: {
     extend: {
+      keyframes: {
+        glow: {
+          '0%, 100%': { boxShadow: '0 0 0 3px var(--glow-color)' },
+          '50%': { boxShadow: '0 0 15px 6px var(--glow-color)' },
+        },
+      },
+      animation: {
+        glow: 'glow 2s infinite',
+      },
       // fontFamily: {
       //   sans: [Quicksand, "sans-serif"],
       // }
@@ -31,7 +40,6 @@ module.exports = {
               medium: "16px",
               large: "18px",
             },
-            
           }
         },
         dark: {
@@ -56,7 +64,7 @@ module.exports = {
           DEFAULT: "rgb(20, 155, 235)",
         },
         focus: "rgb(20, 155, 235)",
-      }, 
+      },
       layout: {
         disabledOpacity: "0.3",
         radius: {
@@ -70,7 +78,7 @@ module.exports = {
           large: "3px",
         },
       },
-    },
-    ),
+    }),
   ],
 };
+

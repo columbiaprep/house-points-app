@@ -12,7 +12,7 @@ interface GlowingEffectProps {
   children: ReactNode;
 }
 
-// Full house style map with all the house names and their respective glow colors that should be used
+// full house list with all the house names and their glow colors that should be used. this can be changed if the color doesnt look good
 const houseStyles: Record<string, { glowColor: string }> = {
   'Blue Thunder': { glowColor: 'rgba(59, 130, 246, 0.8)' },
   'Orange Supernova': { glowColor: 'rgba(251, 146, 60, 0.8)' },
@@ -24,6 +24,7 @@ const houseStyles: Record<string, { glowColor: string }> = {
   'Pink Panther': { glowColor: 'rgba(236, 72, 153, 0.8)' },
 };
 
+//NOTE! Memo is to compare props and only re-render if they change
 const GlowingEffect = memo(
   ({
     className = '',

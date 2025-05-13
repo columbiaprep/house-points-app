@@ -31,6 +31,8 @@ export interface HouseDocument {
     name: string;
     totalPoints: number;
     [key: string]: any; // Allows for dynamic point categories
+    colorName: string;
+    accentColor: string;
 }
 
 export interface FirestoreDataProps {
@@ -43,6 +45,13 @@ export interface Student {
     name: string;
     grade: number;
     house: string;
+}
+
+export interface PointCategories {
+    id: string;
+    description: string;
+    key: string;
+    name: string;
 }
 
 export interface User {
@@ -76,27 +85,6 @@ async function initializePointsCategories() {
 }
 
 initializePointsCategories();
-
-export async function editPointCategory(
-    id: string,
-    updatedCategory: PointCategory,
-) {
-    const categoryDoc = doc(db, "pointCategories", id);
-
-    await setDoc(categoryDoc, updatedCategory, { merge: true });
-}
-
-export async function addPointCategory(newCategory: PointCategory) {
-    const categoryDoc = doc(db, "pointCategories", newCategory.key);
-
-    await setDoc(categoryDoc, newCategory);
-}
-
-export async function deletePointCategory(id: string) {
-    const categoryDoc = doc(db, "pointCategories", id);
-
-    await deleteDoc(categoryDoc);
-}
 
 // Fetch all individuals
 export async function fetchAllIndividuals(): Promise<
@@ -407,4 +395,38 @@ export async function getUserPhoto(email: string): Promise<string> {
     }
 
     return "";
+}
+
+export async function getPointCategories() {
+    const pointCategoriesQuery = await getDocs(
+        collection(db, "pointCategories"),
+    );
+
+    return pointCategoriesQuery.docs.map((doc) => {
+        const data = doc.data();
+        const pointCategory: PointCategories = {
+            id: doc.id,
+            description: data.description,
+            key: data.key,
+            name: data.name,
+        };
+        return pointCategory;
+    });
+}
+
+export async function updatePointCategory(
+    id: string,
+    updatedCategory: PointCategories,
+) {
+    const pointCategoryDoc = doc(db, "pointCategories", id);
+    await setDoc(pointCategoryDoc, updatedCategory);
+}
+export async function addPointCategory(newCategory: PointCategories) {
+    const pointCategoryDoc = doc(collection(db, "pointCategories"));
+    await setDoc(pointCategoryDoc, newCategory);
+}
+
+export async function deletePointCategory(id: string) {
+    const pointCategoryDoc = doc(db, "pointCategories", id);
+    await setDoc(pointCategoryDoc, { deleted: true }, { merge: true });
 }

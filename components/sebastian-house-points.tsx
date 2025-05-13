@@ -82,7 +82,7 @@ export const HousePointsContainer = () => {
                         houseImage={house.houseImage} 
                         totalPoints={house.totalPoints}
                         id={house.name}
-                        
+                        houseRank={house.houseRank}
                         />
                     
                 ))}

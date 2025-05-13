@@ -26,6 +26,7 @@ export interface IndividualDocument {
     grade: number;
     house: string;
     [key: string]: any; // Allows for dynamic point categories
+    houseRank: number
 }
 
 export interface HouseDocument {
@@ -138,6 +139,7 @@ export async function fetchIndividual(id: string): Promise<IndividualDocument> {
         name: data.name,
         grade: data.grade,
         house: data.house,
+        houseRank: data.houseRank
     };
 
     Object.values(pointsCategories).forEach((category) => {

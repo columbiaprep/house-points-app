@@ -33,6 +33,7 @@ export interface HouseDocument {
     [key: string]: any; // Allows for dynamic point categories
     colorName: string;
     accentColor: string;
+    houseRank: number;
 }
 
 export interface FirestoreDataProps {

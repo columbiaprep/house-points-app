@@ -1,6 +1,5 @@
 import {
     collection,
-    deleteDoc,
     doc,
     getDoc,
     getDocs,
@@ -410,6 +409,7 @@ export async function getPointCategories() {
             key: data.key,
             name: data.name,
         };
+
         return pointCategory;
     });
 }
@@ -419,14 +419,17 @@ export async function updatePointCategory(
     updatedCategory: PointCategories,
 ) {
     const pointCategoryDoc = doc(db, "pointCategories", id);
+
     await setDoc(pointCategoryDoc, updatedCategory);
 }
 export async function addPointCategory(newCategory: PointCategories) {
     const pointCategoryDoc = doc(collection(db, "pointCategories"));
+
     await setDoc(pointCategoryDoc, newCategory);
 }
 
 export async function deletePointCategory(id: string) {
     const pointCategoryDoc = doc(db, "pointCategories", id);
+
     await setDoc(pointCategoryDoc, { deleted: true }, { merge: true });
 }

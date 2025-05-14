@@ -204,7 +204,7 @@ export async function writeToHouseData(
         const houseData = houseDoc.data();
 
         // Check if the point category exists in the document
-        if (houseData && !houseData.hasOwnProperty(ptsCategory)) {
+        if (!houseData.hasOwnProperty(ptsCategory)) {
             // Add the point category if it doesn't exist
             updateData = { ...houseData, [ptsCategory]: points };
         } else {

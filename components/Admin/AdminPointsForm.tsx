@@ -101,9 +101,6 @@ const AdminPointsForm = () => {
             setMessage({ text: "Failed to add points.", type: "error" });
             console.error("Failed to add points:", error);
         }
-        setSelectedStudent("");
-        setSelectedHouse("");
-        setPointsToAdd(0);
     };
 
     const handleAddPoints = () => {
@@ -113,7 +110,8 @@ const AdminPointsForm = () => {
         if (addBy === "house") {
             handleAddHousePoints();
         }
-        router.refresh();
+        router.push("/admin");
+        
     };
 
     return (

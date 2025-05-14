@@ -107,6 +107,14 @@ const AdminPointCategories = () => {
                         ))}
                     </TableBody>
                 </Table>
+                <div className="flex justify-center mt-4">
+                    <Button
+                        color={"success"}
+                        onPress={() => setIsAddModalOpen(true)}
+                    >
+                        Add Point Category
+                    </Button>
+                </div>
             </Card>
 
             {/* add category modal */}
@@ -162,6 +170,12 @@ const AdminPointCategories = () => {
                                     setFetchedPointCategories(
                                         updatedCategories,
                                     );
+                                    setNewCategory({
+                                        id: "",
+                                        name: "",
+                                        description: "",
+                                        key: "",
+                                    });
                                     setIsAddModalOpen(false);
                                 }}
                             >

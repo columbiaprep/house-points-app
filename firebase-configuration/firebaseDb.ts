@@ -1,6 +1,5 @@
 import {
     collection,
-    deleteDoc,
     doc,
     getDoc,
     getDocs,
@@ -263,7 +262,7 @@ export async function writeToHouseData(
         const houseData = houseDoc.data();
 
         // Check if the point category exists in the document
-        if (houseData && !houseData.hasOwnProperty(ptsCategory)) {
+        if (!houseData.hasOwnProperty(ptsCategory)) {
             // Add the point category if it doesn't exist
             updateData = { ...houseData, [ptsCategory]: points };
         } else {
@@ -468,6 +467,7 @@ export async function getPointCategories() {
             key: data.key,
             name: data.name,
         };
+
         return pointCategory;
     });
 }
@@ -477,14 +477,17 @@ export async function updatePointCategory(
     updatedCategory: PointCategories,
 ) {
     const pointCategoryDoc = doc(db, "pointCategories", id);
+
     await setDoc(pointCategoryDoc, updatedCategory);
 }
 export async function addPointCategory(newCategory: PointCategories) {
     const pointCategoryDoc = doc(collection(db, "pointCategories"));
+
     await setDoc(pointCategoryDoc, newCategory);
 }
 
 export async function deletePointCategory(id: string) {
     const pointCategoryDoc = doc(db, "pointCategories", id);
+
     await setDoc(pointCategoryDoc, { deleted: true }, { merge: true });
 }

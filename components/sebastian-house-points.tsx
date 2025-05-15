@@ -18,7 +18,7 @@ export const HousePointsRow: React.FC<HouseDocument> = ({id, name, colorName, ac
             {/* Also the distance between House name and Points would change once I could get it to be smaller then the whole page */}
             <Image
             className="ms-2 me-2 object-center object-contain dark:invert flex-initial"
-            src= {houseImageDefaultSrc}
+            src= {"/houseImages/"+ houseImage + ".png"}
             alt= {name}
             width={50}
             height={50}
@@ -79,7 +79,7 @@ export const HousePointsContainer = () => {
                         name={house.name} 
                         colorName={house.colorName} 
                         accentColor={house.accentColor} 
-                        houseImage={house.houseImage} 
+                        houseImage={house.name.split(" ")[0]} 
                         totalPoints={house.totalPoints}
                         id={house.name}
                         

@@ -1,74 +1,50 @@
-'use client';
+// glow.tsx
+import React from 'react';
 
-import { memo, useEffect, useRef, ReactNode } from 'react';
-import { cn } from './Dependencies';
-
-interface GlowingEffectProps {
-  className?: string;
-  borderWidth?: number;
-  duration?: number;
-  color?: string;
-  house?: string;
-  children: ReactNode;
-}
-
-// full house list with all the house names and their glow colors that should be used. this can be changed if the color doesnt look good
-const houseStyles: Record<string, { glowColor: string }> = {
-  'Blue Thunder': { glowColor: 'rgba(59, 130, 246, 0.8)' },
-  'Orange Supernova': { glowColor: 'rgba(251, 146, 60, 0.8)' },
-  'Purple Reign': { glowColor: 'rgba(168, 85, 247, 0.8)' },
-  'Red Pheonix': { glowColor: 'rgba(239, 68, 68, 0.8)' },
-  'Silver Knights': { glowColor: 'rgba(156, 163, 175, 0.8)' },
-  'Green Ivy': { glowColor: 'rgba(34, 197, 94, 0.8)' },
-  'Gold House': { glowColor: 'rgba(234, 179, 8, 0.8)' },
-  'Pink Panther': { glowColor: 'rgba(236, 72, 153, 0.8)' },
+// Props type for the glowing row wrapper
+type GlowProps = {
+  house: string; // Used to determine glow color
+  children: React.ReactElement; // The <tr> row element to be styled
 };
 
-//NOTE! Memo is to compare props and only re-render if they change
-const GlowingEffect = memo(
-  ({
-    className = '',
-    borderWidth = 2,
-    duration = 2000,
-    color,
-    house,
-    children,
-  }: GlowingEffectProps) => {
-    const ref = useRef<HTMLDivElement>(null);
+export default function GlowingEffect({ house, children }: GlowProps) {
+  // RGB glow colors for each house key can be changed to any color to suit the house better if needed
+  // Map of house names to RGBA color values for glow styling
+  const colorMap: Record<string, string> = {
+    GreenIvy:        'rgba(72,187,120,0.6)',
+    GoldHearts:      'rgba(245,158,11,0.6)',
+    RedPhoenix:      'rgba(239,68,68,0.6)',
+    OrangeSuperNova: 'rgba(249,115,22,0.6)',
+    PinkPanther:     'rgba(236,72,153,0.6)',
+    BlueThunder:     'rgba(59,130,246,0.6)',
+    PurpleRain:      'rgba(139,92,246,0.6)',
+    SilverKnights:   'rgba(156,163,175,0.6)',
+  };
 
-    const resolvedColor =
-      color || (house && houseStyles[house]?.glowColor) || 'rgba(255, 255, 255, 0.6)';
+  // Fallback color if house isn't in the map
+  const glowColor = colorMap[house] || 'rgba(107,114,128,0.4)'; // Default color grey
 
-    useEffect(() => {
-      if (ref.current) {
-        const keyframes = [
-          `0 0 0 ${borderWidth}px ${resolvedColor}`,
-          `0 0 15px ${resolvedColor}`,
-          `0 0 0 ${borderWidth}px ${resolvedColor}`,
-        ];
-        ref.current.animate(
-          { boxShadow: keyframes },
-          {
-            duration,
-            iterations: Infinity,
-          }
-        );
-      }
-    }, [borderWidth, duration, resolvedColor]);
+  // Clone the child element (expected to be a <tr>) and add custom styles to it
+  const styledRow = React.cloneElement(children, {
+    className: `${children.props.className || ''} relative`, // Preserve any existing classes and add 'relative' 
+    // NOTE!!: **`relative` (Tailwind/CSS):** Sets the element’s position to `relative`, allowing absolutely positioned child elements to be anchored to it, without moving the element itself.
 
-    return (
-      <div className="relative">
-        <div
-          ref={ref}
-          className={cn(
-            'absolute inset-0 rounded-lg pointer-events-none z-0 transition-all',
-            className
-          )}
-        />
-        <div className="relative z-10">{children}</div>
-      </div>
-    );
-  }
-);
+    style: {
+      ...children.props.style, // Keep original inline styles
+      boxShadow: `0 0 8px ${glowColor}, 0 0 20px ${glowColor}`, // Initial glow effect
+      animation: 'glow 2s ease-in-out infinite', // Animate the glow or glow effect
+    },
+  });
 
-export default GlowingEffect;
+  return (
+    <>
+      {styledRow}
+      <style jsx global>{`
+        @keyframes glow {
+          0%,100% { box-shadow: 0 0 8px ${glowColor}, 0 0 20px ${glowColor}; }
+          50%     { box-shadow: 0 0 16px ${glowColor}, 0 0 40px ${glowColor}; }
+        }
+      `}</style>
+    </>
+  );
+}

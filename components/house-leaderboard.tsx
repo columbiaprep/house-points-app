@@ -6,11 +6,12 @@ import { fetchAllHouses, IndividualDocument } from "@/firebase-configuration/fir
 import { HouseDocument } from "@/firebase-configuration/firebaseDb";
 import {Link} from "@heroui/link";
 
-export const HousePointsRow: React.FC<HouseDocument> = ({id, place, name, colorName, accentColor, houseImage, totalPoints}) => {
+export const HousePointsRow: React.FC<HouseDocument> = ({id, place, name, colorName, accentColor, houseImage, totalPoints, isStudentHouse}) => {
     const gradientClasses = `from-${colorName}-400 to-${accentColor}-700 outline-${accentColor}-900 shadow-${colorName}-500/50`
+    const outlineThickness = isStudentHouse ? "outline-8" : "outline-4"
     return (
             <Link 
-                className={`grid min-w-400 max-h-200 place-items-center ${gradientClasses} shadow-lg items-center flex rounded-xl bg-gradient-to-r mb-4 hover:outline-4 `}
+                className={`grid min-w-400 max-h-200 place-items-center ${gradientClasses} shadow-lg items-center flex rounded-xl bg-gradient-to-r mb-4 hover:${outlineThickness} `}
                 href={`spread/${houseImage}`.toLowerCase()}
                 underline={"none"}
                 isBlock={true}

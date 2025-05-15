@@ -4,23 +4,7 @@ import { Spinner } from "@heroui/react";
 
 import { fetchAllHouses } from "@/firebase-configuration/firebaseDb";
 import { HouseDocument } from "@/firebase-configuration/firebaseDb";
-import {Spinner} from "@heroui/react"
 import {Link} from "@heroui/link";
-
-
-export const HousePointsRow: React.FC<HouseDocument> = ({
-    id,
-    name,
-    colorName,
-    accentColor,
-    houseImage,
-    totalPoints,
-}) => {
-    const houseImageDefaultSrc = "./placeholder.svg";
-    const gradientClasses = `from-${colorName}-400 to-${accentColor}-700 outline-${accentColor}-900 shadow-${colorName}-500/50`;
-
-    console.log(gradientClasses);
-
 
 export const HousePointsRow: React.FC<HouseDocument> = ({id, place, name, colorName, accentColor, houseImage, totalPoints}) => {
     const gradientClasses = `from-${colorName}-400 to-${accentColor}-700 outline-${accentColor}-900 shadow-${colorName}-500/50`
@@ -58,20 +42,10 @@ export const HousePointsRow: React.FC<HouseDocument> = ({id, place, name, colorN
                     {/* Spacing between different houses */}
 
             </Link>
-                
-        
-            
+                      
     )
 }
 
-                <p className="me-2 text-xl basis-2/5 font-stretch-100% font-mono font-medium flex-1 basis-16">
-                    Points: {totalPoints}
-                </p>
-            </div>
-            <div className="h-2">{/* Spacing between different houses */}</div>
-        </div>
-    );
-};
 
 export const HousePointsContainer = () => {
     //anything I'm fetching needs to use the below format

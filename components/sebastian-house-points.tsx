@@ -1,10 +1,25 @@
 import Image from "next/image";
-import { fetchAllHouses } from "@/firebase-configuration/firebaseDb";
 import { useState, useEffect } from "react";
+import { Spinner } from "@heroui/react";
+
+import { fetchAllHouses } from "@/firebase-configuration/firebaseDb";
 import { HouseDocument } from "@/firebase-configuration/firebaseDb";
 import {Spinner} from "@heroui/react"
 import {Link} from "@heroui/link";
 
+
+export const HousePointsRow: React.FC<HouseDocument> = ({
+    id,
+    name,
+    colorName,
+    accentColor,
+    houseImage,
+    totalPoints,
+}) => {
+    const houseImageDefaultSrc = "./placeholder.svg";
+    const gradientClasses = `from-${colorName}-400 to-${accentColor}-700 outline-${accentColor}-900 shadow-${colorName}-500/50`;
+
+    console.log(gradientClasses);
 
 
 export const HousePointsRow: React.FC<HouseDocument> = ({id, place, name, colorName, accentColor, houseImage, totalPoints}) => {
@@ -49,28 +64,36 @@ export const HousePointsRow: React.FC<HouseDocument> = ({id, place, name, colorN
     )
 }
 
-export const HousePointsContainer = () => {
+                <p className="me-2 text-xl basis-2/5 font-stretch-100% font-mono font-medium flex-1 basis-16">
+                    Points: {totalPoints}
+                </p>
+            </div>
+            <div className="h-2">{/* Spacing between different houses */}</div>
+        </div>
+    );
+};
 
+export const HousePointsContainer = () => {
     //anything I'm fetching needs to use the below format
     //import the appropriate interface from the database
-    const [houses, setHouses] = useState<HouseDocument[]>([])
+    const [houses, setHouses] = useState<HouseDocument[]>([]);
 
     //this keeps track of the loading state of the component
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(false);
 
     //useEffect gets called immediately, before the rest of the component loads
     //it calls the function to get the house document info, then passes it
     //to the stateful variable "houses" above
     useEffect(() => {
-        setLoading(true)
+        setLoading(true);
         fetchAllHouses()
             .then((h) => {
-                setHouses(h)
+                setHouses(h);
             })
             .then(() => {
-                setLoading(false)
-            })
-    }, [])
+                setLoading(false);
+            });
+    }, []);
 
     return(
         <div className="grid min-h-screen min-w-screen place-items-center"> {/* Any settings on the container should be added to the div to the left (like border, etc.) */}
@@ -97,6 +120,7 @@ export const HousePointsContainer = () => {
             </div>
             )
             }
+
         </div>
-    )    
-}
+    );
+};

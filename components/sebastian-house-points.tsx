@@ -77,6 +77,7 @@ export const HousePointsContainer = () => {
             {" "}
             {/* Any settings on the container should be added to the div to the left (like border, etc.) */}
             {loading ? (
+
                 <Spinner
                     classNames={{ label: "text-foreground mt-4" }}
                     label="wave"

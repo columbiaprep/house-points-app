@@ -35,7 +35,7 @@ export interface HouseDocument {
     [key: string]: any; // Allows for dynamic point categories
     colorName: string;
     accentColor: string;
-    houseRank: number;
+    place: number;
 }
 
 export interface FirestoreDataProps {
@@ -113,11 +113,12 @@ export async function fetchAllHouses(): Promise<Array<HouseDocument>> {
     );
     const querySnapshot = await getDocs(housesQuery);
 
-    return querySnapshot.docs.map((doc) => {
+    return querySnapshot.docs.map((doc, index) => {
         const data = doc.data();
 
         return {
             id: doc.id,
+            place: index + 1,
             ...data,
         } as HouseDocument;
     });

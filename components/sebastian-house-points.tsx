@@ -4,6 +4,9 @@ import { Spinner } from "@heroui/react";
 
 import { fetchAllHouses } from "@/firebase-configuration/firebaseDb";
 import { HouseDocument } from "@/firebase-configuration/firebaseDb";
+import {Spinner} from "@heroui/react"
+import {Link} from "@heroui/link";
+
 
 export const HousePointsRow: React.FC<HouseDocument> = ({
     id,
@@ -18,28 +21,48 @@ export const HousePointsRow: React.FC<HouseDocument> = ({
 
     console.log(gradientClasses);
 
+
+export const HousePointsRow: React.FC<HouseDocument> = ({id, place, name, colorName, accentColor, houseImage, totalPoints}) => {
+    const gradientClasses = `from-${colorName}-400 to-${accentColor}-700 outline-${accentColor}-900 shadow-${colorName}-500/50`
+    console.log(gradientClasses)
     return (
-        <div className="grid place-items-center min-w-screen">
-            <div
-                className={`${gradientClasses}  shadow-lg items-center flex flex-row h-14 w-full rounded-xl bg-gradient-to-r hover:outline outline-4`}
-            >
-                {/* Div above will be a button later to take you to the houses page */}
-
-                {/* Also the distance between House name and Points would change once I could get it to be smaller then the whole page */}
-                <Image
-                    priority
-                    alt={name}
-                    className="ms-2 me-2 object-center object-contain dark:invert flex-initial"
-                    height={50}
-                    src={houseImageDefaultSrc}
+            <Link 
+                className={`grid min-w-400 max-h-200 place-items-center ${gradientClasses} shadow-lg items-center flex rounded-xl bg-gradient-to-r mb-4 hover:outline-4 `}
+                href={`spread/${houseImage}`.toLowerCase()}
+                underline={"none"}
+                isBlock={true}
+                color={"foreground"}
+            >  
+                    <div className="ml-3 text-xl align-middle basis-1/10 font-stretch-100% font-mono font-bold">
+                        {place}
+                    </div>
+                    {/* Also the distance between House name and Points would change once I could get it to be smaller then the whole page */}
+                    <Image
+                    className="ms-2 me-2 object-center object-contain basis-2/10 dark:invert"
+                    src= {"/houseImages/"+ houseImage + ".png"}
+                    alt= {name}
                     width={50}
-                />
+                    height={50}
+                    priority
+                    />
+                
+                    <p className ={`ml-1 text-center text-2xl align-middle basis-5/10 flex-grow font-stretch-100% font-mono font-bold flex-1 overflow-hidden text-ellipsis`}>
+                        {name} 
+                    </p>
 
-                <p
-                    className={`text-xl align-middle basis-3/5 font-stretch-150% font-mono font-bold flex-1 basis-16`}
-                >
-                    {name}
-                </p>
+                    <p className ="min-w-0 ml-1 me-2 text-xs basis-2/10 font-mono flex-shrink">
+                        Points:<br /><span className="text-xl font-bold">{totalPoints}</span>
+                    </p>
+
+                
+                    {/* Spacing between different houses */}
+
+            </Link>
+                
+        
+            
+    )
+}
 
                 <p className="me-2 text-xl basis-2/5 font-stretch-100% font-mono font-medium flex-1 basis-16">
                     Points: {totalPoints}
@@ -72,32 +95,32 @@ export const HousePointsContainer = () => {
             });
     }, []);
 
-    return (
-        <div className="bg-slate-800 grid place-items-center min-h-screen min-w-screen">
-            {" "}
-            {/* Any settings on the container should be added to the div to the left (like border, etc.) */}
+    return(
+        <div className="grid min-h-screen min-w-screen place-items-center"> {/* Any settings on the container should be added to the div to the left (like border, etc.) */}
             {loading ? (
-
-                <Spinner
-                    classNames={{ label: "text-foreground mt-4" }}
-                    label="wave"
-                    variant="wave"
-                />
-            ) : (
-                <div className="">
-                    {houses.map((house, index) => (
-                        <HousePointsRow
-                            key={index}
-                            accentColor={house.accentColor}
-                            colorName={house.colorName}
-                            houseImage={house.houseImage}
-                            id={house.name}
-                            name={house.name}
-                            totalPoints={house.totalPoints}
+                <Spinner classNames={{label: "text-foreground mt-4"}} label="wave" variant="wave" />
+                ) : 
+            (   
+            <div className="min-w-min w-1/2"> 
+                {houses.map((house, index) => (
+                    <HousePointsRow 
+                        key = {index} 
+                        name={house.name} 
+                        colorName={house.colorName} 
+                        accentColor={house.accentColor} 
+                        houseImage={house.name.split(" ")[0]} 
+                        totalPoints={house.totalPoints}
+                        id={house.name}
+                        place={house.place}
+                        
                         />
-                    ))}
-                </div>
-            )}
+                    
+                    
+                ))}
+            </div>
+            )
+            }
+
         </div>
     );
 };

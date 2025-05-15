@@ -12,12 +12,13 @@ const Dashboard = () => {
     const userData = user.user;
     const accountType = user.accountType;
     const userDbData = user.userDbData;
+    const userEmail = user.user?.email
 
     const [student, setStudent] = useState<IndividualDocument>();
 
     useEffect(() => {
-        if (accountType == "student" && user.user?.email != null) {
-            fetchIndividual(user.user?.email)
+        if (accountType == "student" && userEmail != null) {
+            fetchIndividual(userEmail)
                 .then((user) => {
                     setStudent(user)
                 })

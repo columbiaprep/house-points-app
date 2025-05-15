@@ -10,9 +10,9 @@ const Dashboard = () => {
     const user = useAuth();
     const router = useRouter();
     const userData = user.user;
-    const accountType = user.accountType;
+    const accountType = "student";
     const userDbData = user.userDbData;
-    const userEmail = user.user?.email
+    const userEmail = "szack25@cgps.org"
 
     const [student, setStudent] = useState<IndividualDocument>();
 
@@ -21,6 +21,8 @@ const Dashboard = () => {
             fetchIndividual(userEmail)
                 .then((user) => {
                     setStudent(user)
+                    console.log(userEmail)
+                    console.log(user.house)
                 })
         }
     }, [])
@@ -34,8 +36,11 @@ const Dashboard = () => {
                     </h1>
                 </CardHeader>
                 <CardBody>
-                    {(student != undefined) ?                 
+                    {(student != undefined) ? 
+                        <>            
                     <HousePointsContainer student={student} id={student.id} name={student.name} grade={student.grade} house={student.house} houseRank={student.houseRank}/>
+                    <p>{student.name}</p>
+                    </>
                     : <></>
                     }
                     {accountType == "admin" && (

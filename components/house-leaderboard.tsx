@@ -8,10 +8,11 @@ import {Link} from "@heroui/link";
 
 export const HousePointsRow: React.FC<HouseDocument> = ({id, place, name, colorName, accentColor, houseImage, totalPoints, isStudentHouse}) => {
     const gradientClasses = `from-${colorName}-400 to-${accentColor}-700 outline-${accentColor}-900 shadow-${colorName}-500/50`
-    const outlineThickness = isStudentHouse ? "outline-8" : "outline-4"
+    const outlineThickness = isStudentHouse ? "outline-6 hover:outline-8" : "hover:outline-4"
+    console.log(isStudentHouse)
     return (
             <Link 
-                className={`grid min-w-400 max-h-200 place-items-center ${gradientClasses} shadow-lg items-center flex rounded-xl bg-gradient-to-r mb-4 hover:${outlineThickness} `}
+                className={`grid min-w-400 max-h-200 place-items-center ${gradientClasses} shadow-lg items-center flex rounded-xl bg-gradient-to-r mb-4 ${outlineThickness} `}
                 href={`spread/${houseImage}`.toLowerCase()}
                 underline={"none"}
                 isBlock={true}
@@ -21,7 +22,7 @@ export const HousePointsRow: React.FC<HouseDocument> = ({id, place, name, colorN
                         {place}
                     </div>
                     <Image
-                    className="ms-2 me-2 object-center object-contain basis-2/10 dark:invert"
+                    className="ms-2 me-2 object-center object-contain basis-2/10"
                     src= {"/houseImages/"+ houseImage + ".png"}
                     alt= {name}
                     width={50}
@@ -60,6 +61,7 @@ export const HousePointsContainer: React.FC<IndividualDocument> = (student: Indi
             })
             .then(() => {
                 setLoading(false);
+                
             });
     }, []);
 
@@ -81,7 +83,7 @@ export const HousePointsContainer: React.FC<IndividualDocument> = (student: Indi
                         totalPoints={house.totalPoints}
                         id={house.name}
                         place={house.place}
-                        isStudentHouse={house.name == student.name}
+                        isStudentHouse={house.name == student.house}
                         />
                 ))}
             </div>

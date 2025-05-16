@@ -1,22 +1,23 @@
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { Spinner } from "@heroui/react";
-
+import {useAuth} from "@/contexts/AuthContext"
 import { fetchAllHouses, IndividualDocument } from "@/firebase-configuration/firebaseDb";
 import { HouseDocument } from "@/firebase-configuration/firebaseDb";
 import {Link} from "@heroui/link";
 
 export const HousePointsRow: React.FC<HouseDocument> = ({id, place, name, colorName, accentColor, houseImage, totalPoints, isStudentHouse}) => {
+
     const gradientClasses = `from-${colorName}-400 to-${accentColor}-700 outline-${accentColor}-900 shadow-${colorName}-500/50`
     const outlineThickness = isStudentHouse ? "outline-8" : "hover:outline-4"
-    console.log(isStudentHouse)
     return (
             <Link 
                 className={`grid min-w-400 max-h-200 place-items-center ${gradientClasses} shadow-lg items-center flex rounded-xl bg-gradient-to-r mb-5 ${outlineThickness} `}
-                href={`spread/${houseImage}`.toLowerCase()}
+                href={`/spread/${houseImage}`}
                 underline={"none"}
                 isBlock={true}
                 color={"foreground"}
+                
             >  
                     <div className="ml-3 text-xl align-middle basis-1/10 font-stretch-100% font-mono font-bold">
                         {place}
@@ -42,13 +43,15 @@ export const HousePointsRow: React.FC<HouseDocument> = ({id, place, name, colorN
 }
 
 
-export const HousePointsContainer: React.FC<IndividualDocument> = (student: IndividualDocument) => {
+export const HousePointsContainer = () => {
     //anything I'm fetching needs to use the below format
     //import the appropriate interface from the database
     const [houses, setHouses] = useState<HouseDocument[]>([]);
 
     //this keeps track of the loading state of the component
     const [loading, setLoading] = useState(false);
+
+    const student = useAuth().userDbData
 
     //useEffect gets called immediately, before the rest of the component loads
     //it calls the function to get the house document info, then passes it
@@ -89,7 +92,6 @@ export const HousePointsContainer: React.FC<IndividualDocument> = (student: Indi
             </div>
             )
             }
-
         </div>
     );
 };

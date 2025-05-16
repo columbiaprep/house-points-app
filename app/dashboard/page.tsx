@@ -4,31 +4,16 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { HousePointsContainer } from "@/components/house-leaderboard";
 import { useEffect, useState } from "react";
-import { fetchIndividual, IndividualDocument } from "@/firebase-configuration/firebaseDb";
 
 const Dashboard = () => {
     const user = useAuth();
     const router = useRouter();
     const userData = user.user;
-    const accountType = "student";
-    const userDbData = user.userDbData;
-    const userEmail = "szack25@cgps.org"
-
-    const [student, setStudent] = useState<IndividualDocument>();
-
-    useEffect(() => {
-        if (accountType == "student" && userEmail != null) {
-            fetchIndividual(userEmail)
-                .then((user) => {
-                    setStudent(user)
-                    console.log(userEmail)
-                    console.log(user.house)
-                })
-        }
-    }, [])
+    const accountType = "student"; //TODO: Change back after testing
+    const student = user.userDbData;
+    const userEmail = "szack25@cgps.org" //TODO: Change back after testing
 
     return (
-        <>
             <Card className="">
                 <CardHeader className="flex justify-center">
                     <h1 className="text-2xl font-bold text-center">
@@ -36,9 +21,9 @@ const Dashboard = () => {
                     </h1>
                 </CardHeader>
                 <CardBody>
-                    {(student != undefined) ? 
+                    {(student != null) ? 
                         <>            
-                    <HousePointsContainer student={student} id={student.id} name={student.name} grade={student.grade} house={student.house} houseRank={student.houseRank}/>
+                    <HousePointsContainer/>
                     <p>{student.name}</p>
                     </>
                     : <></>
@@ -53,7 +38,6 @@ const Dashboard = () => {
                     )}
                 </CardBody>
             </Card>
-        </>
     );
 };
 

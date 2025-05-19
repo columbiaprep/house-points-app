@@ -9,6 +9,10 @@ module.exports = {
     './components/**/*.{js,ts,jsx,tsx,mdx}'
   ],
   safelist: [
+    'outline-1',
+    'outline-8',
+    'outline-6',
+    'outline-4',
     // Green Ivy
     'from-green-400',
     'to-emerald-700',

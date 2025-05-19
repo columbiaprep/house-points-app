@@ -91,18 +91,6 @@ export async function editPointCategory(
     await setDoc(categoryDoc, updatedCategory, { merge: true });
 }
 
-export async function addPointCategory(newCategory: PointCategory) {
-    const categoryDoc = doc(db, "pointCategories", newCategory.key);
-
-    await setDoc(categoryDoc, newCategory);
-}
-
-export async function deletePointCategory(id: string) {
-    const categoryDoc = doc(db, "pointCategories", id);
-
-    await deleteDoc(categoryDoc);
-}
-
 // Fetch all individuals
 export async function fetchAllIndividuals(): Promise<
     Array<IndividualDocument>

@@ -49,9 +49,10 @@ const AdminPointCategories = () => {
         fetchPointCategories();
     }, []);
 
-    const handleEditClick = (category: PointCategories) => {
-        setSelectedCategory(category);
-        setIsEditModalOpen(true);
+    const handleAddCategory = async () => {
+        await addPointCategory(newCategory);
+        setCategories([...categories, newCategory]);
+        setNewCategory({ key: "", name: "", description: "" });
     };
 
     const handleSave = async () => {
@@ -64,13 +65,13 @@ const AdminPointCategories = () => {
         }
     };
 
-    const handleInputChange = (field: keyof PointCategories, value: string) => {
-        if (selectedCategory) {
-            setSelectedCategory({ ...selectedCategory, [field]: value });
-        }
+    const handleDeleteCategory = async (id: string) => {
+        await deletePointCategory(id);
+        setCategories(categories.filter((cat) => cat.key !== id));
     };
 
     return (
+
         <div className="flex">
             <Card
                 isBlurred

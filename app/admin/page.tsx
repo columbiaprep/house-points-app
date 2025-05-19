@@ -7,7 +7,6 @@ import AdminPointsForm from "@/components/Admin/AdminPointsForm";
 import AdminReset from "@/components/Admin/AdminReset";
 import { useAuth } from "@/contexts/AuthContext";
 import AddAdmins from "@/components/Admin/AddAdmins";
-import AdminPointCategories from "@/components/Admin/AdminPointCategories";
 
 export default function AdminPage() {
     const auth = useAuth();
@@ -32,7 +31,6 @@ export default function AdminPage() {
                         <div className="md:w-5/12 w-full p-2">
                             <AdminPointsForm />
                             <AddAdmins />
-                            <AdminPointCategories />
                         </div>
                         <div className="md:w-5/12 w-full p-2">
                             <AdminMassPointsForm />

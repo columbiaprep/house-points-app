@@ -6,10 +6,10 @@ import {useAuth} from "@/contexts/AuthContext"
 import { fetchAllHouses, IndividualDocument } from "@/firebase-configuration/firebaseDb";
 import { HouseDocument } from "@/firebase-configuration/firebaseDb";
 import {Link} from "@heroui/link";
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
+import { Chart as ChartJS, ArcElement, Tooltip, Legend, Title } from "chart.js";
 import { Doughnut, Pie } from "react-chartjs-2";
 
-ChartJS.register(ArcElement, Tooltip, Legend);
+ChartJS.register(ArcElement, Tooltip, Legend, Title);
 export const options = {
     scales: {  
       y: {

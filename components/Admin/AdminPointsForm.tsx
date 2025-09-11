@@ -111,7 +111,6 @@ const AdminPointsForm = () => {
             handleAddHousePoints();
         }
         router.push("/admin");
-        
     };
 
     return (

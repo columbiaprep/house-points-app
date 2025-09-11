@@ -1,53 +1,92 @@
 "use client";
-import { useRouter, useParams } from "next/navigation";
+import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useAuth } from '@/contexts/AuthContext'
+
+import { useAuth } from "@/contexts/AuthContext";
 import PointsChartData from "@/components/pointsChart";
-import { housePointsSpread, personalPointsSpread } from "@/components/house-points-spread";
-import { fetchAllHouses, IndividualDocument } from "@/firebase-configuration/firebaseDb";
-import { HouseDocument } from "@/firebase-configuration/firebaseDb";
-import {Link} from "@heroui/link";
+import {
+    generateHouseChartData,
+    generatePersonalChartData,
+} from "@/components/chartDataUtils";
 
-
-
-const HouseSpreadPage = () => { 
+const HouseSpreadPage = () => {
     //use params returns the string in the URL
     const { houseColor } = useParams();
-    const student = useAuth().userDbData
-    const housecolor = typeof houseColor === "string" ? houseColor.toLowerCase() : ""; //if not null changes houseColor to lowercase so I can use in the coloring
-    //as well as checking if is a string and not an array (why can this be an array??)
-    
+    const { user, userDbData: student } = useAuth();
+    const housecolor =
+        typeof houseColor === "string" ? houseColor.toLowerCase() : "";
+
+    // State for chart data
+    const [houseChartData, setHouseChartData] = useState<any>(null);
+    const [personalChartData, setPersonalChartData] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const loadChartData = async () => {
+            if (!housecolor || !user?.email) return;
+
+            try {
+                setLoading(true);
+                // Load both house and personal chart data
+                const [houseData, personalData] = await Promise.all([
+                    generateHouseChartData(housecolor),
+                    generatePersonalChartData(user.email, housecolor),
+                ]);
+
+                setHouseChartData(houseData);
+                setPersonalChartData(personalData);
+            } catch (error) {
+                console.error("Error loading chart data:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        loadChartData();
+    }, [housecolor, user?.email]);
+
+    if (loading) {
+        return (
+            <div className="flex justify-center items-center h-64">
+                <div className="text-lg">Loading chart data...</div>
+            </div>
+        );
+    }
 
     return (
         <div>
-  
-        <h1>I have {student?.totalPoints}</h1>
-        <h1>I am in { houseColor }</h1>
+            <h1>I have {student?.totalPoints} total points</h1>
+            <h1>I am in {houseColor} house</h1>
 
-    
-    
-        <div className={`bg-${housecolor}-200 grid place-items-center font-mono font-bold text-3xl`}>
-            <div>
-                <p className="grid place-items-center">HOUSE SPREAD</p>
-                <PointsChartData 
-                    type="doughnut" 
-                    data={housePointsSpread} 
-                    title="House Points Spread" 
-                    />
+            <div
+                className={`bg-${housecolor}-200 grid place-items-center font-mono font-bold text-3xl`}
+            >
+                <div>
+                    <p className="grid place-items-center">HOUSE SPREAD</p>
+                    {houseChartData && (
+                        <PointsChartData
+                            data={houseChartData}
+                            title="House Points Spread"
+                            type="doughnut"
+                        />
+                    )}
                 </div>
 
-            <div>
-                <p className="grid place-items-center mt-10">Personal Spread</p>
-                <PointsChartData 
-                type="pie" 
-                data={personalPointsSpread} 
-                title="Personal Points Spread" 
-                />
-            </div>
+                <div>
+                    <p className="grid place-items-center mt-10">
+                        Personal Spread
+                    </p>
+                    {personalChartData && (
+                        <PointsChartData
+                            data={personalChartData}
+                            title="Personal Points Spread"
+                            type="pie"
+                        />
+                    )}
+                </div>
             </div>
         </div>
-        
-    )
-  }
-  export default HouseSpreadPage;
+    );
+};
 
+export default HouseSpreadPage;

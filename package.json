@@ -12,11 +12,12 @@
     "@firebase/auth": "^1.9.1",
     "@firebase/firestore": "^4.7.9",
     "@heroui/react": "2.7.5",
+    "@questlabs/react-sdk": "^2.2.87",
     "@react-aria/ssr": "3.9.4",
     "@react-aria/visually-hidden": "3.8.12",
     "@tailwindcss/vite": "^4.0.9",
     "@tanstack/react-table": "^8.21.3",
-    "chart.js": "^4.4.9",
+    "chart.js": "^4.5.0",
     "clsx": "2.1.1",
     "dotenv": "^16.4.7",
     "firebase": "^11.0.1",
@@ -58,8 +59,8 @@
     "typescript": "5.0.4"
   },
   "engines": {
-    "node": "23.4.0",
-    "npm": "11.2.0"
+    "node": "22.13.0",
+    "npm": "11.5.2"
   },
   "name": "cgps-houses",
   "description": "To establish a connection to firebase, follow the following steps:",

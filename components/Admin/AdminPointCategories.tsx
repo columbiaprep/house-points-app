@@ -71,7 +71,6 @@ const AdminPointCategories = () => {
     };
 
     return (
-
         <div className="flex">
             <Card
                 isBlurred

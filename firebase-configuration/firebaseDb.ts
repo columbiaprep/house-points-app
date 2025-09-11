@@ -1,6 +1,5 @@
 import {
     collection,
-    deleteDoc,
     doc,
     getDoc,
     getDocs,
@@ -8,6 +7,8 @@ import {
     query,
     setDoc,
     where,
+    or,
+    and,
 } from "@firebase/firestore";
 
 import { db } from "./firebaseApp";
@@ -24,6 +25,7 @@ export interface IndividualDocument {
     grade: number;
     house: string;
     [key: string]: any; // Allows for dynamic point categories
+    houseRank: number;
 }
 
 export interface HouseDocument {
@@ -31,6 +33,9 @@ export interface HouseDocument {
     name: string;
     totalPoints: number;
     [key: string]: any; // Allows for dynamic point categories
+    colorName: string;
+    accentColor: string;
+    place: number;
 }
 
 export interface FirestoreDataProps {
@@ -86,18 +91,6 @@ export async function editPointCategory(
     await setDoc(categoryDoc, updatedCategory, { merge: true });
 }
 
-export async function addPointCategory(newCategory: PointCategory) {
-    const categoryDoc = doc(db, "pointCategories", newCategory.key);
-
-    await setDoc(categoryDoc, newCategory);
-}
-
-export async function deletePointCategory(id: string) {
-    const categoryDoc = doc(db, "pointCategories", id);
-
-    await deleteDoc(categoryDoc);
-}
-
 // Fetch all individuals
 export async function fetchAllIndividuals(): Promise<
     Array<IndividualDocument>
@@ -122,11 +115,12 @@ export async function fetchAllHouses(): Promise<Array<HouseDocument>> {
     );
     const querySnapshot = await getDocs(housesQuery);
 
-    return querySnapshot.docs.map((doc) => {
+    return querySnapshot.docs.map((doc, index) => {
         const data = doc.data();
 
         return {
             id: doc.id,
+            place: index + 1,
             ...data,
         } as HouseDocument;
     });
@@ -147,6 +141,7 @@ export async function fetchIndividual(id: string): Promise<IndividualDocument> {
         name: data.name,
         grade: data.grade,
         house: data.house,
+        houseRank: data.houseRank,
     };
 
     Object.values(pointsCategories).forEach((category) => {
@@ -159,6 +154,66 @@ export async function fetchIndividual(id: string): Promise<IndividualDocument> {
     );
 
     return individual;
+}
+
+// Given a student, fetches the students above and/or below them in rank
+// Returns an array with 1 or 2 elements, the individual before and/or the one after
+export async function fetchNeighbors(
+    student: IndividualDocument,
+): Promise<IndividualDocument[]> {
+    const collectionRef = collection(db, "individuals");
+
+    const q = query(
+        collectionRef,
+        and(
+            where("houseName", "==", student.house),
+            or(
+                where("houseRank", ">=", student.houseRank + 1),
+                where("houseRank", "<=", student.houseRank - 1),
+            ),
+        ),
+    );
+    const docSnap = await getDocs(q);
+
+    if (!docSnap.empty) {
+        throw new Error(`No neighbors found for ${student.name}`);
+    }
+
+    return docSnap.docs.map((doc) => {
+        const data = doc.data();
+
+        return {
+            id: doc.id,
+            ...data,
+        } as IndividualDocument;
+    });
+}
+
+// Fetch top 5 individuals in a given house
+export async function fetchTopFiveInHouse(
+    houseName: string,
+): Promise<IndividualDocument[]> {
+    const collectionRef = collection(db, "individuals");
+    const q = query(
+        collectionRef,
+        where("houseName", "==", houseName),
+        where("houseRank", ">=", 1),
+        where("houseRank", "<=", 5),
+    );
+    const docSnap = await getDocs(q);
+
+    if (!docSnap.empty) {
+        throw new Error(`No top 5 students matching`);
+    }
+
+    return docSnap.docs.map((doc) => {
+        const data = doc.data();
+
+        return {
+            id: doc.id,
+            ...data,
+        } as IndividualDocument;
+    });
 }
 
 // Write to individual data
@@ -217,7 +272,7 @@ export async function writeToHouseData(
         const houseData = houseDoc.data();
 
         // Check if the point category exists in the document
-        if (houseData && !houseData.hasOwnProperty(ptsCategory)) {
+        if (!houseData.hasOwnProperty(ptsCategory)) {
             // Add the point category if it doesn't exist
             updateData = { ...houseData, [ptsCategory]: points };
         } else {
@@ -407,4 +462,42 @@ export async function getUserPhoto(email: string): Promise<string> {
     }
 
     return "";
+}
+
+export async function getPointCategories() {
+    const pointCategoriesQuery = await getDocs(
+        collection(db, "pointCategories"),
+    );
+
+    return pointCategoriesQuery.docs.map((doc) => {
+        const data = doc.data();
+        const pointCategory: PointCategories = {
+            id: doc.id,
+            description: data.description,
+            key: data.key,
+            name: data.name,
+        };
+
+        return pointCategory;
+    });
+}
+
+export async function updatePointCategory(
+    id: string,
+    updatedCategory: PointCategories,
+) {
+    const pointCategoryDoc = doc(db, "pointCategories", id);
+
+    await setDoc(pointCategoryDoc, updatedCategory);
+}
+export async function addPointCategory(newCategory: PointCategories) {
+    const pointCategoryDoc = doc(collection(db, "pointCategories"));
+
+    await setDoc(pointCategoryDoc, newCategory);
+}
+
+export async function deletePointCategory(id: string) {
+    const pointCategoryDoc = doc(db, "pointCategories", id);
+
+    await setDoc(pointCategoryDoc, { deleted: true }, { merge: true });
 }

@@ -1,32 +1,52 @@
-import React, { useState, useEffect } from "react";
-import { Button, Card, Input } from "@heroui/react";
+import {
+    Card,
+    Table,
+    TableHeader,
+    TableBody,
+    TableRow,
+    TableCell,
+    Button,
+    Input,
+    Modal,
+    ModalHeader,
+    ModalBody,
+    ModalFooter,
+    TableColumn,
+    ModalContent,
+} from "@heroui/react";
+import { useEffect, useState } from "react";
+import { FaPenToSquare } from "react-icons/fa6";
 
 import {
-    pointsCategories,
-    type PointCategory,
-    editPointCategory,
+    getPointCategories,
+    updatePointCategory,
+    PointCategories,
     addPointCategory,
-    deletePointCategory,
 } from "@/firebase-configuration/firebaseDb";
 
-// Outline of component, not finished
-
 const AdminPointCategories = () => {
-    const [categories, setCategories] = useState<PointCategory[]>([]);
-    const [newCategory, setNewCategory] = useState<PointCategory>({
-        key: "",
+    const [fetchedPointCategories, setFetchedPointCategories] = useState<
+        PointCategories[]
+    >([]);
+    const [selectedCategory, setSelectedCategory] =
+        useState<PointCategories | null>(null);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+    const [newCategory, setNewCategory] = useState<PointCategories>({
+        id: "",
         name: "",
         description: "",
+        key: "",
     });
 
     useEffect(() => {
-        const loadCategories = async () => {
-            const fetchedCategories = pointsCategories;
+        const fetchPointCategories = async () => {
+            const pointCategories = await getPointCategories();
 
-            setCategories(fetchedCategories);
+            setFetchedPointCategories(pointCategories);
         };
 
-        loadCategories();
+        fetchPointCategories();
     }, []);
 
     const handleAddCategory = async () => {
@@ -35,19 +55,14 @@ const AdminPointCategories = () => {
         setNewCategory({ key: "", name: "", description: "" });
     };
 
-    const handleEditCategory = async (
-        id: string,
-        updatedCategory: Partial<PointCategory>,
-    ) => {
-        await editPointCategory(id, {
-            ...categories.find((cat) => cat.key === id),
-            ...updatedCategory,
-        } as PointCategory);
-        setCategories(
-            categories.map((cat) =>
-                cat.key === id ? { ...cat, ...updatedCategory } : cat,
-            ),
-        );
+    const handleSave = async () => {
+        if (selectedCategory) {
+            await updatePointCategory(selectedCategory.id, selectedCategory);
+            const updatedCategories = await getPointCategories();
+
+            setFetchedPointCategories(updatedCategories);
+            setIsEditModalOpen(false);
+        }
     };
 
     const handleDeleteCategory = async (id: string) => {
@@ -56,68 +71,181 @@ const AdminPointCategories = () => {
     };
 
     return (
-        <Card>
-            <h1>Manage Point Categories</h1>
-            <div>
-                <Input
-                    placeholder="Key"
-                    type="text"
-                    value={newCategory.key}
-                    onChange={(e) =>
-                        setNewCategory({ ...newCategory, key: e.target.value })
-                    }
-                />
-                <Input
-                    placeholder="Name"
-                    type="text"
-                    value={newCategory.name}
-                    onChange={(e) =>
-                        setNewCategory({ ...newCategory, name: e.target.value })
-                    }
-                />
-                <Input
-                    placeholder="Description"
-                    type="text"
-                    value={newCategory.description}
-                    onChange={(e) =>
-                        setNewCategory({
-                            ...newCategory,
-                            description: e.target.value,
-                        })
-                    }
-                />
-                <Button onClick={handleAddCategory}>Add Category</Button>
-            </div>
-            <ul>
-                {categories.map((category) => (
-                    <li key={category.key}>
-                        <Input
-                            type="text"
-                            value={category.name}
-                            onChange={(e) =>
-                                handleEditCategory(category.key, {
-                                    name: e.target.value,
-                                })
-                            }
-                        />
-                        <Input
-                            type="text"
-                            value={category.description}
-                            onChange={(e) =>
-                                handleEditCategory(category.key, {
-                                    description: e.target.value,
-                                })
-                            }
-                        />
-                        <Button
-                            onPress={() => handleDeleteCategory(category.key)}
-                        >
-                            Delete
-                        </Button>
-                    </li>
-                ))}
-            </ul>
-        </Card>
+        <div className="flex">
+            <Card
+                isBlurred
+                className="border-none bg-background/60 dark:bg-default-100/50 shadow-lg p-6 w-5/6"
+            >
+                <h2 className="text-2xl font-bold text-center">
+                    Admin Point Categories
+                </h2>
+                <p className="text-center">Manage point categories here.</p>
+                <Table>
+                    <TableHeader>
+                        <TableColumn>Name</TableColumn>
+                        <TableColumn>Description</TableColumn>
+                        {/* <TableColumn>Key</TableColumn> */}
+                        <TableColumn>Actions</TableColumn>
+                    </TableHeader>
+                    <TableBody>
+                        {fetchedPointCategories.map((category) => (
+                            <TableRow key={category.id}>
+                                <TableCell>{category.name}</TableCell>
+                                <TableCell>{category.description}</TableCell>
+                                {/* <TableCell>{category.key}</TableCell> */}
+                                <TableCell>
+                                    <Button
+                                        className="px-0 max-w-[40px] bg-white hover:bg-gray-200"
+                                        onPress={() =>
+                                            handleEditClick(category)
+                                        }
+                                    >
+                                        <FaPenToSquare />
+                                    </Button>
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+                <div className="flex justify-center mt-4">
+                    <Button
+                        color={"success"}
+                        onPress={() => setIsAddModalOpen(true)}
+                    >
+                        Add Point Category
+                    </Button>
+                </div>
+            </Card>
+
+            {/* add category modal */}
+            {isAddModalOpen && (
+                <Modal
+                    isOpen={isAddModalOpen}
+                    onClose={() => setIsAddModalOpen(false)}
+                >
+                    <ModalContent>
+                        <ModalHeader>Add Point Category</ModalHeader>
+                        <ModalBody>
+                            <Input
+                                label="Name"
+                                value={newCategory.name}
+                                onChange={(e) =>
+                                    setNewCategory({
+                                        ...newCategory,
+                                        name: e.target.value,
+                                    })
+                                }
+                            />
+                            <Input
+                                label="Description"
+                                value={newCategory.description}
+                                onChange={(e) =>
+                                    setNewCategory({
+                                        ...newCategory,
+                                        description: e.target.value,
+                                    })
+                                }
+                            />
+                            <Input
+                                label="Key"
+                                placeholder="No Spaces"
+                                value={newCategory.key}
+                                onChange={(e) =>
+                                    setNewCategory({
+                                        ...newCategory,
+                                        key: e.target.value,
+                                    })
+                                }
+                            />
+                        </ModalBody>
+                        <ModalFooter>
+                            <Button
+                                color={"success"}
+                                onPress={async () => {
+                                    // Add logic to save the new category
+                                    await addPointCategory(newCategory);
+                                    const updatedCategories =
+                                        await getPointCategories();
+
+                                    setFetchedPointCategories(
+                                        updatedCategories,
+                                    );
+                                    setNewCategory({
+                                        id: "",
+                                        name: "",
+                                        description: "",
+                                        key: "",
+                                    });
+                                    setIsAddModalOpen(false);
+                                }}
+                            >
+                                Save
+                            </Button>
+                            <Button
+                                color={"danger"}
+                                onPress={() => setIsAddModalOpen(false)}
+                            >
+                                Cancel
+                            </Button>
+                        </ModalFooter>
+                    </ModalContent>
+                </Modal>
+            )}
+
+            {/* edit category modal */}
+            {isEditModalOpen && selectedCategory && (
+                <Modal
+                    isOpen={isEditModalOpen}
+                    onClose={() => setIsEditModalOpen(false)}
+                >
+                    <ModalContent>
+                        <ModalHeader>
+                            <h3>
+                                Edit Point Category - {selectedCategory.name}
+                            </h3>
+                        </ModalHeader>
+                        <ModalBody>
+                            <Input
+                                label="Name"
+                                value={selectedCategory.name}
+                                onChange={(e) =>
+                                    handleInputChange("name", e.target.value)
+                                }
+                            />
+                            <Input
+                                label="Description"
+                                value={selectedCategory.description}
+                                onChange={(e) =>
+                                    handleInputChange(
+                                        "description",
+                                        e.target.value,
+                                    )
+                                }
+                            />
+                            <Input
+                                label="Key"
+                                placeholder="No Spaces"
+                                value={selectedCategory.key}
+                                onChange={(e) =>
+                                    handleInputChange("key", e.target.value)
+                                }
+                            />
+                        </ModalBody>
+                        <ModalFooter>
+                            <Button color={"success"} onPress={handleSave}>
+                                Save
+                            </Button>
+                            <Button
+                                color={"danger"}
+                                onPress={() => setIsEditModalOpen(false)}
+                            >
+                                Cancel
+                            </Button>
+                        </ModalFooter>
+                    </ModalContent>
+                </Modal>
+            )}
+        </div>
     );
 };
 

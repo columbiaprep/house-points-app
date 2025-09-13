@@ -20,8 +20,10 @@ import { FaPenToSquare } from "react-icons/fa6";
 import {
     getPointCategories,
     updatePointCategory,
+    PointCategory,
     PointCategories,
     addPointCategory,
+    deletePointCategory,
 } from "@/firebase-configuration/firebaseDb";
 
 const AdminPointCategories = () => {
@@ -32,8 +34,7 @@ const AdminPointCategories = () => {
         useState<PointCategories | null>(null);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-    const [newCategory, setNewCategory] = useState<PointCategories>({
-        id: "",
+    const [newCategory, setNewCategory] = useState<PointCategory>({
         name: "",
         description: "",
         key: "",
@@ -51,7 +52,12 @@ const AdminPointCategories = () => {
 
     const handleAddCategory = async () => {
         await addPointCategory(newCategory);
-        setCategories([...categories, newCategory]);
+        const newCategoryWithId = { ...newCategory, id: Date.now().toString() };
+
+        setFetchedPointCategories([
+            ...fetchedPointCategories,
+            newCategoryWithId,
+        ]);
         setNewCategory({ key: "", name: "", description: "" });
     };
 
@@ -67,7 +73,9 @@ const AdminPointCategories = () => {
 
     const handleDeleteCategory = async (id: string) => {
         await deletePointCategory(id);
-        setCategories(categories.filter((cat) => cat.key !== id));
+        setFetchedPointCategories(
+            fetchedPointCategories.filter((cat) => cat.id !== id),
+        );
     };
 
     return (

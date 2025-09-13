@@ -17,11 +17,13 @@ import { useRouter } from "next/navigation";
 import {
     type IndividualDocument,
     type HouseDocument,
-    writeToIndividualData,
-    writeToHouseData,
+    type PointCategory,
 } from "@/firebase-configuration/firebaseDb";
 import { toTitleCase } from "@/config/globalFuncs";
-import { pointsCategories } from "@/firebase-configuration/firebaseDb";
+import {
+    writePointsOptimized,
+    getCachedPointCategories,
+} from "@/firebase-configuration/cachedFirebaseDb";
 import app from "@/firebase-configuration/firebaseApp";
 
 const AdminPointsForm = () => {
@@ -29,6 +31,9 @@ const AdminPointsForm = () => {
         [],
     );
     const [housesData, setHousesData] = useState<HouseDocument[]>([]);
+    const [pointsCategories, setPointsCategories] = useState<PointCategory[]>(
+        [],
+    );
     const [selectedStudent, setSelectedStudent] = useState("");
     const [selectedCategory, setSelectedCategory] = useState("");
     const [selectedHouse, setSelectedHouse] = useState("");
@@ -52,6 +57,11 @@ const AdminPointsForm = () => {
 
             setIndividualData(data.individuals);
             setHousesData(data.houses);
+
+            // Load point categories
+            const categories = await getCachedPointCategories();
+
+            setPointsCategories(categories);
         } catch (error) {
             console.error("Failed to load data:", error);
         }
@@ -71,14 +81,33 @@ const AdminPointsForm = () => {
             return;
         }
 
+        const student = individualData.find((s) => s.id === selectedStudent);
+
+        if (!student) {
+            setMessage({ text: "Student not found.", type: "error" });
+
+            return;
+        }
+
         try {
-            await writeToIndividualData(
+            const result = await writePointsOptimized(
                 selectedCategory,
                 selectedStudent,
                 pointsToAdd,
+                student.house,
             );
 
-            setMessage({ text: "Points added successfully!", type: "success" });
+            if (result.success) {
+                setMessage({
+                    text: "Points added successfully!",
+                    type: "success",
+                });
+            } else {
+                setMessage({
+                    text: result.error || "Failed to add points.",
+                    type: "error",
+                });
+            }
         } catch (error) {
             setMessage({ text: "Failed to add points.", type: "error" });
             console.error("Failed to add points:", error);
@@ -164,19 +193,18 @@ const AdminPointsForm = () => {
                                     label="Select a category"
                                     onSelectionChange={(value) =>
                                         setSelectedCategory(
-                                            pointsCategories[
-                                                value.currentKey as unknown as number
-                                            ].key,
+                                            Array.from(value)[0] as string,
                                         )
                                     }
                                 >
-                                    {Object.entries(pointsCategories).map(
-                                        ([key, value]) => (
-                                            <SelectItem key={key} id={key}>
-                                                {value.name}
-                                            </SelectItem>
-                                        ),
-                                    )}
+                                    {pointsCategories.map((category) => (
+                                        <SelectItem
+                                            key={category.key}
+                                            id={category.key}
+                                        >
+                                            {category.name}
+                                        </SelectItem>
+                                    ))}
                                 </Select>
                                 <Input
                                     className="mt-4 w-full"
@@ -222,19 +250,18 @@ const AdminPointsForm = () => {
                                     label="Select a category"
                                     onSelectionChange={(value) =>
                                         setSelectedCategory(
-                                            pointsCategories[
-                                                value.currentKey as unknown as number
-                                            ].key,
+                                            Array.from(value)[0] as string,
                                         )
                                     }
                                 >
-                                    {Object.entries(pointsCategories).map(
-                                        ([key, value]) => (
-                                            <SelectItem key={key} id={key}>
-                                                {value.name}
-                                            </SelectItem>
-                                        ),
-                                    )}
+                                    {pointsCategories.map((category) => (
+                                        <SelectItem
+                                            key={category.key}
+                                            id={category.key}
+                                        >
+                                            {category.name}
+                                        </SelectItem>
+                                    ))}
                                 </Select>
 
                                 <Input

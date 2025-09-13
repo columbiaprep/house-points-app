@@ -7,6 +7,7 @@ import {
     DropdownMenu,
     DropdownItem,
     Image,
+    Link,
 } from "@heroui/react";
 
 import { useAuth } from "@/contexts/AuthContext";
@@ -25,11 +26,13 @@ export const Navbar = () => {
                     position="sticky"
                 >
                     <NavbarBrand className="flex items-center gap-2">
-                        <Image
-                            alt="CGPS Houses Logo"
-                            height={50}
-                            src={BrandImage.src}
-                        />
+                        <Link className="cursor-pointer" href="/dashboard">
+                            <Image
+                                alt="CGPS Houses Logo"
+                                height={50}
+                                src={BrandImage.src}
+                            />
+                        </Link>
                     </NavbarBrand>
                     <UserProfile />
                 </NextUINavbar>
@@ -42,6 +45,7 @@ const UserProfile = () => {
     const userData = useAuth();
     const photoURL = userData.user?.photoURL || "";
     const displayName = userData.user?.displayName;
+    const isAdmin = userData.accountType === "admin";
 
     return (
         <Dropdown>
@@ -52,6 +56,11 @@ const UserProfile = () => {
                 </div>
             </DropdownTrigger>
             <DropdownMenu>
+                {isAdmin && (
+                    <DropdownItem key="admin" as={Link} href="/admin">
+                        Admin Dashboard
+                    </DropdownItem>
+                )}
                 {/* <DropdownItem key="profile">Profile</DropdownItem>
                 <DropdownItem key="settings">Settings</DropdownItem> */}
                 <DropdownItem

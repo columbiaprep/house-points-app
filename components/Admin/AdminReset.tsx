@@ -10,6 +10,7 @@ import {
     ModalHeader,
     ModalBody,
     Card,
+    CardBody,
 } from "@heroui/react";
 import Papa from "papaparse";
 
@@ -100,65 +101,75 @@ const AdminReset = () => {
     };
 
     return (
-        <Card className="container mt-4 p-4 bg-background md:w-5/6 w-full">
-            <h2 className="text-2xl font-bold text-center">Yearly Reset</h2>
-            <div>
-                <Modal
-                    isOpen={isOpen}
-                    title="Reset All House Rosters"
-                    onClose={onClose}
-                >
-                    <ModalContent>
-                        <ModalHeader>Reset All House Rosters</ModalHeader>
-                        <ModalBody>
-                            <p>
-                                Are you sure you want to reset all house
-                                rosters?
-                            </p>
-                            <p>This action cannot be undone.</p>
-                        </ModalBody>
-                        <ModalFooter>
-                            <Button
-                                color="danger"
-                                disabled={loading}
-                                onPress={handleFullReset}
-                            >
-                                {loading ? <Spinner /> : "Reset All"}
-                            </Button>
-                            <Button onPress={onClose}>Cancel</Button>
-                        </ModalFooter>
-                    </ModalContent>
-                </Modal>
-                <h2 className="text-center p-4">
-                    Import Entire Houses Roster (Should Include: Name, Grade,
-                    House, ID)
-                </h2>
-                <div className="bg-gray-100 p-2 rounded flex flex-col font-sans gap-2">
-                    <div className="container">
-                        <Input
-                            accept=".csv"
-                            className="bg-gray-200 p-2 rounded"
-                            type="file"
-                            onChange={handleFileChange}
-                        />
+        <Card className="border-red-200 bg-red-50">
+            <CardBody>
+                <div className="text-center mb-4">
+                    <h2 className="text-lg font-bold text-red-700">
+                        ⚠️ Database Reset
+                    </h2>
+                    <p className="text-sm text-red-600">
+                        Dangerous operation - Resets all student points and
+                        updates house rosters
+                    </p>
+                </div>
+                <div>
+                    <Modal
+                        isOpen={isOpen}
+                        title="Reset All House Rosters"
+                        onClose={onClose}
+                    >
+                        <ModalContent>
+                            <ModalHeader>Reset All House Rosters</ModalHeader>
+                            <ModalBody>
+                                <p>
+                                    Are you sure you want to reset all house
+                                    rosters?
+                                </p>
+                                <p>This action cannot be undone.</p>
+                            </ModalBody>
+                            <ModalFooter>
+                                <Button
+                                    color="danger"
+                                    disabled={loading}
+                                    onPress={handleFullReset}
+                                >
+                                    {loading ? <Spinner /> : "Reset All"}
+                                </Button>
+                                <Button onPress={onClose}>Cancel</Button>
+                            </ModalFooter>
+                        </ModalContent>
+                    </Modal>
+                    <h2 className="text-center p-4">
+                        Import Entire Houses Roster (Should Include: Name,
+                        Grade, House, ID)
+                    </h2>
+                    <div className="bg-gray-100 p-2 rounded flex flex-col font-sans gap-2">
+                        <div className="container">
+                            <Input
+                                accept=".csv"
+                                className="bg-gray-200 p-2 rounded"
+                                type="file"
+                                onChange={handleFileChange}
+                            />
+                            {fileContents && (
+                                <Button className="mt-4" onPress={onOpen}>
+                                    Reset All
+                                </Button>
+                            )}
+                        </div>
                         {fileContents && (
-                            <Button className="mt-4" onPress={onOpen}>
-                                Reset All
-                            </Button>
+                            <div className="mt-4 bg-white p-4 rounded shadow">
+                                <h3 className="text-lg font-semibold">
+                                    File Contents:
+                                </h3>
+                                <div className="whitespace-pre-wrap">
+                                    {fileContents}
+                                </div>
+                            </div>
                         )}
                     </div>
-                    {fileContents && (
-                        <div className="mt-4 bg-white p-4 rounded shadow">
-                            <h3 className="text-lg font-semibold">
-                                File Contents:
-                            </h3>
-                            <div className="whitespace-pre-wrap">
-                                {fileContents}
-                            </div>
-                        </div>
-                    )}
                 </div>
-            </div>
+            </CardBody>
         </Card>
     );
 };

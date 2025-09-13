@@ -6,6 +6,7 @@ import {
     orderBy,
     query,
     setDoc,
+    deleteDoc,
     where,
     or,
     and,
@@ -17,6 +18,10 @@ export interface PointCategory {
     key: string;
     name: string;
     description: string;
+}
+
+export interface PointCategories extends PointCategory {
+    id: string;
 }
 
 export interface IndividualDocument {
@@ -53,6 +58,15 @@ export interface Student {
 export interface User {
     displayName: string;
     email: string;
+}
+
+export interface BonusPoint {
+    id: string;
+    category: string;
+    points: number;
+    timestamp: Date;
+    reason: string;
+    addedBy: string;
 }
 
 export async function getPointsData(email: string) {
@@ -305,9 +319,21 @@ export async function getSavedHouseRosterData(): Promise<Array<Student>> {
 export async function resetDatabase(roster: Array<Student>) {
     const batch: Array<Promise<void>> = [];
 
-    // compile all houses data to reset
-    const housesQuery = await getDocs(collection(db, "houses"));
+    // compile all houses data to reset  
     // if house of student is not in the houses collection, add it
+
+    // First, clear all bonus points for all houses
+    const allHouses = await getDocs(collection(db, "houses"));
+
+    for (const houseDoc of allHouses.docs) {
+        const bonusPointsQuery = await getDocs(
+            collection(db, "houses", houseDoc.id, "bonusPoints"),
+        );
+
+        bonusPointsQuery.docs.forEach((bonusDoc) => {
+            batch.push(deleteDoc(bonusDoc.ref));
+        });
+    }
 
     roster.forEach((student) => {
         const studentDoc = doc(db, "individuals", student.id);
@@ -490,7 +516,7 @@ export async function updatePointCategory(
 
     await setDoc(pointCategoryDoc, updatedCategory);
 }
-export async function addPointCategory(newCategory: PointCategories) {
+export async function addPointCategory(newCategory: PointCategory) {
     const pointCategoryDoc = doc(collection(db, "pointCategories"));
 
     await setDoc(pointCategoryDoc, newCategory);
@@ -500,4 +526,99 @@ export async function deletePointCategory(id: string) {
     const pointCategoryDoc = doc(db, "pointCategories", id);
 
     await setDoc(pointCategoryDoc, { deleted: true }, { merge: true });
+}
+
+// Bonus Points Functions
+export async function addBonusPointToHouse(
+    houseId: string,
+    category: string,
+    points: number,
+    reason: string,
+    addedBy: string,
+): Promise<string> {
+    const bonusPointId = doc(
+        collection(db, "houses", houseId, "bonusPoints"),
+    ).id;
+    const bonusPointDoc = doc(
+        db,
+        "houses",
+        houseId,
+        "bonusPoints",
+        bonusPointId,
+    );
+
+    const bonusPoint: Omit<BonusPoint, "id"> = {
+        category,
+        points,
+        timestamp: new Date(),
+        reason,
+        addedBy,
+    };
+
+    await setDoc(bonusPointDoc, bonusPoint);
+
+    return bonusPointId;
+}
+
+export async function getBonusPointsForHouse(
+    houseId: string,
+): Promise<BonusPoint[]> {
+    const bonusPointsQuery = await getDocs(
+        collection(db, "houses", houseId, "bonusPoints"),
+    );
+
+    return bonusPointsQuery.docs.map(
+        (doc) =>
+            ({
+                id: doc.id,
+                ...doc.data(),
+                timestamp: doc.data().timestamp?.toDate() || new Date(),
+            }) as BonusPoint,
+    );
+}
+
+export async function getAllBonusPoints(): Promise<
+    Record<string, BonusPoint[]>
+> {
+    const housesQuery = await getDocs(collection(db, "houses"));
+    const allBonusPoints: Record<string, BonusPoint[]> = {};
+
+    for (const houseDoc of housesQuery.docs) {
+        const houseId = houseDoc.id;
+
+        allBonusPoints[houseId] = await getBonusPointsForHouse(houseId);
+    }
+
+    return allBonusPoints;
+}
+
+export async function calculateHouseBonusPoints(
+    houseId: string,
+): Promise<Record<string, number>> {
+    const bonusPoints = await getBonusPointsForHouse(houseId);
+    const categoryTotals: Record<string, number> = {};
+
+    bonusPoints.forEach((bp) => {
+        categoryTotals[bp.category] =
+            (categoryTotals[bp.category] || 0) + bp.points;
+    });
+
+    return categoryTotals;
+}
+
+export async function clearHouseBonusPoints(houseId: string): Promise<void> {
+    const bonusPointsQuery = await getDocs(
+        collection(db, "houses", houseId, "bonusPoints"),
+    );
+
+    const deletePromises = bonusPointsQuery.docs.map((doc) =>
+        deleteDoc(doc.ref),
+    );
+
+    await Promise.all(deletePromises);
+}
+
+export async function deleteBonusPoint(houseId: string, bonusPointId: string): Promise<void> {
+    const bonusPointDoc = doc(db, "houses", houseId, "bonusPoints", bonusPointId);
+    await deleteDoc(bonusPointDoc);
 }

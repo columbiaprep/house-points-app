@@ -21,6 +21,7 @@ export default function PointsChartData({
 }: ChartProps) {
     const chartOptions = {
         ...options, //putting the inputs from options into chartoptions like a ==
+        ...data?.options, // merge in options from data if they exist
         plugins: {
             title: {
                 display: true,
@@ -28,10 +29,16 @@ export default function PointsChartData({
                 font: { size: 18 },
             },
             ...options?.plugins,
+            ...data?.options?.plugins, // merge in plugins from data
         },
         animation: {
             delay: 1000,
             ...options?.animation,
+            ...data?.options?.animation,
+        },
+        layout: {
+            ...options?.layout,
+            ...data?.options?.layout,
         },
     };
 

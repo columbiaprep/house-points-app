@@ -1,11 +1,10 @@
 import Image from "next/image";
-import { useState, useEffect } from "react";
 import { Spinner } from "@heroui/react";
 import { Link } from "@heroui/link";
 
 import { useAuth } from "@/contexts/AuthContext";
-import { fetchAllHouses } from "@/firebase-configuration/firebaseDb";
 import { HouseDocument } from "@/firebase-configuration/firebaseDb";
+import { useHouseSummaries } from "@/hooks/useFirebaseData";
 
 export const HousePointsRow: React.FC<HouseDocument> = ({
     id,
@@ -24,7 +23,7 @@ export const HousePointsRow: React.FC<HouseDocument> = ({
         <Link
             className={`grid min-w-400 max-h-200 place-items-center ${gradientClasses} shadow-lg items-center flex rounded-xl bg-gradient-to-r mb-5 ${outlineThickness} `}
             color={"foreground"}
-            href={`/spread/${houseImage}`}
+            href={`/spread/${houseImage.toLowerCase()}`}
             isBlock={true}
             underline={"none"}
         >
@@ -56,49 +55,39 @@ export const HousePointsRow: React.FC<HouseDocument> = ({
 };
 
 export const HousePointsContainer = () => {
-    //anything I'm fetching needs to use the below format
-    //import the appropriate interface from the database
-    const [houses, setHouses] = useState<HouseDocument[]>([]);
-
-    //this keeps track of the loading state of the component
-    const [loading, setLoading] = useState(false);
-
     const student = useAuth().userDbData;
+    const { data: houses, isLoading: loading, error } = useHouseSummaries();
 
-    //useEffect gets called immediately, before the rest of the component loads
-    //it calls the function to get the house document info, then passes it
-    //to the stateful variable "houses" above
-    useEffect(() => {
-        setLoading(true);
-        fetchAllHouses()
-            .then((h) => {
-                setHouses(h);
-            })
-            .then(() => {
-                setLoading(false);
-            });
-    }, []);
+    if (error) {
+        console.error("Error loading house summaries:", error);
+
+        return (
+            <div className="text-center text-red-500">
+                Error loading house data
+            </div>
+        );
+    }
 
     return (
-        <div className="grid min-h-screen min-w-screen place-items-center">
-            {" "}
-            {/* Any settings on the container should be added to the div to the left (like border, etc.) */}
+        <div className="w-full flex justify-center">
             {loading ? (
-                <Spinner
-                    classNames={{ label: "text-foreground mt-4" }}
-                    label="wave"
-                    variant="wave"
-                />
+                <div className="flex justify-center items-center h-64">
+                    <Spinner
+                        classNames={{ label: "text-foreground mt-4" }}
+                        label="wave"
+                        variant="wave"
+                    />
+                </div>
             ) : (
-                <div className="min-w-min w-1/2">
-                    {houses.map((house, index) => (
+                <div className="w-full max-w-2xl">
+                    {houses?.map((house, index) => (
                         <HousePointsRow
                             key={index}
                             accentColor={house.accentColor}
                             colorName={house.colorName}
                             houseImage={house.name.split(" ")[0]}
                             id={house.name}
-                            isStudentHouse={house.name == student.house}
+                            isStudentHouse={house.name == student?.house}
                             name={house.name}
                             place={house.place}
                             totalPoints={house.totalPoints}

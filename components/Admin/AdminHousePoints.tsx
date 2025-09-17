@@ -155,7 +155,7 @@ const AdminHousePoints = () => {
                         }
                     >
                         {pointsCategories.map((category) => (
-                            <SelectItem key={category.key} value={category.key}>
+                            <SelectItem key={category.key} value={category.key as any}>
                                 {category.name}
                             </SelectItem>
                         ))}

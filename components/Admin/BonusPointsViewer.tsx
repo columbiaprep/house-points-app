@@ -126,10 +126,10 @@ const BonusPointsViewer = () => {
                                 )
                             }
                         >
-                            <SelectItem key="single" value="single">
+                            <SelectItem key="single" value={"single" as any}>
                                 Single House
                             </SelectItem>
-                            <SelectItem key="all" value="all">
+                            <SelectItem key="all" value={"all" as any}>
                                 All Houses
                             </SelectItem>
                         </Select>
@@ -154,7 +154,7 @@ const BonusPointsViewer = () => {
                         }
                     >
                         {housesData.map((house) => (
-                            <SelectItem key={house.id} value={house.id}>
+                            <SelectItem key={house.id} value={house.id as any}>
                                 {toTitleCase(house.name)}
                             </SelectItem>
                         ))}

@@ -736,7 +736,7 @@ const AdminStudentManager = () => {
                                                 (category) => (
                                                     <SelectItem
                                                         key={category.key}
-                                                        value={category.key}
+                                                        value={category.key as any}
                                                     >
                                                         {category.name}
                                                     </SelectItem>

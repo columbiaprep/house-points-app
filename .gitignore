@@ -38,3 +38,5 @@ next-env.d.ts
 house-points-funcs/
 testdata/
 package-lock.json
+
+.firebase/

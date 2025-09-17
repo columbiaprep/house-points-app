@@ -8,8 +8,8 @@ import {
 } from "@heroui/react";
 import { useState } from "react";
 
-import { writeToIndividualData } from "@/firebase-configuration/firebaseDb";
-import { pointsCategories } from "@/firebase-configuration/firebaseDb";
+import { pointsCategories, fetchIndividual } from "@/firebase-configuration/firebaseDb";
+import { batchWritePoints, PointUpdate } from "@/firebase-configuration/cachedFirebaseDb";
 
 const AdminMassPointsForm = () => {
     const [fileContents, setFileContents] = useState<string>("");
@@ -32,11 +32,38 @@ const AdminMassPointsForm = () => {
     };
 
     const handleSubmission = async () => {
-        const studentIds = fileContents.split("\n").map((line) => line.trim());
+        const studentIds = fileContents.split("\n").map((line) => line.trim()).filter(id => id.length > 0);
 
-        studentIds.forEach(async (student) => {
-            await writeToIndividualData(category, student, points);
-        });
+        try {
+            // Get house for each student and create batch updates
+            const updates: PointUpdate[] = [];
+
+            for (const studentId of studentIds) {
+                try {
+                    const individual = await fetchIndividual(studentId);
+                    updates.push({
+                        studentId,
+                        house: individual.house,
+                        category,
+                        points
+                    });
+                } catch (error) {
+                    console.error(`Error fetching student ${studentId}:`, error);
+                }
+            }
+
+            // Batch update all students and houses at once
+            const result = await batchWritePoints(updates);
+
+            if (result.success) {
+                alert(`Successfully updated ${result.studentsUpdated} students and ${result.housesUpdated} houses`);
+            } else {
+                alert(`Error: ${result.error}`);
+            }
+        } catch (error) {
+            console.error("Error in mass points submission:", error);
+            alert("Error processing mass points submission");
+        }
     };
 
     return (

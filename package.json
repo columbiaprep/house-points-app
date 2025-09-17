@@ -55,6 +55,7 @@
     "eslint-plugin-react": "^7.37.3",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-unused-imports": "^3.2.0",
+    "firebase-admin": "^13.5.0",
     "postcss": "^8.4.38",
     "prettier": "^3.4.2",
     "tailwind-variants": "0.1.20",
@@ -62,7 +63,7 @@
     "typescript": "5.0.4"
   },
   "engines": {
-    "node": "22.13.0",
+    "node": "22",
     "npm": "11.5.2"
   },
   "name": "cgps-houses",

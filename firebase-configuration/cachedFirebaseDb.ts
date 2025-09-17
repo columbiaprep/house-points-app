@@ -7,7 +7,9 @@ import {
 } from "@firebase/firestore";
 
 import { db } from "./firebaseApp";
-import { PointCategory } from "./firebaseDb";
+import { type PointCategory } from "./firebaseDb";
+
+export type { PointCategory };
 
 // Cache keys
 const POINT_CATEGORIES_CACHE_KEY = "cgps_point_categories";
@@ -32,7 +34,6 @@ export async function getCachedPointCategories(): Promise<PointCategory[]> {
         const categories = pointsCategoriesSnapshot.docs.map(
             (doc) =>
                 ({
-                    id: doc.id,
                     ...doc.data(),
                 }) as PointCategory,
         );
@@ -55,7 +56,6 @@ export async function getCachedPointCategories(): Promise<PointCategory[]> {
         return pointsCategoriesSnapshot.docs.map(
             (doc) =>
                 ({
-                    id: doc.id,
                     ...doc.data(),
                 }) as PointCategory,
         );
@@ -127,7 +127,7 @@ export async function batchWritePoints(
         }
 
         // Apply house updates
-        for (const [houseName, categoryUpdates] of houseUpdates) {
+        for (const [houseName, categoryUpdates] of Array.from(houseUpdates.entries())) {
             const houseRef = doc(db, "houses", houseName);
             const houseDoc = await getDoc(houseRef);
 
@@ -135,7 +135,7 @@ export async function batchWritePoints(
                 const currentData = houseDoc.data();
                 const updateData: any = {};
 
-                for (const [category, pointDelta] of categoryUpdates) {
+                for (const [category, pointDelta] of Array.from(categoryUpdates.entries())) {
                     updateData[category] =
                         (currentData[category] || 0) + pointDelta;
                 }

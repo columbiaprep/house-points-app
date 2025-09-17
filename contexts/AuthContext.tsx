@@ -62,7 +62,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
                 // Only fetch individual data for students, not admins
                 if (accountType === "student") {
-                    setUserDbData(await getDataDoc(user.email));
+                    const userData = await getDataDoc(user.email);
+                    setUserDbData(userData);
                 } else {
                     setUserDbData(null);
                 }
@@ -90,7 +91,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     };
 
     const getDataDoc = async (email: string) => {
-        return await fetchIndividual(email);
+        try {
+            return await fetchIndividual(email);
+        } catch (error) {
+            console.warn(`Individual record not found for ${email}:`, error);
+            return null;
+        }
     };
 
     const authWithGoogle = async () => {

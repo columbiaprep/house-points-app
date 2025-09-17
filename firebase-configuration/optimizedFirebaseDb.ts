@@ -196,31 +196,48 @@ export async function fetchHouseSummariesWithFallback(): Promise<
         console.warn(
             "Using fallback: fetching houses from original collection",
         );
-        const { fetchAllHouses } = await import("./firebaseDb");
+        const { fetchAllHouses, calculateHouseBonusPoints } = await import("./firebaseDb");
         const houses = await fetchAllHouses();
 
-        // Convert to HouseSummary format
-        return houses.map((house) => ({
-            name: house.name,
-            totalPoints: house.totalPoints,
-            colorName: house.colorName,
-            accentColor: house.accentColor,
-            place: house.place || 0,
-            lastUpdated: new Date(),
-            ...Object.fromEntries(
-                Object.entries(house).filter(
-                    ([key]) =>
-                        ![
-                            "id",
-                            "name",
-                            "totalPoints",
-                            "colorName",
-                            "accentColor",
-                            "place",
-                        ].includes(key),
-                ),
-            ),
-        }));
+        // Convert to HouseSummary format with bonus points calculation
+        const summariesWithBonus = await Promise.all(
+            houses.map(async (house) => {
+                // Calculate bonus points for this house
+                const bonusPoints = await calculateHouseBonusPoints(house.id);
+                const totalBonusPoints = Object.values(bonusPoints).reduce((sum, points) => sum + points, 0);
+
+                return {
+                    name: house.name,
+                    totalPoints: house.totalPoints + totalBonusPoints, // Include bonus points in total
+                    bonusPoints: totalBonusPoints,
+                    colorName: house.colorName,
+                    accentColor: house.accentColor,
+                    place: house.place || 0,
+                    lastUpdated: new Date(),
+                    ...Object.fromEntries(
+                        Object.entries(house).filter(
+                            ([key]) =>
+                                ![
+                                    "id",
+                                    "name",
+                                    "totalPoints",
+                                    "colorName",
+                                    "accentColor",
+                                    "place",
+                                ].includes(key),
+                        ),
+                    ),
+                };
+            })
+        );
+
+        // Re-sort by totalPoints (including bonus) and update places
+        summariesWithBonus.sort((a, b) => b.totalPoints - a.totalPoints);
+        summariesWithBonus.forEach((house, index) => {
+            house.place = index + 1;
+        });
+
+        return summariesWithBonus;
     } catch (error) {
         console.error("Error in fetchHouseSummariesWithFallback:", error);
         throw error;

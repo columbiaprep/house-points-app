@@ -18,6 +18,7 @@ import {
     type IndividualDocument,
     type HouseDocument,
     type PointCategory,
+    writeToHouseData,
 } from "@/firebase-configuration/firebaseDb";
 import { toTitleCase } from "@/config/globalFuncs";
 import {
@@ -238,8 +239,8 @@ const AdminPointsForm = () => {
                                 >
                                     {housesData.map((house) => (
                                         <SelectItem
-                                            key={house.name}
-                                            id={house.name}
+                                            key={house.id}
+                                            id={house.id}
                                         >
                                             {toTitleCase(house.name)}
                                         </SelectItem>

@@ -1,0 +1,41 @@
+name: Deploy to DigitalOcean
+
+on:
+  # Manual trigger - click "Run workflow" button in GitHub Actions
+  workflow_dispatch:
+
+  # Optional: Auto-deploy on push to main (uncomment if desired)
+  # push:
+  #   branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout main branch
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Configure Git
+      run: |
+        git config --global user.name "GitHub Actions"
+        git config --global user.email "actions@github.com"
+
+    - name: Deploy to deployment branch
+      run: |
+        # Switch to deployment branch (create if doesn't exist)
+        git checkout deployment 2>/dev/null || git checkout -b deployment
+
+        # Reset deployment branch to match main exactly
+        git reset --hard main
+
+        # Force push to deployment branch
+        git push origin deployment --force
+
+    - name: Deployment Success
+      run: |
+        echo "✅ Successfully deployed main branch to deployment branch"
+        echo "🚀 DigitalOcean will now build and deploy your app"

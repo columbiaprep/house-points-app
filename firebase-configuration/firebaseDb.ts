@@ -156,16 +156,12 @@ export async function fetchIndividual(id: string): Promise<IndividualDocument> {
         grade: data.grade,
         house: data.house,
         houseRank: data.houseRank,
+        totalPoints: data.totalPoints || 0, // Use stored totalPoints instead of recalculating
     };
 
     Object.values(pointsCategories).forEach((category) => {
         individual[category.key] = data[category.key] || 0;
     });
-
-    individual.totalPoints = Object.values(pointsCategories).reduce(
-        (total, category) => total + (individual[category.key] || 0),
-        0,
-    );
 
     return individual;
 }
@@ -241,9 +237,11 @@ export async function writeToIndividualData(
     const individualDoc = await getDoc(individualDocRef);
 
     let updateData = { [ptsCategory]: points };
+    let houseId = "";
 
     if (individualDoc.exists()) {
         const individualData = individualDoc.data();
+        houseId = individualData.house; // Get house directly from existing data
 
         // Check if the point category exists in the document
         if (individualData && !individualData.hasOwnProperty(ptsCategory)) {
@@ -261,10 +259,6 @@ export async function writeToIndividualData(
                 (individualDoc.data().totalPoints || 0) + points;
         }
     }
-
-    const houseId = await fetchIndividual(id).then(
-        (individual) => individual.house,
-    );
 
     await setDoc(individualDocRef, updateData, { merge: true });
     await writeToHouseData(ptsCategory, houseId, points);

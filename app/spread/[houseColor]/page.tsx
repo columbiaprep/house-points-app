@@ -16,6 +16,7 @@ import {
     fetchAllHouses,
 } from "@/firebase-configuration/firebaseDb";
 
+
 const HouseSpreadPage = () => {
     //use params returns the string in the URL
     const { houseColor } = useParams();
@@ -335,7 +336,7 @@ const HouseSpreadPage = () => {
                         {/* Nearby Rankings Leaderboard */}
                         <div className="flex flex-col items-center">
                             <div className="w-full max-w-sm">
-                                {user?.email && userHouse && (
+                                {user?.email && userHouse && (isAdmin || userHouse.toLowerCase().includes(housecolor)) && (
                                     <NearbyRankingsContainer
                                         currentStudentEmail={user.email}
                                         houseFilter={userHouse}

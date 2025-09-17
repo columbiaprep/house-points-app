@@ -33,7 +33,7 @@ export const OptimizedHousePointsRow: React.FC<
                 alt={name}
                 className="ms-2 me-2 object-center object-contain basis-2/10"
                 height={50}
-                src={"/houseImages/" + houseImage + ".png"}
+                src={"/house-images/" + houseImage + ".png"}
                 width={50}
             />
 

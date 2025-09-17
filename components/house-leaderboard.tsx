@@ -35,7 +35,7 @@ export const HousePointsRow: React.FC<HouseDocument> = ({
                 alt={name}
                 className="ms-2 me-2 object-center object-contain basis-2/10"
                 height={50}
-                src={"/houseImages/" + houseImage + ".png"}
+                src={"/house-images/" + houseImage.toLowerCase() + ".png"}
                 width={50}
             />
 

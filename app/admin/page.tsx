@@ -8,6 +8,7 @@ import AddAdmins from "@/components/Admin/AddAdmins";
 import { AggregatedDataManager } from "@/components/Admin/AggregatedDataManager";
 import AdminStudentManager from "@/components/Admin/AdminStudentManager";
 import HouseBonusPointsManager from "@/components/Admin/HouseBonusPointsManager";
+import StudentCsvDownloader from "@/components/Admin/StudentCsvDownloader";
 
 export default function AdminPage() {
     const auth = useAuth();
@@ -37,6 +38,11 @@ export default function AdminPage() {
                     {/* House Bonus Points Management Section */}
                     <div className="w-full mb-8">
                         <HouseBonusPointsManager />
+                    </div>
+
+                    {/* Student Data Export Section */}
+                    <div className="w-full mb-8">
+                        <StudentCsvDownloader />
                     </div>
 
                     {/* Secondary Admin Tools - Grid Layout */}

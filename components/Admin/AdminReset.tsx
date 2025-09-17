@@ -45,23 +45,16 @@ const AdminReset = () => {
                 dynamicTyping: true,
             });
 
-            const headers: string[] = [
-                "STUDENT: First Name",
-                "STUDENT: Last Name",
-                "STUDENT: Email 1",
-                "Class",
-                "Grade",
-            ];
+            const headers: string[] = ["Name", "Grade", "House", "Email"];
             const students: Array<Student> = parseResult.data.map(
                 (row: any) => {
+                    const fullName = row[headers[0]] || "";
+
                     return {
-                        id: row[headers[2]],
-                        name: `${row[headers[0]]} ${row[headers[1]]}`,
-                        firstName: row[headers[0]],
-                        lastName: row[headers[1]],
-                        email: row[headers[2]],
-                        house: row[headers[3]],
-                        grade: row[headers[4]],
+                        id: row[headers[3]], // Email is used as ID
+                        name: fullName,
+                        house: row[headers[2]],
+                        grade: row[headers[1]],
                     };
                 },
             );

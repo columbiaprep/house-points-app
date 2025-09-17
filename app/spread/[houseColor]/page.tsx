@@ -42,13 +42,32 @@ const HouseSpreadPage = () => {
     // Fetch user's house information
     useEffect(() => {
         const fetchUserHouse = async () => {
-            if (!user?.email) {
-                console.log("No user email found");
+            if (!user?.email || !accountType) {
+                console.log("No user email found or account type not loaded yet");
 
                 return;
             }
 
-            console.log("Fetching house for user:", user.email);
+            console.log("Fetching house for user:", user.email, "accountType:", accountType);
+
+            // Skip individual lookup for admins
+            if (accountType === "admin") {
+                console.log("User is admin, using URL house color");
+                const fallbackHouseMap: { [key: string]: string } = {
+                    blue: "Blue House",
+                    gold: "Gold House",
+                    green: "Green House",
+                    orange: "Orange House",
+                    pink: "Pink House",
+                    purple: "Purple House",
+                    red: "Red House",
+                    silver: "Silver House",
+                };
+                const fallbackHouse = fallbackHouseMap[housecolor] || "Blue House";
+                setUserHouse(fallbackHouse);
+                return;
+            }
+
             try {
                 const userInfo = await fetchIndividual(user.email);
 
@@ -133,17 +152,18 @@ const HouseSpreadPage = () => {
         };
 
         fetchUserHouse();
-    }, [user?.email, isAdmin, housecolor]);
+    }, [user?.email, accountType, housecolor]);
 
     useEffect(() => {
         const loadChartData = async () => {
-            if (!housecolor || !user?.email) return;
+            if (!housecolor || !user?.email || !accountType) return;
 
             try {
                 setLoading(true);
 
                 // Load house data (always real)
                 const houseData = await generateHouseChartData(housecolor);
+                console.log("House chart data loaded:", houseData);
 
                 setHouseChartData(houseData);
 
@@ -151,10 +171,13 @@ const HouseSpreadPage = () => {
                 let personalData;
 
                 if (testMode && isAdmin) {
-                    // Use mock data for admin testing
+                    // Use mock data when test mode is enabled for admins
                     personalData = generateMockPersonalChartData(housecolor);
+                } else if (isAdmin) {
+                    // For admins when test mode is off, show a default message or empty state
+                    personalData = null;
                 } else {
-                    // Use real data for students or when test mode is off
+                    // Use real data for students
                     personalData = await generatePersonalChartData(
                         user.email,
                         housecolor,
@@ -170,7 +193,7 @@ const HouseSpreadPage = () => {
         };
 
         loadChartData();
-    }, [housecolor, user?.email, testMode, isAdmin]);
+    }, [housecolor, user?.email, testMode, accountType]);
 
     if (loading) {
         return (
@@ -267,12 +290,21 @@ const HouseSpreadPage = () => {
                             <p className="grid place-items-center font-mono font-bold text-3xl mb-6">
                                 HOUSE SPREAD
                             </p>
-                            {houseChartData && (
+                            {houseChartData ? (
                                 <PointsChartData
                                     data={houseChartData}
                                     title="House Points Spread"
                                     type="doughnut"
                                 />
+                            ) : (
+                                <div className="text-center p-8 bg-gray-100 rounded-lg">
+                                    <p className="text-gray-600 text-lg mb-2">
+                                        No points have been added for this house yet
+                                    </p>
+                                    <p className="text-sm text-gray-500">
+                                        Points will appear here once activities are recorded
+                                    </p>
+                                </div>
                             )}
                         </div>
 
@@ -282,13 +314,22 @@ const HouseSpreadPage = () => {
                                 Personal Spread{" "}
                                 {testMode && isAdmin && "(Test Data)"}
                             </p>
-                            {personalChartData && (
+                            {personalChartData ? (
                                 <PointsChartData
                                     data={personalChartData}
                                     title={`Personal Points Spread${testMode && isAdmin ? " (Test Data)" : ""}`}
                                     type="pie"
                                 />
-                            )}
+                            ) : isAdmin && !testMode ? (
+                                <div className="text-center p-8 bg-gray-100 rounded-lg">
+                                    <p className="text-gray-600 mb-2">
+                                        Personal data not available for admin accounts
+                                    </p>
+                                    <p className="text-sm text-gray-500">
+                                        Toggle "Test Student Mode" to see sample data
+                                    </p>
+                                </div>
+                            ) : null}
                         </div>
 
                         {/* Nearby Rankings Leaderboard */}

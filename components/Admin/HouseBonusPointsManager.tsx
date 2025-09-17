@@ -37,8 +37,10 @@ import { useAuth } from "@/contexts/AuthContext";
 const HouseBonusPointsManager = () => {
     const auth = useAuth();
     const [housesData, setHousesData] = useState<HouseDocument[]>([]);
-    const [pointsCategories, setPointsCategories] = useState<PointCategory[]>([]);
-    
+    const [pointsCategories, setPointsCategories] = useState<PointCategory[]>(
+        [],
+    );
+
     // Form state
     const [selectedHouse, setSelectedHouse] = useState("");
     const [selectedCategory, setSelectedCategory] = useState("");
@@ -53,7 +55,9 @@ const HouseBonusPointsManager = () => {
     // Viewer state
     const [viewerSelectedHouse, setViewerSelectedHouse] = useState<string>("");
     const [bonusPoints, setBonusPoints] = useState<BonusPoint[]>([]);
-    const [allBonusPoints, setAllBonusPoints] = useState<Record<string, BonusPoint[]>>({});
+    const [allBonusPoints, setAllBonusPoints] = useState<
+        Record<string, BonusPoint[]>
+    >({});
     const [viewerLoading, setViewerLoading] = useState(false);
     const [viewMode, setViewMode] = useState<"single" | "all">("single");
 
@@ -75,6 +79,7 @@ const HouseBonusPointsManager = () => {
 
                 // Load point categories
                 const categories = await getCachedPointCategories();
+
                 setPointsCategories(categories);
             } catch (error) {
                 console.error("Failed to load data:", error);
@@ -89,11 +94,17 @@ const HouseBonusPointsManager = () => {
     }, []);
 
     const handleAddHousePoints = async () => {
-        if (!selectedHouse || !selectedCategory || pointsToAdd === 0 || !reason.trim()) {
+        if (
+            !selectedHouse ||
+            !selectedCategory ||
+            pointsToAdd === 0 ||
+            !reason.trim()
+        ) {
             setMessage({
                 text: "Please select a house, category, enter points, and provide a reason",
                 type: "error",
             });
+
             return;
         }
 
@@ -102,6 +113,7 @@ const HouseBonusPointsManager = () => {
                 text: "Authentication required",
                 type: "error",
             });
+
             return;
         }
 
@@ -115,6 +127,7 @@ const HouseBonusPointsManager = () => {
                 auth.user.email,
             );
             const houseName = getHouseName(selectedHouse);
+
             setMessage({
                 text: `Successfully added ${pointsToAdd} bonus points to ${houseName}`,
                 type: "success",
@@ -124,7 +137,7 @@ const HouseBonusPointsManager = () => {
             setSelectedCategory("");
             setPointsToAdd(0);
             setReason("");
-            
+
             // Refresh bonus points data if viewing the same house
             if (viewerSelectedHouse === selectedHouse) {
                 loadBonusPoints();
@@ -144,10 +157,17 @@ const HouseBonusPointsManager = () => {
         setViewerLoading(true);
         try {
             if (viewMode === "single" && viewerSelectedHouse) {
-                const points = await getBonusPointsForHouse(viewerSelectedHouse);
-                setBonusPoints(points.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime()));
+                const points =
+                    await getBonusPointsForHouse(viewerSelectedHouse);
+
+                setBonusPoints(
+                    points.sort(
+                        (a, b) => b.timestamp.getTime() - a.timestamp.getTime(),
+                    ),
+                );
             } else if (viewMode === "all") {
                 const allPoints = await getAllBonusPoints();
+
                 setAllBonusPoints(allPoints);
             }
         } catch (error) {
@@ -174,28 +194,35 @@ const HouseBonusPointsManager = () => {
     };
 
     const getHouseName = (houseId: string) => {
-        const house = housesData.find(h => h.id === houseId);
+        const house = housesData.find((h) => h.id === houseId);
+
         return house ? toTitleCase(house.name) : houseId;
     };
 
     const getTotalForHouse = (houseId: string) => {
         const points = allBonusPoints[houseId] || [];
+
         return points.reduce((total, bp) => total + bp.points, 0);
     };
 
     const handleDeleteBonusPoint = async (bonusPoint: BonusPoint) => {
         const houseName = getHouseName(viewerSelectedHouse);
-        if (!confirm(`Are you sure you want to delete this bonus point?\n\nHouse: ${houseName}\nCategory: ${bonusPoint.category}\nPoints: ${bonusPoint.points}\nReason: ${bonusPoint.reason}`)) {
+
+        if (
+            !confirm(
+                `Are you sure you want to delete this bonus point?\n\nHouse: ${houseName}\nCategory: ${bonusPoint.category}\nPoints: ${bonusPoint.points}\nReason: ${bonusPoint.reason}`,
+            )
+        ) {
             return;
         }
 
         setViewerLoading(true);
         try {
             await deleteBonusPoint(viewerSelectedHouse, bonusPoint.id);
-            
+
             // Refresh the bonus points data
             await loadBonusPoints();
-            
+
             setMessage({
                 text: `Successfully deleted bonus point entry`,
                 type: "success",
@@ -214,7 +241,9 @@ const HouseBonusPointsManager = () => {
     return (
         <Card className="w-full">
             <CardHeader>
-                <h2 className="text-xl font-bold">🏆 House Bonus Points Management</h2>
+                <h2 className="text-xl font-bold">
+                    🏆 House Bonus Points Management
+                </h2>
             </CardHeader>
             <CardBody>
                 <Tabs aria-label="Bonus Points Management">
@@ -231,7 +260,9 @@ const HouseBonusPointsManager = () => {
                                 placeholder="Choose a house"
                                 value={selectedHouse}
                                 onSelectionChange={(value) =>
-                                    setSelectedHouse(Array.from(value)[0] as string)
+                                    setSelectedHouse(
+                                        Array.from(value)[0] as string,
+                                    )
                                 }
                             >
                                 {housesData.map((house) => (
@@ -246,11 +277,16 @@ const HouseBonusPointsManager = () => {
                                 placeholder="Choose point category"
                                 value={selectedCategory}
                                 onSelectionChange={(value) =>
-                                    setSelectedCategory(Array.from(value)[0] as string)
+                                    setSelectedCategory(
+                                        Array.from(value)[0] as string,
+                                    )
                                 }
                             >
                                 {pointsCategories.map((category) => (
-                                    <SelectItem key={category.key} value={category.key}>
+                                    <SelectItem
+                                        key={category.key}
+                                        value={category.key}
+                                    >
                                         {category.name}
                                     </SelectItem>
                                 ))}
@@ -269,7 +305,9 @@ const HouseBonusPointsManager = () => {
                                 type="number"
                                 value={pointsToAdd.toString()}
                                 onChange={(e) =>
-                                    setPointsToAdd(parseInt(e.target.value) || 0)
+                                    setPointsToAdd(
+                                        parseInt(e.target.value) || 0,
+                                    )
                                 }
                             />
 
@@ -294,7 +332,7 @@ const HouseBonusPointsManager = () => {
                             )}
                         </div>
                     </Tab>
-                    
+
                     <Tab key="history" title="📋 View History">
                         <div className="pt-4">
                             <div className="flex justify-between items-center mb-4">
@@ -302,22 +340,32 @@ const HouseBonusPointsManager = () => {
                                     <Select
                                         size="sm"
                                         value={viewMode}
-                                        onSelectionChange={(key) => setViewMode(Array.from(key)[0] as "single" | "all")}
+                                        onSelectionChange={(key) =>
+                                            setViewMode(
+                                                Array.from(key)[0] as
+                                                    | "single"
+                                                    | "all",
+                                            )
+                                        }
                                     >
-                                        <SelectItem key="single" value="single">Single House</SelectItem>
-                                        <SelectItem key="all" value="all">All Houses</SelectItem>
+                                        <SelectItem key="single" value="single">
+                                            Single House
+                                        </SelectItem>
+                                        <SelectItem key="all" value="all">
+                                            All Houses
+                                        </SelectItem>
                                     </Select>
                                     <Button
+                                        isLoading={viewerLoading}
                                         size="sm"
                                         variant="flat"
-                                        isLoading={viewerLoading}
                                         onPress={loadBonusPoints}
                                     >
                                         Refresh
                                     </Button>
                                 </div>
                             </div>
-                            
+
                             {viewMode === "single" && (
                                 <div className="mb-4">
                                     <Select
@@ -325,11 +373,16 @@ const HouseBonusPointsManager = () => {
                                         placeholder="Choose a house"
                                         value={viewerSelectedHouse}
                                         onSelectionChange={(value) =>
-                                            setViewerSelectedHouse(Array.from(value)[0] as string)
+                                            setViewerSelectedHouse(
+                                                Array.from(value)[0] as string,
+                                            )
                                         }
                                     >
                                         {housesData.map((house) => (
-                                            <SelectItem key={house.id} value={house.id}>
+                                            <SelectItem
+                                                key={house.id}
+                                                value={house.id}
+                                            >
                                                 {toTitleCase(house.name)}
                                             </SelectItem>
                                         ))}
@@ -350,31 +403,51 @@ const HouseBonusPointsManager = () => {
                                     <TableBody emptyContent="No bonus points found">
                                         {bonusPoints.map((bp) => (
                                             <TableRow key={bp.id}>
-                                                <TableCell>{formatDate(bp.timestamp)}</TableCell>
                                                 <TableCell>
-                                                    <Chip size="sm" variant="flat">
+                                                    {formatDate(bp.timestamp)}
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Chip
+                                                        size="sm"
+                                                        variant="flat"
+                                                    >
                                                         {bp.category}
                                                     </Chip>
                                                 </TableCell>
                                                 <TableCell>
-                                                    <Chip 
-                                                        size="sm" 
-                                                        color={bp.points > 0 ? "success" : "danger"}
+                                                    <Chip
+                                                        color={
+                                                            bp.points > 0
+                                                                ? "success"
+                                                                : "danger"
+                                                        }
+                                                        size="sm"
                                                     >
-                                                        {bp.points > 0 ? "+" : ""}{bp.points}
+                                                        {bp.points > 0
+                                                            ? "+"
+                                                            : ""}
+                                                        {bp.points}
                                                     </Chip>
                                                 </TableCell>
-                                                <TableCell>{bp.reason}</TableCell>
+                                                <TableCell>
+                                                    {bp.reason}
+                                                </TableCell>
                                                 <TableCell className="text-sm text-gray-600">
                                                     {bp.addedBy}
                                                 </TableCell>
                                                 <TableCell>
                                                     <Button
-                                                        size="sm"
                                                         color="danger"
+                                                        isLoading={
+                                                            viewerLoading
+                                                        }
+                                                        size="sm"
                                                         variant="flat"
-                                                        isLoading={viewerLoading}
-                                                        onPress={() => handleDeleteBonusPoint(bp)}
+                                                        onPress={() =>
+                                                            handleDeleteBonusPoint(
+                                                                bp,
+                                                            )
+                                                        }
                                                     >
                                                         🗑️ Delete
                                                     </Button>
@@ -385,51 +458,105 @@ const HouseBonusPointsManager = () => {
                                 </Table>
                             ) : (
                                 <div className="space-y-4">
-                                    {Object.entries(allBonusPoints).map(([houseId, points]) => (
-                                        <Card key={houseId} className="border">
-                                            <CardHeader className="pb-2">
-                                                <div className="flex justify-between items-center w-full">
-                                                    <h3 className="font-semibold">{getHouseName(houseId)}</h3>
-                                                    <Chip color="primary" variant="flat">
-                                                        Total: {getTotalForHouse(houseId)} points
-                                                    </Chip>
-                                                </div>
-                                            </CardHeader>
-                                            <CardBody className="pt-0">
-                                                <div className="space-y-2">
-                                                    {points.length === 0 ? (
-                                                        <p className="text-sm text-gray-500">No bonus points</p>
-                                                    ) : (
-                                                        points
-                                                            .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
-                                                            .slice(0, 3)
-                                                            .map((bp) => (
-                                                                <div key={bp.id} className="flex justify-between items-center text-sm">
-                                                                    <span>{formatDate(bp.timestamp)}</span>
-                                                                    <div className="flex gap-2">
-                                                                        <Chip size="sm" variant="flat">
-                                                                            {bp.category}
-                                                                        </Chip>
-                                                                        <Chip 
-                                                                            size="sm" 
-                                                                            color={bp.points > 0 ? "success" : "danger"}
-                                                                        >
-                                                                            {bp.points > 0 ? "+" : ""}{bp.points}
-                                                                        </Chip>
+                                    {Object.entries(allBonusPoints).map(
+                                        ([houseId, points]) => (
+                                            <Card
+                                                key={houseId}
+                                                className="border"
+                                            >
+                                                <CardHeader className="pb-2">
+                                                    <div className="flex justify-between items-center w-full">
+                                                        <h3 className="font-semibold">
+                                                            {getHouseName(
+                                                                houseId,
+                                                            )}
+                                                        </h3>
+                                                        <Chip
+                                                            color="primary"
+                                                            variant="flat"
+                                                        >
+                                                            Total:{" "}
+                                                            {getTotalForHouse(
+                                                                houseId,
+                                                            )}{" "}
+                                                            points
+                                                        </Chip>
+                                                    </div>
+                                                </CardHeader>
+                                                <CardBody className="pt-0">
+                                                    <div className="space-y-2">
+                                                        {points.length === 0 ? (
+                                                            <p className="text-sm text-gray-500">
+                                                                No bonus points
+                                                            </p>
+                                                        ) : (
+                                                            points
+                                                                .sort(
+                                                                    (a, b) =>
+                                                                        b.timestamp.getTime() -
+                                                                        a.timestamp.getTime(),
+                                                                )
+                                                                .slice(0, 3)
+                                                                .map((bp) => (
+                                                                    <div
+                                                                        key={
+                                                                            bp.id
+                                                                        }
+                                                                        className="flex justify-between items-center text-sm"
+                                                                    >
+                                                                        <span>
+                                                                            {formatDate(
+                                                                                bp.timestamp,
+                                                                            )}
+                                                                        </span>
+                                                                        <div className="flex gap-2">
+                                                                            <Chip
+                                                                                size="sm"
+                                                                                variant="flat"
+                                                                            >
+                                                                                {
+                                                                                    bp.category
+                                                                                }
+                                                                            </Chip>
+                                                                            <Chip
+                                                                                color={
+                                                                                    bp.points >
+                                                                                    0
+                                                                                        ? "success"
+                                                                                        : "danger"
+                                                                                }
+                                                                                size="sm"
+                                                                            >
+                                                                                {bp.points >
+                                                                                0
+                                                                                    ? "+"
+                                                                                    : ""}
+                                                                                {
+                                                                                    bp.points
+                                                                                }
+                                                                            </Chip>
+                                                                        </div>
+                                                                        <span className="max-w-[200px] truncate">
+                                                                            {
+                                                                                bp.reason
+                                                                            }
+                                                                        </span>
                                                                     </div>
-                                                                    <span className="max-w-[200px] truncate">{bp.reason}</span>
-                                                                </div>
-                                                            ))
-                                                    )}
-                                                    {points.length > 3 && (
-                                                        <p className="text-xs text-gray-500">
-                                                            ...and {points.length - 3} more
-                                                        </p>
-                                                    )}
-                                                </div>
-                                            </CardBody>
-                                        </Card>
-                                    ))}
+                                                                ))
+                                                        )}
+                                                        {points.length > 3 && (
+                                                            <p className="text-xs text-gray-500">
+                                                                ...and{" "}
+                                                                {points.length -
+                                                                    3}{" "}
+                                                                more
+                                                            </p>
+                                                        )}
+                                                    </div>
+                                                </CardBody>
+                                            </Card>
+                                        ),
+                                    )}
                                 </div>
                             )}
                         </div>

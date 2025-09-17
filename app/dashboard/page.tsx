@@ -10,9 +10,9 @@ const Dashboard = () => {
     const user = useAuth();
     const router = useRouter();
     const userData = user.user;
-    const accountType: "student" | "admin" = "student"; //TODO: Change back after testing
+    const accountType = user.accountType;
     const student = user.userDbData;
-    const userEmail = "szack25@cgps.org"; //TODO: Change back after testing
+    const isAdmin = accountType === "admin";
 
     return (
         <Card className="">
@@ -22,7 +22,7 @@ const Dashboard = () => {
                 </h1>
             </CardHeader>
             <CardBody>
-                {student != null ? (
+                {student != null || isAdmin ? (
                     <>
                         <div className="w-full max-w-7xl mx-auto">
                             <div className="grid lg:grid-cols-3 gap-6 items-start">
@@ -37,21 +37,20 @@ const Dashboard = () => {
                                 </div>
                             </div>
                         </div>
+                        {isAdmin && (
+                            <div className="mt-6 text-center">
+                                <Button
+                                    color="primary"
+                                    onPress={() => router.push("/admin")}
+                                >
+                                    Admin Dashboard
+                                </Button>
+                            </div>
+                        )}
                     </>
                 ) : (
                     <div className="text-center">
                         <p>Loading your data...</p>
-                    </div>
-                )}
-                {/* @ts-ignore - test code TODO: fix */}
-                {accountType == "admin" && (
-                    <div className="mt-6 text-center">
-                        <Button
-                            color="primary"
-                            onPress={() => router.push("/admin")}
-                        >
-                            Admin Dashboard
-                        </Button>
                     </div>
                 )}
             </CardBody>

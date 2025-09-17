@@ -71,16 +71,24 @@ export async function generateHouseChartData(houseColorName: string) {
             }
         }
 
-        // Extract point values for each category
+        // Extract point values for each category (include 0 values to show structure)
         const labels: string[] = [];
         const data: number[] = [];
 
         categories.forEach((category) => {
-            if (houseData[category.key] && houseData[category.key] > 0) {
-                labels.push(`${category.name}: ${houseData[category.key]} pts`);
-                data.push(houseData[category.key]);
-            }
+            const points = houseData[category.key] || 0;
+            labels.push(`${category.name}: ${points} pts`);
+            data.push(points);
         });
+
+        // Check if all data is zero
+        const allZero = data.every(value => value === 0);
+        console.log("House chart data generated:", { labels, data, houseName: houseData.name, allZero });
+
+        // Return null for all-zero data - will be handled in the component
+        if (allZero) {
+            return null;
+        }
 
         // Generate colors based on house color
         const backgroundColors = generateHouseColors(

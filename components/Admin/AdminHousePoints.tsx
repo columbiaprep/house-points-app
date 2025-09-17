@@ -140,7 +140,7 @@ const AdminHousePoints = () => {
                         }
                     >
                         {housesData.map((house) => (
-                            <SelectItem key={house.id} value={house.id}>
+                            <SelectItem key={house.id}>
                                 {toTitleCase(house.name)}
                             </SelectItem>
                         ))}

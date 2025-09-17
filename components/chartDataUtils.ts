@@ -4,6 +4,7 @@ import { collection, getDocs, where, query } from "@firebase/firestore";
 
 import { generateHouseColors, generateBorderColors } from "./chartColorUtils";
 
+import { fetchHouseChartData } from "@/firebase-configuration/optimizedFirebaseDb";
 import { db } from "@/firebase-configuration/firebaseApp";
 import {
     HouseDocument,
@@ -24,43 +25,70 @@ export async function generateHouseChartData(houseColorName: string) {
             (doc) => doc.data() as PointCategory,
         );
 
-        // Find the house document by colorName
-        const housesQuery = query(
-            collection(db, "houses"),
-            where("colorName", "==", houseColorName),
-        );
-        const housesSnapshot = await getDocs(housesQuery);
+        // Try to use the optimized function first, fall back to original method
+        let houseData = await fetchHouseChartData(houseColorName);
 
-        let houseData: HouseDocument;
-
-        if (housesSnapshot.empty) {
-            // Try finding by document ID if colorName doesn't work
-            const allHousesSnapshot = await getDocs(collection(db, "houses"));
-            const houseDoc = allHousesSnapshot.docs.find(
-                (doc) =>
-                    doc.data().colorName === houseColorName ||
-                    doc.id === houseColorName,
+        if (!houseData) {
+            console.log(
+                `No house found in aggregated data for ${houseColorName}, falling back to original method`,
             );
 
-            if (!houseDoc) {
-                throw new Error(`No house found with color: ${houseColorName}`);
-            }
+            // Fallback to original method
+            const housesQuery = query(
+                collection(db, "houses"),
+                where("colorName", "==", houseColorName),
+            );
+            const housesSnapshot = await getDocs(housesQuery);
 
-            houseData = houseDoc.data() as HouseDocument;
-        } else {
-            houseData = housesSnapshot.docs[0].data() as HouseDocument;
+            if (housesSnapshot.empty) {
+                // Try finding by document ID or partial match if colorName doesn't work
+                const allHousesSnapshot = await getDocs(
+                    collection(db, "houses"),
+                );
+                const houseDoc = allHousesSnapshot.docs.find((doc) => {
+                    const data = doc.data();
+
+                    return (
+                        data.colorName === houseColorName ||
+                        doc.id === houseColorName ||
+                        data.colorName?.toLowerCase() ===
+                            houseColorName.toLowerCase() ||
+                        data.name
+                            ?.toLowerCase()
+                            .includes(houseColorName.toLowerCase())
+                    );
+                });
+
+                if (!houseDoc) {
+                    throw new Error(
+                        `No house found with color: ${houseColorName}`,
+                    );
+                }
+
+                houseData = houseDoc.data() as HouseDocument;
+            } else {
+                houseData = housesSnapshot.docs[0].data() as HouseDocument;
+            }
         }
 
-        // Extract point values for each category
+        // Extract point values for each category (include 0 values to show structure)
         const labels: string[] = [];
         const data: number[] = [];
 
         categories.forEach((category) => {
-            if (houseData[category.key] && houseData[category.key] > 0) {
-                labels.push(category.name);
-                data.push(houseData[category.key]);
-            }
+            const points = houseData[category.key] || 0;
+            labels.push(`${category.name}: ${points} pts`);
+            data.push(points);
         });
+
+        // Check if all data is zero
+        const allZero = data.every(value => value === 0);
+        console.log("House chart data generated:", { labels, data, houseName: houseData.name, allZero });
+
+        // Return null for all-zero data - will be handled in the component
+        if (allZero) {
+            return null;
+        }
 
         // Generate colors based on house color
         const backgroundColors = generateHouseColors(
@@ -80,9 +108,53 @@ export async function generateHouseChartData(houseColorName: string) {
                     data,
                     backgroundColor: backgroundColors,
                     borderColor: borderColors,
-                    borderWidth: 3,
+                    borderWidth: 1,
                 },
             ],
+            options: {
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: "bottom",
+                        labels: {
+                            boxWidth: 15,
+                            padding: 10,
+                            usePointStyle: true,
+                            generateLabels: function (chart) {
+                                const data = chart.data;
+
+                                if (
+                                    data.labels.length &&
+                                    data.datasets.length
+                                ) {
+                                    return data.labels.map((label, index) => {
+                                        const dataset = data.datasets[0];
+                                        const value = dataset.data[index];
+
+                                        return {
+                                            text: `${label.split(":")[0]}: ${value} pts`,
+                                            fillStyle:
+                                                dataset.backgroundColor[index],
+                                            strokeStyle:
+                                                dataset.borderColor[index],
+                                            lineWidth: dataset.borderWidth,
+                                            hidden: false,
+                                            index: index,
+                                        };
+                                    });
+                                }
+
+                                return [];
+                            },
+                        },
+                    },
+                },
+                layout: {
+                    padding: {
+                        bottom: 20,
+                    },
+                },
+            },
         };
     } catch (error) {
         console.error("Error generating house chart data:", error);
@@ -96,7 +168,7 @@ export async function generateHouseChartData(houseColorName: string) {
                     data: [0],
                     backgroundColor: ["rgba(107, 114, 128, 0.5)"],
                     borderColor: ["rgba(107, 114, 128, 1)"],
-                    borderWidth: 3,
+                    borderWidth: 1,
                 },
             ],
         };
@@ -139,7 +211,9 @@ export async function generatePersonalChartData(
 
         categories.forEach((category) => {
             if (studentData[category.key] && studentData[category.key] > 0) {
-                labels.push(category.name);
+                labels.push(
+                    `${category.name}: ${studentData[category.key]} pts`,
+                );
                 data.push(studentData[category.key]);
             }
         });
@@ -163,9 +237,53 @@ export async function generatePersonalChartData(
                     data,
                     backgroundColor: backgroundColors,
                     borderColor: borderColors,
-                    borderWidth: 3,
+                    borderWidth: 1,
                 },
             ],
+            options: {
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: "bottom",
+                        labels: {
+                            boxWidth: 15,
+                            padding: 10,
+                            usePointStyle: true,
+                            generateLabels: function (chart) {
+                                const data = chart.data;
+
+                                if (
+                                    data.labels.length &&
+                                    data.datasets.length
+                                ) {
+                                    return data.labels.map((label, index) => {
+                                        const dataset = data.datasets[0];
+                                        const value = dataset.data[index];
+
+                                        return {
+                                            text: `${label.split(":")[0]}: ${value} pts`,
+                                            fillStyle:
+                                                dataset.backgroundColor[index],
+                                            strokeStyle:
+                                                dataset.borderColor[index],
+                                            lineWidth: dataset.borderWidth,
+                                            hidden: false,
+                                            index: index,
+                                        };
+                                    });
+                                }
+
+                                return [];
+                            },
+                        },
+                    },
+                },
+                layout: {
+                    padding: {
+                        bottom: 20,
+                    },
+                },
+            },
         };
     } catch (error) {
         console.error("Error generating personal chart data:", error);
@@ -179,7 +297,7 @@ export async function generatePersonalChartData(
                     data: [0],
                     backgroundColor: ["rgba(107, 114, 128, 0.5)"],
                     borderColor: ["rgba(107, 114, 128, 1)"],
-                    borderWidth: 3,
+                    borderWidth: 1,
                 },
             ],
         };

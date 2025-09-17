@@ -59,7 +59,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
                     : null;
 
                 setAccountType(accountType);
-                setUserDbData(await getDataDoc(user.email));
+
+                // Only fetch individual data for students, not admins
+                if (accountType === "student") {
+                    setUserDbData(await getDataDoc(user.email));
+                } else {
+                    setUserDbData(null);
+                }
+
                 setLoading(false);
             } else {
                 setUser(null);

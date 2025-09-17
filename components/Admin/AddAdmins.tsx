@@ -1,4 +1,4 @@
-import { Button, Card, CircularProgress, Input } from "@heroui/react";
+import { Button, Card, CardBody, CircularProgress, Input } from "@heroui/react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -76,12 +76,14 @@ const AddAdmins = () => {
     };
 
     return (
-        <Card
-            isBlurred
-            className="point-form-card border-none shadow-lg p-6 h-fit md:w-5/6 w-full"
-        >
-            <div>
-                <h2 className="text-2xl font-bold text-center">Add Admins</h2>
+        <Card className="mt-4">
+            <CardBody>
+                <div className="text-center mb-4">
+                    <h2 className="text-lg font-bold">👨‍💼 Admin Management</h2>
+                    <p className="text-sm text-gray-600">
+                        Add or remove administrator privileges
+                    </p>
+                </div>
                 <span className="text-center">
                     <form
                         className="flex flex-col items-center gap-4"
@@ -129,7 +131,7 @@ const AddAdmins = () => {
                 {successMess && (
                     <p className="text-center text-green-500">{successMess}</p>
                 )}
-            </div>
+            </CardBody>
         </Card>
     );
 };

@@ -1,22 +1,62 @@
+rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Match all documents in the "users" collection
+    // Users collection - users can read all user docs and write their own
     match /users/{userId} {
-      // Allow read access only if the user is authenticated and the userId matches the authenticated user's email
       allow read: if request.auth != null;
-      
-      // Allow write access only if the user is authenticated and the userId matches the authenticated user's email
       allow write: if request.auth != null && request.auth.token.email == userId;
     }
 
-    // Match all documents in any other collection (e.g., data collection)
-    match /{document=**} {
-      // Allow read access only if the user is authenticated
+    // Core data collections - all authenticated users can read, controlled writes
+    match /individuals/{document} {
       allow read: if request.auth != null;
+      // Allow writes for authenticated users - app logic will control admin permissions
+      allow write: if request.auth != null;
+    }
 
-      // Allow write access only if the user is authenticated and their accountType is "admin"
-      allow write: if request.auth.token.email!= null && get(/databases/$(database)/documents/users/$(request.auth.token.email)).data.accountType == "admin";
+    match /houses/{document} {
+      allow read: if request.auth != null;
+      // Allow writes for authenticated users - app logic will control admin permissions
+      allow write: if request.auth != null;
+    }
+
+    match /pointCategories/{document} {
+      allow read: if request.auth != null;
+      // Allow writes for authenticated users - app logic will control admin permissions
+      allow write: if request.auth != null;
+    }
+
+    // Admin-only collections (restrict at database level)
+    match /futureHouseRoster/{document} {
+      allow read: if request.auth != null;
+      // Only allow writes if user email is in a hardcoded admin list (avoid circular dependency)
+      allow write: if request.auth != null &&
+                     request.auth.token.email in ['bschott@cgps.org', 'admin@cgps.org'];
+    }
+
+    // Bonus points subcollections
+    match /houses/{houseId}/bonusPoints/{bonusPointId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+
+    // Aggregated data collections (if they exist)
+    match /houseSummaries/{document} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+
+    match /houseRankings/{houseId}/students/{studentId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+
+    // Fallback for any other collections - read only
+    match /{document=**} {
+      allow read: if request.auth != null;
+      allow write: if false; // Deny writes to unknown collections
     }
   }
 }

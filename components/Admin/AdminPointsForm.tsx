@@ -11,7 +11,6 @@ import {
     Radio,
 } from "@heroui/react";
 import { Card, CardBody } from "@heroui/card";
-import { getDownloadURL, getStorage, ref } from "firebase/storage";
 import { useRouter } from "next/navigation";
 
 import {
@@ -19,13 +18,14 @@ import {
     type HouseDocument,
     type PointCategory,
     writeToHouseData,
+    fetchAllIndividuals,
+    fetchAllHouses,
 } from "@/firebase-configuration/firebaseDb";
 import { toTitleCase } from "@/config/globalFuncs";
 import {
     writePointsOptimized,
     getCachedPointCategories,
 } from "@/firebase-configuration/cachedFirebaseDb";
-import app from "@/firebase-configuration/firebaseApp";
 
 const AdminPointsForm = () => {
     const [individualData, setIndividualData] = useState<IndividualDocument[]>(
@@ -44,24 +44,21 @@ const AdminPointsForm = () => {
         text: string;
         type: string;
     } | null>(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const router = useRouter();
 
-    const storage = getStorage(app);
     const loadData = async () => {
-        const dataRef = ref(storage, "data.json");
-
         try {
-            const url = await getDownloadURL(dataRef);
-            const response = await fetch(url);
-            const data = await response.json();
+            // Load data from Firestore instead of Firebase Storage
+            const [individuals, houses, categories] = await Promise.all([
+                fetchAllIndividuals(),
+                fetchAllHouses(),
+                getCachedPointCategories(),
+            ]);
 
-            setIndividualData(data.individuals);
-            setHousesData(data.houses);
-
-            // Load point categories
-            const categories = await getCachedPointCategories();
-
+            setIndividualData(individuals);
+            setHousesData(houses);
             setPointsCategories(categories);
         } catch (error) {
             console.error("Failed to load data:", error);

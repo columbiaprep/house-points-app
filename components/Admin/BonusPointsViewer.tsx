@@ -15,16 +15,15 @@ import {
     SelectItem,
     Chip,
 } from "@heroui/react";
-import { getDownloadURL, getStorage, ref } from "firebase/storage";
 
 import {
     type HouseDocument,
     type BonusPoint,
     getAllBonusPoints,
     getBonusPointsForHouse,
+    fetchAllHouses,
 } from "@/firebase-configuration/firebaseDb";
 import { toTitleCase } from "@/config/globalFuncs";
-import app from "@/firebase-configuration/firebaseApp";
 
 const BonusPointsViewer = () => {
     const [housesData, setHousesData] = useState<HouseDocument[]>([]);
@@ -36,19 +35,15 @@ const BonusPointsViewer = () => {
     const [loading, setLoading] = useState(false);
     const [viewMode, setViewMode] = useState<"single" | "all">("single");
 
-    const storage = getStorage(app);
-
     useEffect(() => {
         const loadHousesData = async () => {
             try {
-                const dataRef = ref(storage, "data.json");
-                const url = await getDownloadURL(dataRef);
-                const response = await fetch(url);
-                const data = await response.json();
+                // Load houses data from Firestore instead of Firebase Storage
+                const houses = await fetchAllHouses();
 
-                setHousesData(data.houses);
-                if (data.houses.length > 0) {
-                    setSelectedHouse(data.houses[0].id);
+                setHousesData(houses);
+                if (houses.length > 0) {
+                    setSelectedHouse(houses[0].id);
                 }
             } catch (error) {
                 console.error("Failed to load houses data:", error);

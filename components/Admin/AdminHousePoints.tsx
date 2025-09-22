@@ -8,16 +8,15 @@ import {
     Select,
     SelectItem,
 } from "@heroui/react";
-import { getDownloadURL, getStorage, ref } from "firebase/storage";
 
 import {
     type HouseDocument,
     type PointCategory,
     addBonusPointToHouse,
+    fetchAllHouses,
 } from "@/firebase-configuration/firebaseDb";
 import { toTitleCase } from "@/config/globalFuncs";
 import { getCachedPointCategories } from "@/firebase-configuration/cachedFirebaseDb";
-import app from "@/firebase-configuration/firebaseApp";
 import { useAuth } from "@/contexts/AuthContext";
 
 const AdminHousePoints = () => {
@@ -36,22 +35,16 @@ const AdminHousePoints = () => {
         type: "success" | "error";
     } | null>(null);
 
-    const storage = getStorage(app);
-
     useEffect(() => {
         const loadData = async () => {
             try {
-                // Load houses data
-                const dataRef = ref(storage, "data.json");
-                const url = await getDownloadURL(dataRef);
-                const response = await fetch(url);
-                const data = await response.json();
+                // Load data from Firestore instead of Firebase Storage
+                const [houses, categories] = await Promise.all([
+                    fetchAllHouses(),
+                    getCachedPointCategories(),
+                ]);
 
-                setHousesData(data.houses);
-
-                // Load point categories
-                const categories = await getCachedPointCategories();
-
+                setHousesData(houses);
                 setPointsCategories(categories);
             } catch (error) {
                 console.error("Failed to load data:", error);

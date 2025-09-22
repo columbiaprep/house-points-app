@@ -170,6 +170,21 @@ const AdminStudentManager = () => {
 
                 // Get student's house
                 const student = await fetchIndividual(studentEmail.trim());
+                console.log("Student data for point modification:", {
+                    email: studentEmail.trim(),
+                    student: student,
+                    house: student.house,
+                    category: selectedCategory
+                });
+
+                if (!student.house) {
+                    setMessage({
+                        text: `Error: Student ${studentEmail.trim()} does not have a house assigned. Please assign a house first.`,
+                        type: "error",
+                    });
+                    return;
+                }
+
                 const finalPoints =
                     operationType === "add" ? pointsToModify : -pointsToModify;
 
@@ -377,6 +392,9 @@ const AdminStudentManager = () => {
             const finalPoints =
                 operationType === "add" ? pointsToModify : -pointsToModify;
 
+            // Track student-category combinations to prevent duplicates
+            const processedCombinations = new Map<string, number>();
+
             for (let i = 0; i < csvData.length; i++) {
                 const row = csvData[i];
 
@@ -394,17 +412,36 @@ const AdminStudentManager = () => {
                         : finalPoints;
 
                     if (category) {
-                        updates.push({
-                            studentId: row.email,
-                            house: student.house,
-                            category: category,
-                            points: points,
-                        });
+                        const combinationKey = `${row.email}-${category}`;
+
+                        // Check for duplicates and accumulate points
+                        if (processedCombinations.has(combinationKey)) {
+                            processedCombinations.set(combinationKey,
+                                processedCombinations.get(combinationKey)! + points);
+                        } else {
+                            processedCombinations.set(combinationKey, points);
+                        }
                     } else {
                         failed.push(`${row.email}: No category specified`);
                     }
                 } catch (error) {
                     failed.push(`${row.email}: Student not found`);
+                }
+            }
+
+            // Convert accumulated combinations to updates
+            for (const [combinationKey, totalPoints] of processedCombinations) {
+                const [email, category] = combinationKey.split('-');
+                try {
+                    const student = await fetchIndividual(email);
+                    updates.push({
+                        studentId: email,
+                        house: student.house,
+                        category: category,
+                        points: totalPoints,
+                    });
+                } catch (error) {
+                    failed.push(`${email}: Student not found during final processing`);
                 }
             }
 
@@ -736,7 +773,6 @@ const AdminStudentManager = () => {
                                                 (category) => (
                                                     <SelectItem
                                                         key={category.key}
-                                                        value={category.key as any}
                                                     >
                                                         {category.name}
                                                     </SelectItem>

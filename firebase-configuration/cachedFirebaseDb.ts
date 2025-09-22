@@ -93,6 +93,17 @@ export async function batchWritePoints(
 
         // Group updates by house to minimize house document updates
         for (const update of updates) {
+            // Validate required fields
+            if (!update.house || !update.studentId || !update.category) {
+                console.error("Invalid update object:", update);
+                return {
+                    success: false,
+                    studentsUpdated: 0,
+                    housesUpdated: 0,
+                    error: `Invalid update data: missing ${!update.house ? 'house' : !update.studentId ? 'studentId' : 'category'}`
+                };
+            }
+
             // Update individual student
             const studentRef = doc(db, "individuals", update.studentId);
             const studentDoc = await getDoc(studentRef);
@@ -123,11 +134,24 @@ export async function batchWritePoints(
                     "totalPoints",
                     (houseCategories.get("totalPoints") || 0) + update.points,
                 );
+            } else {
+                console.error(`Student document not found: ${update.studentId}`);
+                return {
+                    success: false,
+                    studentsUpdated: 0,
+                    housesUpdated: 0,
+                    error: `Student document not found: ${update.studentId}`
+                };
             }
         }
 
         // Apply house updates
         for (const [houseName, categoryUpdates] of Array.from(houseUpdates.entries())) {
+            if (!houseName) {
+                console.error("Empty house name found in updates");
+                continue;
+            }
+
             const houseRef = doc(db, "houses", houseName);
             const houseDoc = await getDoc(houseRef);
 

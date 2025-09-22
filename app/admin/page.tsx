@@ -9,6 +9,7 @@ import { AggregatedDataManager } from "@/components/Admin/AggregatedDataManager"
 import AdminStudentManager from "@/components/Admin/AdminStudentManager";
 import HouseBonusPointsManager from "@/components/Admin/HouseBonusPointsManager";
 import StudentCsvDownloader from "@/components/Admin/StudentCsvDownloader";
+import AuthDebugTester from "@/components/Admin/AuthDebugTester";
 
 export default function AdminPage() {
     const auth = useAuth();
@@ -45,6 +46,10 @@ export default function AdminPage() {
                         <StudentCsvDownloader />
                     </div>
 
+                    {/* Authentication Debug Tester */}
+                    <div className="w-full mb-8">
+                        <AuthDebugTester />
+                    </div>
 
                     {/* Secondary Admin Tools - Grid Layout */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">

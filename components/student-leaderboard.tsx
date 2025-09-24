@@ -115,19 +115,12 @@ export const StudentLeaderboardContainer = () => {
 
     useEffect(() => {
         if (allStudents && categories) {
-            // Calculate total points for each student using proper point categories
-            const studentsWithTotals = allStudents.map((student) => {
-                let total = 0;
-
-                categories.forEach((category) => {
-                    total += student[category.key] || 0;
-                });
-
-                return {
-                    ...student,
-                    totalPoints: total,
-                };
-            });
+            // Use the totalPoints field directly from the student documents
+            // Individual documents already have totalPoints calculated and stored
+            const studentsWithTotals = allStudents.map((student) => ({
+                ...student,
+                totalPoints: student.totalPoints || 0, // Use existing totalPoints field
+            }));
 
             // Sort by total points (descending) and take top 10
             const top10 = studentsWithTotals

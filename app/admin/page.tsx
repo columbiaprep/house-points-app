@@ -10,6 +10,8 @@ import AdminStudentManager from "@/components/Admin/AdminStudentManager";
 import HouseBonusPointsManager from "@/components/Admin/HouseBonusPointsManager";
 import StudentCsvDownloader from "@/components/Admin/StudentCsvDownloader";
 import AuthDebugTester from "@/components/Admin/AuthDebugTester";
+import HouseDataDiagnostic from "@/components/Admin/HouseDataDiagnostic";
+import HouseDataMigration from "@/components/Admin/HouseDataMigration";
 
 export default function AdminPage() {
     const auth = useAuth();
@@ -49,6 +51,16 @@ export default function AdminPage() {
                     {/* Authentication Debug Tester */}
                     <div className="w-full mb-8">
                         <AuthDebugTester />
+                    </div>
+
+                    {/* House Data Diagnostic */}
+                    <div className="w-full mb-8">
+                        <HouseDataDiagnostic />
+                    </div>
+
+                    {/* House Data Migration */}
+                    <div className="w-full mb-8">
+                        <HouseDataMigration />
                     </div>
 
                     {/* Secondary Admin Tools - Grid Layout */}

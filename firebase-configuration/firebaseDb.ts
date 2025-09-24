@@ -36,7 +36,9 @@ export interface IndividualDocument {
 export interface HouseDocument {
     id: string;
     name: string;
-    totalPoints: number;
+    studentPoints: number; // NEW: sum of all student earned points
+    bonusPoints: number;   // NEW: sum of all house bonus points
+    totalPoints: number;   // studentPoints + bonusPoints
     [key: string]: any; // Allows for dynamic point categories
     colorName: string;
     accentColor: string;
@@ -290,9 +292,26 @@ export async function writeToHouseData(
                 [ptsCategory]: (houseData[ptsCategory] || 0) + points,
             };
         }
-        if (ptsCategory !== "totalPoints") {
-            updateData.totalPoints = (houseData.totalPoints || 0) + points;
+
+        // Update studentPoints and totalPoints for student-earned points
+        if (ptsCategory !== "totalPoints" && ptsCategory !== "studentPoints" && ptsCategory !== "bonusPoints") {
+            updateData.studentPoints = (houseData.studentPoints || 0) + points;
+            updateData.totalPoints = (houseData.studentPoints || 0) + points + (houseData.bonusPoints || 0);
         }
+    } else {
+        // Initialize new house document with default values
+        const houseColorInfo = getHouseColorInfo(id);
+        updateData = {
+            id,
+            name: id,
+            colorName: houseColorInfo.colorName,
+            accentColor: houseColorInfo.accentColor,
+            studentPoints: ptsCategory !== "totalPoints" && ptsCategory !== "studentPoints" && ptsCategory !== "bonusPoints" ? points : 0,
+            bonusPoints: 0,
+            totalPoints: ptsCategory !== "totalPoints" && ptsCategory !== "studentPoints" && ptsCategory !== "bonusPoints" ? points : 0,
+            place: 0,
+            [ptsCategory]: points,
+        };
     }
 
     await setDoc(houseDocRef, updateData, { merge: true });
@@ -603,6 +622,36 @@ export async function addBonusPointToHouse(
     };
 
     await setDoc(bonusPointDoc, bonusPoint);
+
+    // Update house's bonusPoints and totalPoints
+    const houseDocRef = doc(db, "houses", houseId);
+    const houseDoc = await getDoc(houseDocRef);
+
+    if (houseDoc.exists()) {
+        const houseData = houseDoc.data();
+        const newBonusPoints = (houseData.bonusPoints || 0) + points;
+        const newTotalPoints = (houseData.studentPoints || 0) + newBonusPoints;
+
+        await setDoc(houseDocRef, {
+            bonusPoints: newBonusPoints,
+            totalPoints: newTotalPoints,
+            [category]: (houseData[category] || 0) + points, // Also update category total
+        }, { merge: true });
+    } else {
+        // Initialize new house document if it doesn't exist
+        const houseColorInfo = getHouseColorInfo(houseId);
+        await setDoc(houseDocRef, {
+            id: houseId,
+            name: houseId,
+            colorName: houseColorInfo.colorName,
+            accentColor: houseColorInfo.accentColor,
+            studentPoints: 0,
+            bonusPoints: points,
+            totalPoints: points,
+            place: 0,
+            [category]: points,
+        }, { merge: true });
+    }
 
     return bonusPointId;
 }

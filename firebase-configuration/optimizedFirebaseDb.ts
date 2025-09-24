@@ -199,37 +199,33 @@ export async function fetchHouseSummariesWithFallback(): Promise<
         const { fetchAllHouses, calculateHouseBonusPoints } = await import("./firebaseDb");
         const houses = await fetchAllHouses();
 
-        // Convert to HouseSummary format with bonus points calculation
-        const summariesWithBonus = await Promise.all(
-            houses.map(async (house) => {
-                // Calculate bonus points for this house
-                const bonusPoints = await calculateHouseBonusPoints(house.id);
-                const totalBonusPoints = Object.values(bonusPoints).reduce((sum, points) => sum + points, 0);
-
-                return {
-                    name: house.name,
-                    totalPoints: house.totalPoints + totalBonusPoints, // Include bonus points in total
-                    bonusPoints: totalBonusPoints,
-                    colorName: house.colorName,
-                    accentColor: house.accentColor,
-                    place: house.place || 0,
-                    lastUpdated: new Date(),
-                    ...Object.fromEntries(
-                        Object.entries(house).filter(
-                            ([key]) =>
-                                ![
-                                    "id",
-                                    "name",
-                                    "totalPoints",
-                                    "colorName",
-                                    "accentColor",
-                                    "place",
-                                ].includes(key),
-                        ),
+        // Convert to HouseSummary format using new architecture
+        const summariesWithBonus = houses.map((house) => {
+            return {
+                name: house.name,
+                totalPoints: house.totalPoints || 0, // Use the calculated totalPoints directly
+                bonusPoints: house.bonusPoints || 0, // Use the stored bonusPoints directly
+                colorName: house.colorName,
+                accentColor: house.accentColor,
+                place: house.place || 0,
+                lastUpdated: new Date(),
+                ...Object.fromEntries(
+                    Object.entries(house).filter(
+                        ([key]) =>
+                            ![
+                                "id",
+                                "name",
+                                "totalPoints",
+                                "bonusPoints",
+                                "studentPoints",
+                                "colorName",
+                                "accentColor",
+                                "place",
+                            ].includes(key),
                     ),
-                };
-            })
-        );
+                ),
+            };
+        });
 
         // Re-sort by totalPoints (including bonus) and update places
         summariesWithBonus.sort((a, b) => b.totalPoints - a.totalPoints);

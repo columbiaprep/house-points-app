@@ -131,6 +131,10 @@ export async function batchWritePoints(
                     (houseCategories.get(update.category) || 0) + update.points,
                 );
                 houseCategories.set(
+                    "studentPoints",
+                    (houseCategories.get("studentPoints") || 0) + update.points,
+                );
+                houseCategories.set(
                     "totalPoints",
                     (houseCategories.get("totalPoints") || 0) + update.points,
                 );
@@ -160,8 +164,14 @@ export async function batchWritePoints(
                 const updateData: any = {};
 
                 for (const [category, pointDelta] of Array.from(categoryUpdates.entries())) {
-                    updateData[category] =
-                        (currentData[category] || 0) + pointDelta;
+                    if (category === "totalPoints") {
+                        // For totalPoints, we need to recalculate based on studentPoints + bonusPoints
+                        const newStudentPoints = (currentData.studentPoints || 0) + (categoryUpdates.get("studentPoints") || 0);
+                        const existingBonusPoints = currentData.bonusPoints || 0;
+                        updateData.totalPoints = newStudentPoints + existingBonusPoints;
+                    } else {
+                        updateData[category] = (currentData[category] || 0) + pointDelta;
+                    }
                 }
 
                 batch.update(houseRef, updateData);

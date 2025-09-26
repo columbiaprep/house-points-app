@@ -35,6 +35,7 @@ export const OptimizedHousePointsRow: React.FC<
                 height={50}
                 src={"/house-images/" + houseImage + ".png"}
                 width={50}
+                style={{ width: "auto", height: "auto" }}
             />
 
             <p

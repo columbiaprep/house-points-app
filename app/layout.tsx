@@ -6,7 +6,7 @@ import clsx from "clsx";
 import { Providers } from "./providers";
 
 import { siteConfig } from "@/config/site";
-import { fontSans } from "@/config/fonts";
+import { fontSans, fontMono } from "@/config/fonts";
 import { Navbar } from "@/components/navbar";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { QueryProvider } from "@/contexts/QueryProvider";
@@ -34,6 +34,7 @@ export default function RootLayout({
                 className={clsx(
                     "min-h-screen w-full font-sans antialiased",
                     fontSans.variable,
+                    fontMono.variable,
                 )}
             >
                 <AuthProvider>

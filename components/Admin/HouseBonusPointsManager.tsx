@@ -17,8 +17,13 @@ import {
     Chip,
     Tabs,
     Tab,
+    Modal,
+    ModalContent,
+    ModalHeader,
+    ModalBody,
+    ModalFooter,
+    useDisclosure,
 } from "@heroui/react";
-import { getDownloadURL, getStorage, ref } from "firebase/storage";
 
 import {
     type HouseDocument,
@@ -28,13 +33,23 @@ import {
     getAllBonusPoints,
     getBonusPointsForHouse,
     deleteBonusPoint,
+    fetchAllHouses,
 } from "@/firebase-configuration/firebaseDb";
 import { toTitleCase } from "@/config/globalFuncs";
 import { getCachedPointCategories } from "@/firebase-configuration/cachedFirebaseDb";
-import app from "@/firebase-configuration/firebaseApp";
 import { useAuth } from "@/contexts/AuthContext";
 
 const HouseBonusPointsManager = () => {
+    const { isOpen, onOpen, onOpenChange } = useDisclosure();
+
+    // Custom close handler to properly manage focus
+    const handleModalClose = () => {
+        // Clear any focused elements and reset select states
+        if (document.activeElement instanceof HTMLElement) {
+            document.activeElement.blur();
+        }
+        onOpenChange();
+    };
     const auth = useAuth();
     const [housesData, setHousesData] = useState<HouseDocument[]>([]);
     const [pointsCategories, setPointsCategories] = useState<PointCategory[]>(
@@ -61,24 +76,22 @@ const HouseBonusPointsManager = () => {
     const [viewerLoading, setViewerLoading] = useState(false);
     const [viewMode, setViewMode] = useState<"single" | "all">("single");
 
-    const storage = getStorage(app);
-
     useEffect(() => {
         const loadData = async () => {
             try {
-                // Load houses data
-                const dataRef = ref(storage, "data.json");
-                const url = await getDownloadURL(dataRef);
-                const response = await fetch(url);
-                const data = await response.json();
+                // Load houses data from Firestore instead of Firebase Storage
+                console.log("Loading houses from Firestore...");
+                const houses = await fetchAllHouses();
+                console.log("Loaded houses:", houses);
 
-                setHousesData(data.houses);
-                if (data.houses.length > 0) {
-                    setViewerSelectedHouse(data.houses[0].id);
+                setHousesData(houses);
+                if (houses.length > 0) {
+                    setViewerSelectedHouse(houses[0].id);
                 }
 
                 // Load point categories
                 const categories = await getCachedPointCategories();
+                console.log("Loaded categories:", categories);
 
                 setPointsCategories(categories);
             } catch (error) {
@@ -119,6 +132,14 @@ const HouseBonusPointsManager = () => {
 
         setLoading(true);
         try {
+            console.log("Adding bonus points with:", {
+                selectedHouse,
+                selectedCategory,
+                pointsToAdd,
+                reason,
+                addedBy: auth.user.email
+            });
+
             await addBonusPointToHouse(
                 selectedHouse,
                 selectedCategory,
@@ -239,14 +260,41 @@ const HouseBonusPointsManager = () => {
     };
 
     return (
-        <Card className="w-full">
-            <CardHeader>
-                <h2 className="text-xl font-bold">
-                    🏆 House Bonus Points Management
-                </h2>
-            </CardHeader>
-            <CardBody>
-                <Tabs aria-label="Bonus Points Management">
+        <>
+            <Card className="mt-4">
+                <CardBody>
+                    <div className="flex justify-between items-center mb-4">
+                        <h2 className="text-xl font-bold">
+                            🏆 House Bonus Points
+                        </h2>
+                        <Button color="primary" onPress={onOpen}>
+                            Manage House Points
+                        </Button>
+                    </div>
+                    <p className="text-sm text-gray-600">
+                        Award bonus points to houses and view bonus point history.
+                    </p>
+                </CardBody>
+            </Card>
+
+            <Modal
+                isOpen={isOpen}
+                scrollBehavior="inside"
+                size="2xl"
+                onOpenChange={handleModalClose}
+            >
+                <ModalContent>
+                    {(onClose) => (
+                        <>
+                            <ModalHeader>
+                                <div className="flex flex-col">
+                                    <h3 className="text-lg font-bold">
+                                        🏆 House Bonus Points Management
+                                    </h3>
+                                </div>
+                            </ModalHeader>
+                            <ModalBody>
+                                <Tabs aria-label="Bonus Points Management">
                     <Tab key="add" title="➕ Add Bonus Points">
                         <div className="flex flex-col gap-4 pt-4">
                             <div className="text-center">
@@ -258,15 +306,15 @@ const HouseBonusPointsManager = () => {
                             <Select
                                 label="Select House"
                                 placeholder="Choose a house"
-                                value={selectedHouse}
-                                onSelectionChange={(value) =>
-                                    setSelectedHouse(
-                                        Array.from(value)[0] as string,
-                                    )
-                                }
+                                selectedKeys={selectedHouse ? [selectedHouse] : []}
+                                onSelectionChange={(keys) => {
+                                    const selected = Array.from(keys)[0] as string;
+                                    console.log("Selected house:", selected);
+                                    setSelectedHouse(selected || "");
+                                }}
                             >
                                 {housesData.map((house) => (
-                                    <SelectItem key={house.id} value={house.id as any}>
+                                    <SelectItem key={house.id} value={house.id}>
                                         {toTitleCase(house.name)}
                                     </SelectItem>
                                 ))}
@@ -275,12 +323,12 @@ const HouseBonusPointsManager = () => {
                             <Select
                                 label="Select Category"
                                 placeholder="Choose point category"
-                                value={selectedCategory}
-                                onSelectionChange={(value) =>
-                                    setSelectedCategory(
-                                        Array.from(value)[0] as string,
-                                    )
-                                }
+                                selectedKeys={selectedCategory ? [selectedCategory] : []}
+                                onSelectionChange={(keys) => {
+                                    const selected = Array.from(keys)[0] as string;
+                                    console.log("Selected category:", selected);
+                                    setSelectedCategory(selected || "");
+                                }}
                             >
                                 {pointsCategories.map((category) => (
                                     <SelectItem
@@ -338,20 +386,18 @@ const HouseBonusPointsManager = () => {
                             <div className="flex justify-between items-center mb-4">
                                 <div className="flex gap-2">
                                     <Select
+                                        aria-label="View mode selection"
                                         size="sm"
-                                        value={viewMode}
-                                        onSelectionChange={(key) =>
-                                            setViewMode(
-                                                Array.from(key)[0] as
-                                                    | "single"
-                                                    | "all",
-                                            )
-                                        }
+                                        selectedKeys={viewMode ? [viewMode] : []}
+                                        onSelectionChange={(keys) => {
+                                            const selected = Array.from(keys)[0] as "single" | "all";
+                                            setViewMode(selected || "single");
+                                        }}
                                     >
-                                        <SelectItem key="single" value={"single" as any}>
+                                        <SelectItem key="single" value="single">
                                             Single House
                                         </SelectItem>
-                                        <SelectItem key="all" value={"all" as any}>
+                                        <SelectItem key="all" value="all">
                                             All Houses
                                         </SelectItem>
                                     </Select>
@@ -371,12 +417,11 @@ const HouseBonusPointsManager = () => {
                                     <Select
                                         label="Select House"
                                         placeholder="Choose a house"
-                                        value={viewerSelectedHouse}
-                                        onSelectionChange={(value) =>
-                                            setViewerSelectedHouse(
-                                                Array.from(value)[0] as string,
-                                            )
-                                        }
+                                        selectedKeys={viewerSelectedHouse ? [viewerSelectedHouse] : []}
+                                        onSelectionChange={(keys) => {
+                                            const selected = Array.from(keys)[0] as string;
+                                            setViewerSelectedHouse(selected || "");
+                                        }}
                                     >
                                         {housesData.map((house) => (
                                             <SelectItem
@@ -561,9 +606,18 @@ const HouseBonusPointsManager = () => {
                             )}
                         </div>
                     </Tab>
-                </Tabs>
-            </CardBody>
-        </Card>
+                                </Tabs>
+                            </ModalBody>
+                            <ModalFooter>
+                                <Button color="danger" variant="light" onPress={handleModalClose}>
+                                    Close
+                                </Button>
+                            </ModalFooter>
+                        </>
+                    )}
+                </ModalContent>
+            </Modal>
+        </>
     );
 };
 

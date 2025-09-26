@@ -13,6 +13,31 @@ const Dashboard = () => {
     const accountType = user.accountType;
     const student = user.userDbData;
     const isAdmin = accountType === "admin";
+    const loading = user.loading;
+
+    // Show loading while authentication is being resolved
+    if (loading) {
+        return (
+            <Card className="">
+                <CardHeader className="flex justify-center">
+                    <h1 className="text-2xl font-bold text-center">
+                        House Points Dashboard
+                    </h1>
+                </CardHeader>
+                <CardBody>
+                    <div className="text-center">
+                        <p>Loading your data...</p>
+                    </div>
+                </CardBody>
+            </Card>
+        );
+    }
+
+    // Redirect to auth if not authenticated
+    if (!userData) {
+        router.push("/auth");
+        return null;
+    }
 
     return (
         <Card className="">

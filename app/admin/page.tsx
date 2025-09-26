@@ -8,7 +8,8 @@ import AddAdmins from "@/components/Admin/AddAdmins";
 import { AggregatedDataManager } from "@/components/Admin/AggregatedDataManager";
 import AdminStudentManager from "@/components/Admin/AdminStudentManager";
 import HouseBonusPointsManager from "@/components/Admin/HouseBonusPointsManager";
-import StudentCsvDownloader from "@/components/Admin/StudentCsvDownloader";
+import UnifiedHistoryViewer from "@/components/Admin/UnifiedHistoryViewer";
+import BatchRollbackManager from "@/components/Admin/BatchRollbackManager";
 
 export default function AdminPage() {
     const auth = useAuth();
@@ -30,21 +31,25 @@ export default function AdminPage() {
                         Admin Dashboard
                     </h1>
 
-                    {/* Primary Student Management Section */}
-                    <div className="w-full mb-8">
-                        <AdminStudentManager />
+                    {/* Primary Management Section - Side by Side */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                        <div>
+                            <AdminStudentManager />
+                        </div>
+                        <div>
+                            <HouseBonusPointsManager />
+                        </div>
                     </div>
 
-                    {/* House Bonus Points Management Section */}
+                    {/* Unified History Viewer Section */}
                     <div className="w-full mb-8">
-                        <HouseBonusPointsManager />
+                        <UnifiedHistoryViewer />
                     </div>
 
-                    {/* Student Data Export Section */}
+                    {/* Batch Rollback Manager Section */}
                     <div className="w-full mb-8">
-                        <StudentCsvDownloader />
+                        <BatchRollbackManager />
                     </div>
-
 
                     {/* Secondary Admin Tools - Grid Layout */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">

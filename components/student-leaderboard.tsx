@@ -7,6 +7,7 @@ import {
     useHouseSummaries,
     usePointCategories,
 } from "@/hooks/useFirebaseData";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface StudentLeaderboardRowProps extends IndividualDocument {
     rank: number;
@@ -105,9 +106,11 @@ export const StudentLeaderboardRow: React.FC<StudentLeaderboardRowProps> = ({
 
 export const StudentLeaderboardContainer = () => {
     const [topStudents, setTopStudents] = useState<IndividualDocument[]>([]);
+    const auth = useAuth();
+    const isAuthenticated = !!auth.user && !auth.loading;
 
-    const { data: allStudents, isLoading: studentsLoading } = useIndividuals();
-    const { data: houses } = useHouseSummaries();
+    const { data: allStudents, isLoading: studentsLoading } = useIndividuals(isAuthenticated);
+    const { data: houses } = useHouseSummaries(isAuthenticated);
     const { data: categories, isLoading: categoriesLoading } =
         usePointCategories();
 
@@ -115,19 +118,12 @@ export const StudentLeaderboardContainer = () => {
 
     useEffect(() => {
         if (allStudents && categories) {
-            // Calculate total points for each student using proper point categories
-            const studentsWithTotals = allStudents.map((student) => {
-                let total = 0;
-
-                categories.forEach((category) => {
-                    total += student[category.key] || 0;
-                });
-
-                return {
-                    ...student,
-                    totalPoints: total,
-                };
-            });
+            // Use the totalPoints field directly from the student documents
+            // Individual documents already have totalPoints calculated and stored
+            const studentsWithTotals = allStudents.map((student) => ({
+                ...student,
+                totalPoints: student.totalPoints || 0, // Use existing totalPoints field
+            }));
 
             // Sort by total points (descending) and take top 10
             const top10 = studentsWithTotals
@@ -166,6 +162,26 @@ export const StudentLeaderboardContainer = () => {
                                 (house) => house.name === student.house,
                             );
 
+                            // Calculate proper rank handling ties
+                            let rank = 1;
+                            if (index > 0) {
+                                // Check if current student has different points than previous
+                                if (student.totalPoints !== topStudents[index - 1].totalPoints) {
+                                    rank = index + 1; // Skip ranks for tied students
+                                } else {
+                                    // Find the rank of the first student in this tie group
+                                    for (let i = index - 1; i >= 0; i--) {
+                                        if (topStudents[i].totalPoints !== student.totalPoints) {
+                                            rank = i + 2; // First different score + 1
+                                            break;
+                                        }
+                                        if (i === 0) {
+                                            rank = 1; // All students from beginning have same score
+                                        }
+                                    }
+                                }
+                            }
+
                             return (
                                 <StudentLeaderboardRow
                                     key={student.id}
@@ -173,7 +189,7 @@ export const StudentLeaderboardContainer = () => {
                                         matchingHouse?.accentColor
                                     }
                                     houseColorName={matchingHouse?.colorName}
-                                    rank={index + 1}
+                                    rank={rank}
                                     totalPoints={student.totalPoints}
                                     {...student}
                                 />

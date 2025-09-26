@@ -15,6 +15,8 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
                         gcTime: 10 * 60 * 1000, // 10 minutes (previously cacheTime)
                         retry: 2,
                         refetchOnWindowFocus: false,
+                        // Disable queries during SSR
+                        enabled: typeof window !== 'undefined',
                     },
                 },
             }),

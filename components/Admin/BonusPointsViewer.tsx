@@ -113,6 +113,7 @@ const BonusPointsViewer = () => {
                     </h2>
                     <div className="flex gap-2">
                         <Select
+                            aria-label="View mode selection"
                             size="sm"
                             value={viewMode}
                             onSelectionChange={(key) =>

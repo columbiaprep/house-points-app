@@ -185,17 +185,23 @@ export async function fetchHouseSummariesWithFallback(): Promise<
     HouseSummary[]
 > {
     try {
+        console.log("fetchHouseSummariesWithFallback: trying optimized summaries");
         const summaries = await fetchHouseSummaries();
 
         // Check if data exists and is recent
         if (summaries.length > 0 && !isDataStale(summaries[0].lastUpdated)) {
             return summaries;
         }
+    } catch (error) {
+        // If houseSummaries collection doesn't exist or permission denied, use fallback
+        console.log("fetchHouseSummariesWithFallback: houseSummaries collection not available, using fallback:", error);
+    }
 
-        // Fallback to original fetchAllHouses
-        console.warn(
-            "Using fallback: fetching houses from original collection",
-        );
+    // Fallback to original fetchAllHouses
+    console.log(
+        "Using fallback: fetching houses from original collection",
+    );
+    try {
         const { fetchAllHouses, calculateHouseBonusPoints } = await import("./firebaseDb");
         const houses = await fetchAllHouses();
 
@@ -229,9 +235,15 @@ export async function fetchHouseSummariesWithFallback(): Promise<
 
         // Re-sort by totalPoints (including bonus) and update places
         summariesWithBonus.sort((a, b) => b.totalPoints - a.totalPoints);
-        summariesWithBonus.forEach((house, index) => {
-            house.place = index + 1;
-        });
+
+        // Handle tied rankings properly
+        let currentRank = 1;
+        for (let i = 0; i < summariesWithBonus.length; i++) {
+            if (i > 0 && summariesWithBonus[i].totalPoints !== summariesWithBonus[i - 1].totalPoints) {
+                currentRank = i + 1; // Skip ranks for tied items
+            }
+            summariesWithBonus[i].place = currentRank;
+        }
 
         return summariesWithBonus;
     } catch (error) {

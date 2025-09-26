@@ -7,7 +7,7 @@ import {
 } from "@firebase/firestore";
 
 import { db } from "./firebaseApp";
-import { type PointCategory } from "./firebaseDb";
+import { type PointCategory, logPointEvent } from "./firebaseDb";
 
 export type { PointCategory };
 
@@ -74,6 +74,7 @@ export interface PointUpdate {
     house: string;
     category: string;
     points: number;
+    studentName?: string; // Optional - used for logging
 }
 
 export interface BatchPointResult {
@@ -86,6 +87,9 @@ export interface BatchPointResult {
 // Optimized batch point writing
 export async function batchWritePoints(
     updates: PointUpdate[],
+    addedBy?: string,
+    batchType: 'bulk' | 'csv' = 'bulk',
+    metadata?: { fileName?: string; [key: string]: any },
 ): Promise<BatchPointResult> {
     try {
         const batch = writeBatch(db);
@@ -180,6 +184,39 @@ export async function batchWritePoints(
 
         await batch.commit();
 
+        // Enhanced batch logging: individual events + summary (for rollback capability)
+        if (addedBy && updates.length > 0) {
+            const batchId = `batch_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
+            const totalPoints = updates.reduce((sum, update) => sum + update.points, 0);
+            const categories = [...new Set(updates.map(update => update.category))];
+            const houses = [...new Set(updates.map(update => update.house))];
+            const affectedStudents = updates.map(update => update.studentId);
+
+            // Log individual events for each student (enables surgical rollback)
+            console.log(`[batchWritePoints] Logging ${updates.length} individual events with batchId: ${batchId}`);
+            for (const update of updates) {
+                try {
+                    console.log(`[batchWritePoints] Logging event for student: ${update.studentId}, house: ${update.house}, category: ${update.category}, points: ${update.points}`);
+                    await logPointEvent({
+                        studentId: update.studentId,
+                        studentName: update.studentName || update.studentId, // Use name if available
+                        house: update.house,
+                        category: update.category,
+                        points: update.points,
+                        timestamp: new Date(),
+                        addedBy: addedBy,
+                        type: batchType,
+                        batchId: batchId,
+                    });
+                    console.log(`[batchWritePoints] Successfully logged event for ${update.studentId}`);
+                } catch (error) {
+                    console.error(`[batchWritePoints] Failed to log event for ${update.studentId}:`, error);
+                }
+            }
+
+            console.log(`[batchWritePoints] Individual event logging completed for batchId: ${batchId}`);
+        }
+
         return {
             success: true,
             studentsUpdated: updates.length,
@@ -203,8 +240,9 @@ export async function writePointsOptimized(
     studentId: string,
     points: number,
     house: string,
+    addedBy?: string,
 ): Promise<BatchPointResult> {
     const update: PointUpdate = { studentId, house, category, points };
 
-    return batchWritePoints([update]);
+    return batchWritePoints([update], addedBy, 'bulk');
 }

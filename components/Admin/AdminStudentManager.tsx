@@ -30,6 +30,7 @@ import {
     writePointsOptimized,
     batchWritePoints,
 } from "@/firebase-configuration/cachedFirebaseDb";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface StudentPointsDisplay {
     student: IndividualDocument;
@@ -38,6 +39,7 @@ interface StudentPointsDisplay {
 }
 
 const AdminStudentManager = () => {
+    const { user } = useAuth();
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
     const [pointsCategories, setPointsCategories] = useState<PointCategory[]>(
         [],
@@ -267,7 +269,9 @@ const AdminStudentManager = () => {
                     }
                 }
 
-                const result = await batchWritePoints(updates);
+                console.log(`[AdminStudentManager] About to call batchWritePoints with ${updates.length} updates:`, updates);
+                const result = await batchWritePoints(updates, user?.email || 'unknown-admin', mode === 'csv' ? 'csv' : 'bulk');
+                console.log(`[AdminStudentManager] batchWritePoints result:`, result);
 
                 if (result.success) {
                     setMessage({
@@ -448,7 +452,9 @@ const AdminStudentManager = () => {
             setCsvProgress(100);
 
             if (updates.length > 0) {
-                const result = await batchWritePoints(updates);
+                console.log(`[AdminStudentManager] About to call batchWritePoints with ${updates.length} updates:`, updates);
+                const result = await batchWritePoints(updates, user?.email || 'unknown-admin', mode === 'csv' ? 'csv' : 'bulk');
+                console.log(`[AdminStudentManager] batchWritePoints result:`, result);
 
                 if (result.success) {
                     setMessage({
@@ -677,7 +683,7 @@ const AdminStudentManager = () => {
                                                                 Simple Format:
                                                             </strong>{" "}
                                                             One email per line
-                                                            <pre className="bg-gray-100 p-2 rounded mt-1">
+                                                            <pre className="bg-gray-800 text-gray-100 p-2 rounded mt-1 text-xs overflow-x-auto">
                                                                 student1@cgps.org
                                                                 student2@cgps.org
                                                                 student3@cgps.org
@@ -687,23 +693,16 @@ const AdminStudentManager = () => {
                                                             <strong>
                                                                 Advanced Format:
                                                             </strong>{" "}
-                                                            Email, Category,
-                                                            Points
-                                                            <pre className="bg-gray-100 p-2 rounded mt-1">
-                                                                Email,Category,Points
-                                                                student1@cgps.org,academic,10
-                                                                student2@cgps.org,behavior,5
-                                                                student3@cgps.org,leadership,15
+                                                            Email, Category, Points
+                                                            <pre className="bg-gray-800 text-gray-100 p-2 rounded mt-1 text-xs overflow-x-auto whitespace-pre-wrap">
+Email,Category,Points
+student1@cgps.org,academic,10
+student2@cgps.org,behavior,5
+student3@cgps.org,leadership,15
                                                             </pre>
                                                         </div>
                                                         <p className="text-xs text-gray-500 mt-2">
-                                                            For simple format,
-                                                            you must specify
-                                                            category and points
-                                                            below. For advanced
-                                                            format, individual
-                                                            row values will be
-                                                            used.
+                                                            For simple format, you must specify category and points below. For advanced format, individual row values will be used.
                                                         </p>
                                                     </div>
                                                 </CardBody>
@@ -769,8 +768,9 @@ const AdminStudentManager = () => {
                                                 )
                                             }
                                         >
-                                            {pointsCategories.map(
-                                                (category) => (
+                                            {pointsCategories
+                                                .filter(category => category.key !== 'totalPoints')
+                                                .map((category) => (
                                                     <SelectItem
                                                         key={category.key}
                                                     >

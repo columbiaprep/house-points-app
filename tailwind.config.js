@@ -1,5 +1,4 @@
 const { heroui } = require("@heroui/react");
-const { Quicksand, Ledger } = require("next/font/google");
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
@@ -63,11 +62,7 @@ module.exports = {
   ],
   darkMode: "class",
   theme: {
-    extend: {
-      // fontFamily: {
-      //   sans: [Quicksand, "sans-serif"],
-      // }
-    }
+    extend: {}
   },
   plugins: [
     heroui({

@@ -17,6 +17,12 @@ import {
     Chip,
     Tabs,
     Tab,
+    Modal,
+    ModalContent,
+    ModalHeader,
+    ModalBody,
+    ModalFooter,
+    useDisclosure,
 } from "@heroui/react";
 
 import {
@@ -34,6 +40,16 @@ import { getCachedPointCategories } from "@/firebase-configuration/cachedFirebas
 import { useAuth } from "@/contexts/AuthContext";
 
 const HouseBonusPointsManager = () => {
+    const { isOpen, onOpen, onOpenChange } = useDisclosure();
+
+    // Custom close handler to properly manage focus
+    const handleModalClose = () => {
+        // Clear any focused elements and reset select states
+        if (document.activeElement instanceof HTMLElement) {
+            document.activeElement.blur();
+        }
+        onOpenChange();
+    };
     const auth = useAuth();
     const [housesData, setHousesData] = useState<HouseDocument[]>([]);
     const [pointsCategories, setPointsCategories] = useState<PointCategory[]>(
@@ -244,14 +260,41 @@ const HouseBonusPointsManager = () => {
     };
 
     return (
-        <Card className="w-full">
-            <CardHeader>
-                <h2 className="text-xl font-bold">
-                    🏆 House Bonus Points Management
-                </h2>
-            </CardHeader>
-            <CardBody>
-                <Tabs aria-label="Bonus Points Management">
+        <>
+            <Card className="mt-4">
+                <CardBody>
+                    <div className="flex justify-between items-center mb-4">
+                        <h2 className="text-xl font-bold">
+                            🏆 House Bonus Points
+                        </h2>
+                        <Button color="primary" onPress={onOpen}>
+                            Manage House Points
+                        </Button>
+                    </div>
+                    <p className="text-sm text-gray-600">
+                        Award bonus points to houses and view bonus point history.
+                    </p>
+                </CardBody>
+            </Card>
+
+            <Modal
+                isOpen={isOpen}
+                scrollBehavior="inside"
+                size="2xl"
+                onOpenChange={handleModalClose}
+            >
+                <ModalContent>
+                    {(onClose) => (
+                        <>
+                            <ModalHeader>
+                                <div className="flex flex-col">
+                                    <h3 className="text-lg font-bold">
+                                        🏆 House Bonus Points Management
+                                    </h3>
+                                </div>
+                            </ModalHeader>
+                            <ModalBody>
+                                <Tabs aria-label="Bonus Points Management">
                     <Tab key="add" title="➕ Add Bonus Points">
                         <div className="flex flex-col gap-4 pt-4">
                             <div className="text-center">
@@ -343,6 +386,7 @@ const HouseBonusPointsManager = () => {
                             <div className="flex justify-between items-center mb-4">
                                 <div className="flex gap-2">
                                     <Select
+                                        aria-label="View mode selection"
                                         size="sm"
                                         selectedKeys={viewMode ? [viewMode] : []}
                                         onSelectionChange={(keys) => {
@@ -562,9 +606,18 @@ const HouseBonusPointsManager = () => {
                             )}
                         </div>
                     </Tab>
-                </Tabs>
-            </CardBody>
-        </Card>
+                                </Tabs>
+                            </ModalBody>
+                            <ModalFooter>
+                                <Button color="danger" variant="light" onPress={handleModalClose}>
+                                    Close
+                                </Button>
+                            </ModalFooter>
+                        </>
+                    )}
+                </ModalContent>
+            </Modal>
+        </>
     );
 };
 

@@ -49,31 +49,45 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     useEffect(() => {
         setLoading(true);
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
-            if (user && user.email) {
-                if (user.photoURL) {
-                    setPhotoURL(user.photoURL);
-                }
-                setUser(user);
-                const accountType = user.email
-                    ? await getUserAccountType(user.email)
-                    : null;
+            try {
+                if (user && user.email) {
+                    if (user.photoURL) {
+                        setPhotoURL(user.photoURL);
+                    }
+                    setUser(user);
+                    const accountType = user.email
+                        ? await getUserAccountType(user.email)
+                        : null;
 
-                setAccountType(accountType);
+                    setAccountType(accountType);
 
-                // Only fetch individual data for students, not admins
-                if (accountType === "student") {
-                    const userData = await getDataDoc(user.email);
-                    setUserDbData(userData);
+                    // Only fetch individual data for students, not admins
+                    if (accountType === "student") {
+                        const userData = await getDataDoc(user.email);
+                        setUserDbData(userData);
+                    } else {
+                        setUserDbData(null);
+                    }
+
+                    setLoading(false);
                 } else {
-                    setUserDbData(null);
+                    setUser(null);
+                    setAccountType(null);
+                    setLoading(false);
+                    router.push("/auth");
                 }
-
+            } catch (error) {
+                console.error("AuthContext error:", error);
+                // Set loading to false and continue with limited functionality
                 setLoading(false);
-            } else {
-                setUser(null);
                 setAccountType(null);
-                setLoading(false);
-                router.push("/auth");
+                setUserDbData(null);
+                // Don't redirect to auth if there's just a permissions error
+                if (user) {
+                    setUser(user);
+                } else {
+                    router.push("/auth");
+                }
             }
         });
 

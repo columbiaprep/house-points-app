@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Card, Button } from "@heroui/react";
 
@@ -9,9 +9,11 @@ const AuthPage = () => {
     const auth = useAuth();
     const router = useRouter();
 
-    if (auth.user?.email) {
-        router.push("/dashboard");
-    }
+    useEffect(() => {
+        if (auth.user?.email) {
+            router.push("/dashboard");
+        }
+    }, [auth.user?.email, router]);
 
     return (
         <>

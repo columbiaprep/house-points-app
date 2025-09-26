@@ -76,7 +76,7 @@ const AddAdmins = () => {
     };
 
     return (
-        <Card className="mt-4">
+        <Card>
             <CardBody>
                 <div className="text-center mb-4">
                     <h2 className="text-lg font-bold">👨‍💼 Admin Management</h2>

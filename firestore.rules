@@ -42,6 +42,18 @@ service cloud.firestore {
       allow write: if request.auth != null;
     }
 
+    // Point events collection for audit trail and rollback functionality
+    match /pointsEvents/{document} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+
+    // Rollback requests collection for batch rollback functionality
+    match /rollbackRequests/{document} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+
     // Aggregated data collections (if they exist)
     match /houseSummaries/{document} {
       allow read: if request.auth != null;

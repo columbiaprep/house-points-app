@@ -19,10 +19,16 @@ import { resetDatabase, Student } from "@/firebase-configuration/firebaseDb";
 const AdminReset = () => {
     const [fileContents, setFileContents] = useState<string>("");
     const [loading, setLoading] = useState(false);
+    const [validationMessage, setValidationMessage] = useState<string>("");
+    const [isSuccess, setIsSuccess] = useState(false);
     const { isOpen, onOpen, onClose } = useDisclosure();
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
+
+        // Clear previous validation messages
+        setValidationMessage("");
+        setIsSuccess(false);
 
         if (file) {
             const reader = new FileReader();
@@ -38,6 +44,9 @@ const AdminReset = () => {
 
     const handleFullReset = async () => {
         setLoading(true);
+        setValidationMessage("");
+        setIsSuccess(false);
+
         try {
             const parseResult = Papa.parse(fileContents, {
                 header: true,
@@ -45,19 +54,40 @@ const AdminReset = () => {
                 dynamicTyping: true,
             });
 
-            const headers: string[] = ["Name", "Grade", "House", "Email"];
-            const students: Array<Student> = parseResult.data.map(
-                (row: any) => {
-                    const fullName = row[headers[0]] || "";
+            const expectedHeaders = ["Name", "Grade", "House", "Email"];
+            const actualHeaders = parseResult.meta.fields || [];
+
+            // Validate headers
+            const missingHeaders = expectedHeaders.filter(header => !actualHeaders.includes(header));
+            if (missingHeaders.length > 0) {
+                setValidationMessage(`Missing required headers: ${missingHeaders.join(", ")}. Expected headers: ${expectedHeaders.join(", ")}`);
+                setLoading(false);
+                return;
+            }
+            const students: Array<Student> = parseResult.data
+                .map((row: any) => {
+                    const fullName = row[expectedHeaders[0]] || "";
+                    const email = row[expectedHeaders[3]];
+                    const house = row[expectedHeaders[2]];
+                    const grade = row[expectedHeaders[1]];
+
+                    // Validate required fields
+                    if (!email || !fullName || !house || grade === undefined) {
+                        console.warn("Skipping invalid student row:", row);
+                        return null;
+                    }
+
+                    // Sanitize email for use as Firestore document ID
+                    const sanitizedId = email.trim().toLowerCase();
 
                     return {
-                        id: row[headers[3]], // Email is used as ID
+                        id: sanitizedId,
                         name: fullName,
-                        house: row[headers[2]],
-                        grade: row[headers[1]],
+                        house: house,
+                        grade: grade,
                     };
-                },
-            );
+                })
+                .filter((student): student is Student => student !== null);
 
             students.forEach((student) => {
                 if (student.house.includes("Green")) {
@@ -87,8 +117,18 @@ const AdminReset = () => {
             });
 
             await resetDatabase(students);
+
+            // Success - show success message and auto-close modal
+            setIsSuccess(true);
+            setValidationMessage(`Successfully reset database with ${students.length} students`);
+            setTimeout(() => {
+                onClose();
+                setValidationMessage("");
+                setIsSuccess(false);
+            }, 2000);
         } catch (error) {
             console.error("Failed to reset all house rosters:", error);
+            setValidationMessage("Failed to reset database. Please check the console for details.");
         }
         setLoading(false);
     };
@@ -119,6 +159,11 @@ const AdminReset = () => {
                                     rosters?
                                 </p>
                                 <p>This action cannot be undone.</p>
+                                {validationMessage && (
+                                    <div className={`mt-4 p-3 rounded ${isSuccess ? 'bg-green-100 text-green-800 border border-green-200' : 'bg-red-100 text-red-800 border border-red-200'}`}>
+                                        {validationMessage}
+                                    </div>
+                                )}
                             </ModalBody>
                             <ModalFooter>
                                 <Button
@@ -134,7 +179,7 @@ const AdminReset = () => {
                     </Modal>
                     <h2 className="text-center p-4">
                         Import Entire Houses Roster (Should Include: Name,
-                        Grade, House, ID)
+                        Grade, House, Email)
                     </h2>
                     <div className="bg-gray-100 p-2 rounded flex flex-col font-sans gap-2">
                         <div className="container">
@@ -144,6 +189,11 @@ const AdminReset = () => {
                                 type="file"
                                 onChange={handleFileChange}
                             />
+                            {validationMessage && !isOpen && (
+                                <div className={`mt-4 p-3 rounded ${isSuccess ? 'bg-green-100 text-green-800 border border-green-200' : 'bg-red-100 text-red-800 border border-red-200'}`}>
+                                    {validationMessage}
+                                </div>
+                            )}
                             {fileContents && (
                                 <Button className="mt-4" onPress={onOpen}>
                                     Reset All

@@ -37,6 +37,7 @@ export const HousePointsRow: React.FC<HouseDocument> = ({
                 height={50}
                 src={"/house-images/" + houseImage.toLowerCase() + ".png"}
                 width={50}
+                style={{ width: "auto", height: "auto" }}
             />
 
             <p
@@ -55,8 +56,10 @@ export const HousePointsRow: React.FC<HouseDocument> = ({
 };
 
 export const HousePointsContainer = () => {
-    const student = useAuth().userDbData;
-    const { data: houses, isLoading: loading, error } = useHouseSummaries();
+    const auth = useAuth();
+    const student = auth.userDbData;
+    const isAuthenticated = !!auth.user && !auth.loading;
+    const { data: houses, isLoading: loading, error } = useHouseSummaries(isAuthenticated);
 
     if (error) {
         console.error("Error loading house summaries:", error);

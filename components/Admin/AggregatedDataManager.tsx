@@ -6,14 +6,17 @@
 import { useState } from "react";
 import { Button, Card, CardBody, Progress } from "@heroui/react";
 import { getFunctions, httpsCallable } from "firebase/functions";
+import { MdDownload } from "react-icons/md";
 
 import app from "@/firebase-configuration/firebaseApp";
 import { checkAggregatedCollectionsExist } from "@/firebase-configuration/optimizedFirebaseDb";
+import { fetchAllIndividuals, getPointCategories } from "@/firebase-configuration/firebaseDb";
 
 const functions = getFunctions(app);
 
 export const AggregatedDataManager = () => {
     const [loading, setLoading] = useState(false);
+    const [downloading, setDownloading] = useState(false);
     const [status, setStatus] = useState<{
         houseSummaries: boolean;
         houseRankings: boolean;
@@ -103,6 +106,73 @@ export const AggregatedDataManager = () => {
         }
     };
 
+    const downloadStudentData = async () => {
+        setDownloading(true);
+        try {
+            // Fetch all students and point categories
+            const [students, pointCategories] = await Promise.all([
+                fetchAllIndividuals(),
+                getPointCategories()
+            ]);
+
+            // Create CSV headers
+            const headers = [
+                "Email",
+                "Name",
+                "Grade",
+                "House",
+                "House Rank",
+                ...pointCategories.map(cat => cat.name),
+                "Total Points"
+            ];
+
+            // Create CSV rows
+            const rows = students.map(student => {
+                const totalPoints = pointCategories.reduce(
+                    (total, category) => total + (student[category.key] || 0),
+                    0
+                );
+
+                return [
+                    student.id, // Email is the document ID
+                    student.name,
+                    student.grade,
+                    student.house,
+                    student.houseRank || 0,
+                    ...pointCategories.map(cat => student[cat.key] || 0),
+                    totalPoints
+                ];
+            });
+
+            // Combine headers and rows
+            const csvContent = [headers, ...rows]
+                .map(row => row.map(field => `"${field}"`).join(","))
+                .join("\n");
+
+            // Create blob and download link
+            const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+            const link = document.createElement("a");
+
+            if (link.download !== undefined) {
+                const url = URL.createObjectURL(blob);
+                link.setAttribute("href", url);
+                link.setAttribute("download", `students_data_${new Date().toISOString().split('T')[0]}.csv`);
+                link.style.visibility = "hidden";
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+            } else {
+                throw new Error("Browser does not support file downloads");
+            }
+        } catch (error) {
+            console.error("Error downloading student data:", error);
+            alert("Error downloading student data. Check console for details.");
+        } finally {
+            setDownloading(false);
+        }
+    };
+
     return (
         <Card className="w-full max-w-lg">
             <CardBody className="space-y-4">
@@ -186,6 +256,18 @@ export const AggregatedDataManager = () => {
                             🎯 Rebuild Rankings
                         </Button>
                     </div>
+
+                    <Button
+                        className="w-full"
+                        color="success"
+                        isDisabled={loading}
+                        isLoading={downloading}
+                        startContent={<MdDownload size={16} />}
+                        variant="flat"
+                        onPress={downloadStudentData}
+                    >
+                        {downloading ? "Generating..." : "📊 Download Student Data CSV"}
+                    </Button>
                 </div>
 
                 {lastInitialized && (
@@ -194,7 +276,7 @@ export const AggregatedDataManager = () => {
                     </div>
                 )}
 
-                {loading && <Progress isIndeterminate size="sm" />}
+                {loading && <Progress isIndeterminate size="sm" aria-label="Loading data management operations" />}
             </CardBody>
         </Card>
     );

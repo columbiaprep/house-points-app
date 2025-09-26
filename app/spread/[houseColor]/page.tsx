@@ -8,6 +8,8 @@ import PointsChartData from "@/components/pointsChart";
 import {
     generateHouseChartData,
     generatePersonalChartData,
+    generateHouseStudentChartData,
+    generateHouseBonusChartData,
 } from "@/components/chartDataUtils";
 import { generateMockPersonalChartData } from "@/components/mockStudentData";
 import { NearbyRankingsContainer } from "@/components/nearby-rankings";
@@ -31,6 +33,8 @@ const HouseSpreadPage = () => {
 
     // State for chart data
     const [houseChartData, setHouseChartData] = useState<any>(null);
+    const [studentChartData, setStudentChartData] = useState<any>(null);
+    const [bonusChartData, setBonusChartData] = useState<any>(null);
     const [personalChartData, setPersonalChartData] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [testMode, setTestMode] = useState(false);
@@ -162,11 +166,19 @@ const HouseSpreadPage = () => {
             try {
                 setLoading(true);
 
-                // Load house data (always real)
+                // Load house data (always real) - keeping for backwards compatibility
                 const houseData = await generateHouseChartData(housecolor);
                 console.log("House chart data loaded:", houseData);
-
                 setHouseChartData(houseData);
+
+                // Load separate student and bonus data
+                const studentData = await generateHouseStudentChartData(housecolor);
+                const bonusData = await generateHouseBonusChartData(housecolor);
+                console.log("Student chart data loaded:", studentData);
+                console.log("Bonus chart data loaded:", bonusData);
+
+                setStudentChartData(studentData);
+                setBonusChartData(bonusData);
 
                 // Load personal data (real or mock based on test mode and user type)
                 let personalData;
@@ -285,25 +297,48 @@ const HouseSpreadPage = () => {
             <div className="fixed inset-0 top-20 overflow-auto">
                 <div className={`bg-${housecolor}-200 min-h-full w-full py-24`}>
                     {/* Grid layout for charts and leaderboard */}
-                    <div className="max-w-7xl mx-auto grid lg:grid-cols-3 gap-8 px-6">
-                        {/* House Spread Chart */}
+                    <div className="max-w-7xl mx-auto grid lg:grid-cols-4 gap-6 px-6">
+                        {/* Student Points Chart */}
                         <div className="flex flex-col items-center">
-                            <p className="grid place-items-center font-mono font-bold text-3xl mb-6">
-                                HOUSE SPREAD
+                            <p className="grid place-items-center font-mono font-bold text-2xl mb-4 text-center">
+                                STUDENT POINTS
                             </p>
-                            {houseChartData ? (
+                            {studentChartData ? (
                                 <PointsChartData
-                                    data={houseChartData}
-                                    title="House Points Spread"
+                                    data={studentChartData}
+                                    title="Student Points by Category"
                                     type="doughnut"
                                 />
                             ) : (
-                                <div className="text-center p-8 bg-gray-100 rounded-lg">
-                                    <p className="text-gray-600 text-lg mb-2">
-                                        No points have been added for this house yet
+                                <div className="text-center p-6 bg-gray-100 rounded-lg">
+                                    <p className="text-gray-600 text-base mb-2">
+                                        No student points yet
                                     </p>
                                     <p className="text-sm text-gray-500">
-                                        Points will appear here once activities are recorded
+                                        Points will appear once students earn them
+                                    </p>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* House Bonus Points Chart */}
+                        <div className="flex flex-col items-center">
+                            <p className="grid place-items-center font-mono font-bold text-2xl mb-4 text-center">
+                                BONUS POINTS
+                            </p>
+                            {bonusChartData ? (
+                                <PointsChartData
+                                    data={bonusChartData}
+                                    title="House Bonus Points by Category"
+                                    type="doughnut"
+                                />
+                            ) : (
+                                <div className="text-center p-6 bg-gray-100 rounded-lg">
+                                    <p className="text-gray-600 text-base mb-2">
+                                        No bonus points yet
+                                    </p>
+                                    <p className="text-sm text-gray-500">
+                                        Bonus points awarded by teachers will appear here
                                     </p>
                                 </div>
                             )}
@@ -311,9 +346,9 @@ const HouseSpreadPage = () => {
 
                         {/* Personal Spread Chart */}
                         <div className="flex flex-col items-center">
-                            <p className="grid place-items-center font-mono font-bold text-3xl mb-6">
-                                Personal Spread{" "}
-                                {testMode && isAdmin && "(Test Data)"}
+                            <p className="grid place-items-center font-mono font-bold text-2xl mb-4 text-center">
+                                PERSONAL SPREAD{" "}
+                                {testMode && isAdmin && "(Test)"}
                             </p>
                             {personalChartData ? (
                                 <PointsChartData

@@ -1,4 +1,5 @@
 "use client";
+import { useState } from "react";
 import { NavbarBrand, Navbar as NextUINavbar } from "@heroui/navbar";
 import {
     Avatar,
@@ -11,6 +12,7 @@ import {
 } from "@heroui/react";
 
 import { useAuth } from "@/contexts/AuthContext";
+import { AboutModal } from "@/components/About";
 import BrandImage from "@/public/cgps-houses-logo.png";
 
 export const Navbar = () => {
@@ -46,31 +48,45 @@ const UserProfile = () => {
     const photoURL = userData.user?.photoURL || "";
     const displayName = userData.user?.displayName;
     const isAdmin = userData.accountType === "admin";
+    const [isAboutOpen, setIsAboutOpen] = useState(false);
 
     return (
-        <Dropdown>
-            <DropdownTrigger className="border-solid border-2 border-transparent hover:border-white p-2 bg-slate-200 rounded-lg">
-                <div className="flex items-center gap-2 cursor-pointer">
-                    <Avatar isBordered radius="full" src={photoURL} />
-                    <span className="text-black">{displayName}</span>
-                </div>
-            </DropdownTrigger>
-            <DropdownMenu>
-                {isAdmin && (
-                    <DropdownItem key="admin" as={Link} href="/admin">
-                        Admin Dashboard
+        <>
+            <Dropdown>
+                <DropdownTrigger className="border-solid border-2 border-transparent hover:border-white p-2 bg-slate-200 rounded-lg">
+                    <div className="flex items-center gap-2 cursor-pointer">
+                        <Avatar isBordered radius="full" src={photoURL} />
+                        <span className="text-black">{displayName}</span>
+                    </div>
+                </DropdownTrigger>
+                <DropdownMenu>
+                    {isAdmin && (
+                        <DropdownItem key="admin" as={Link} href="/admin">
+                            Admin Dashboard
+                        </DropdownItem>
+                    )}
+                    <DropdownItem
+                        key="about"
+                        onPress={() => setIsAboutOpen(true)}
+                    >
+                        About
                     </DropdownItem>
-                )}
-                {/* <DropdownItem key="profile">Profile</DropdownItem>
-                <DropdownItem key="settings">Settings</DropdownItem> */}
-                <DropdownItem
-                    key="logout"
-                    color="danger"
-                    onPress={async () => await userData.signOutUser()}
-                >
-                    Logout
-                </DropdownItem>
-            </DropdownMenu>
-        </Dropdown>
+                    {/* <DropdownItem key="profile">Profile</DropdownItem>
+                    <DropdownItem key="settings">Settings</DropdownItem> */}
+                    <DropdownItem
+                        key="logout"
+                        color="danger"
+                        onPress={async () => await userData.signOutUser()}
+                    >
+                        Logout
+                    </DropdownItem>
+                </DropdownMenu>
+            </Dropdown>
+
+            <AboutModal
+                isOpen={isAboutOpen}
+                onOpenChange={setIsAboutOpen}
+            />
+        </>
     );
 };

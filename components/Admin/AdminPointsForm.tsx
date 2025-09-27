@@ -17,7 +17,7 @@ import {
     type IndividualDocument,
     type HouseDocument,
     type PointCategory,
-    writeToHouseData,
+    addBonusPointToHouse,
     fetchAllIndividuals,
     fetchAllHouses,
 } from "@/firebase-configuration/firebaseDb";
@@ -114,19 +114,21 @@ const AdminPointsForm = () => {
 
     const handleAddHousePoints = async () => {
         try {
-            await writeToHouseData(
-                selectedCategory,
+            await addBonusPointToHouse(
                 selectedHouse,
+                selectedCategory,
                 pointsToAdd,
+                "House bonus points",
+                "admin", // You may want to pass actual admin email here
             );
 
             setMessage({
-                text: `Points added successfully!`,
+                text: `Bonus points added successfully!`,
                 type: "success",
             });
         } catch (error) {
-            setMessage({ text: "Failed to add points.", type: "error" });
-            console.error("Failed to add points:", error);
+            setMessage({ text: "Failed to add bonus points.", type: "error" });
+            console.error("Failed to add bonus points:", error);
         }
     };
 
@@ -158,7 +160,7 @@ const AdminPointsForm = () => {
                             onValueChange={setAddBy}
                         >
                             <Radio value="student">Student</Radio>
-                            <Radio value="house">House</Radio>
+                            <Radio value="house">House Bonus</Radio>
                         </RadioGroup>
                         {addBy === "student" && (
                             <div className="by-student">
@@ -217,7 +219,7 @@ const AdminPointsForm = () => {
                         {addBy === "house" && (
                             <div className="by-house">
                                 <h3 className="text-xl font-semibold">
-                                    By House
+                                    House Bonus Points
                                 </h3>
                                 <Select
                                     className="w-full"
@@ -264,7 +266,7 @@ const AdminPointsForm = () => {
 
                                 <Input
                                     className="mt-4 w-full"
-                                    label="Points to Add"
+                                    label="Bonus Points to Add"
                                     type="number"
                                     onChange={(e) =>
                                         setPointsToAdd(parseInt(e.target.value))

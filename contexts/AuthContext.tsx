@@ -55,15 +55,35 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
                         setPhotoURL(user.photoURL);
                     }
                     setUser(user);
+
+                    // Add delay to ensure auth token is fully propagated to Firestore
+                    await new Promise(resolve => setTimeout(resolve, 500));
+
+                    // Retry mechanism for Firestore calls
+                    const retryFirestoreCall = async (fn: () => Promise<any>, maxRetries = 3) => {
+                        for (let i = 0; i < maxRetries; i++) {
+                            try {
+                                return await fn();
+                            } catch (error: any) {
+                                if (error?.code === 'permission-denied' && i < maxRetries - 1) {
+                                    console.log(`Firestore permission denied, retrying... (${i + 1}/${maxRetries})`);
+                                    await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
+                                    continue;
+                                }
+                                throw error;
+                            }
+                        }
+                    };
+
                     const accountType = user.email
-                        ? await getUserAccountType(user.email)
+                        ? await retryFirestoreCall(() => getUserAccountType(user.email!))
                         : null;
 
                     setAccountType(accountType);
 
                     // Only fetch individual data for students, not admins
                     if (accountType === "student") {
-                        const userData = await getDataDoc(user.email);
+                        const userData = await retryFirestoreCall(() => getDataDoc(user.email!));
                         setUserDbData(userData);
                     } else {
                         setUserDbData(null);

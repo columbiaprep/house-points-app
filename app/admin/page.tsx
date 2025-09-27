@@ -10,6 +10,7 @@ import AdminStudentManager from "@/components/Admin/AdminStudentManager";
 import HouseBonusPointsManager from "@/components/Admin/HouseBonusPointsManager";
 import UnifiedHistoryViewer from "@/components/Admin/UnifiedHistoryViewer";
 import BatchRollbackManager from "@/components/Admin/BatchRollbackManager";
+import HouseTotalsFixer from "@/components/Admin/HouseTotalsFixer";
 
 export default function AdminPage() {
     const auth = useAuth();
@@ -49,6 +50,11 @@ export default function AdminPage() {
                     {/* Batch Rollback Manager Section */}
                     <div className="w-full mb-8">
                         <BatchRollbackManager />
+                    </div>
+
+                    {/* House Totals Fixer Section */}
+                    <div className="w-full mb-8">
+                        <HouseTotalsFixer />
                     </div>
 
                     {/* Secondary Admin Tools - Grid Layout */}

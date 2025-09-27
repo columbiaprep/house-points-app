@@ -71,11 +71,6 @@ export const OptimizedHousePointsContainer = () => {
 
                 setUsingOptimized(houseSummaries);
 
-                if (houseSummaries) {
-                    console.log("📊 Using optimized house summaries");
-                } else {
-                    console.log("⚠️ Fallback: Using original house data");
-                }
 
                 const housesData = await fetchHouseSummariesWithFallback();
 

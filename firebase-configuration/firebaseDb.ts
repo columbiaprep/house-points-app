@@ -843,15 +843,12 @@ export async function logPointEvent(event: Omit<PointEvent, 'id'>): Promise<stri
 }
 
 export async function getAllPointEvents(limitCount: number = 50): Promise<PointEvent[]> {
-    console.log(`[getAllPointEvents] Querying pointsEvents collection with limit: ${limitCount}`);
     const eventsQuery = query(
         collection(db, "pointsEvents"),
         orderBy("timestamp", "desc"),
         limit(limitCount),
     );
     const querySnapshot = await getDocs(eventsQuery);
-
-    console.log(`[getAllPointEvents] Found ${querySnapshot.docs.length} documents`);
 
     const events = querySnapshot.docs.map((doc) => {
         const data = doc.data();
@@ -860,17 +857,6 @@ export async function getAllPointEvents(limitCount: number = 50): Promise<PointE
             timestamp: data.timestamp.toDate(),
         } as PointEvent;
     });
-
-    console.log(`[getAllPointEvents] First few events:`, events.slice(0, 3).map(e => ({
-        id: e.id,
-        studentId: e.studentId,
-        house: e.house,
-        category: e.category,
-        points: e.points,
-        type: e.type,
-        batchId: e.batchId,
-        timestamp: e.timestamp.toISOString()
-    })));
 
     return events;
 }

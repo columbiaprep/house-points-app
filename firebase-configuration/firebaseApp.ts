@@ -1,7 +1,8 @@
 "use client";
 import { initializeApp } from "@firebase/app";
 import { getAuth } from "@firebase/auth";
-import { getFirestore } from "@firebase/firestore";
+import { getFirestore, connectFirestoreEmulator } from "@firebase/firestore";
+import { setLogLevel } from "@firebase/firestore";
 
 const firebaseConfig = {
     apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -15,6 +16,14 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
+
+// Suppress Firestore debug logs in production to reduce noise from idle stream timeouts
+if (process.env.NODE_ENV === 'production') {
+    setLogLevel('error');
+} else {
+    // In development, suppress only debug logs but keep warnings/errors
+    setLogLevel('warn');
+}
 
 export { db, auth };
 export default app;

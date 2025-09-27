@@ -29,7 +29,11 @@ export default function RootLayout({
 }) {
     return (
         <html suppressHydrationWarning lang="en">
-            <head />
+            <head>
+                <link rel="preconnect" href="https://fonts.googleapis.com" />
+                <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+                <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet" />
+            </head>
             <body
                 className={clsx(
                     "min-h-screen w-full font-sans antialiased",

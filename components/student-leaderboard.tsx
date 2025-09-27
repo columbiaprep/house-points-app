@@ -97,7 +97,7 @@ export const StudentLeaderboardRow: React.FC<StudentLeaderboardRowProps> = ({
             </div>
 
             <div className="flex-shrink-0 text-right">
-                <p className="text-lg font-mono font-bold">{totalPoints}</p>
+                <p className="text-base sm:text-lg font-mono font-bold">{totalPoints}</p>
                 <p className="text-xs text-gray-700">pts</p>
             </div>
         </div>
@@ -136,8 +136,8 @@ export const StudentLeaderboardContainer = () => {
 
     return (
         <div className="w-full">
-            <h2 className="text-xl font-bold text-center mb-4 font-mono">
-                🏆 TOP 10 STUDENTS 🏆
+            <h2 className="text-xl sm:text-2xl font-bold text-center mb-4 font-mono">
+                Top 10 Students
             </h2>
             {loading ? (
                 <div className="flex justify-center items-center h-64">
@@ -150,7 +150,7 @@ export const StudentLeaderboardContainer = () => {
             ) : (
                 <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
                     <div
-                        className="w-full max-h-96 overflow-y-auto pr-1"
+                        className="w-full h-[400px] overflow-y-auto pr-1"
                         style={{
                             scrollbarWidth: "thin",
                             scrollbarColor: "#9ca3af #e5e7eb",

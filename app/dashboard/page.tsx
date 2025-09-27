@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { HousePointsContainer } from "@/components/house-leaderboard";
 import { StudentLeaderboardContainer } from "@/components/student-leaderboard";
+import { HouseBarChart } from "@/components/house-bar-chart";
 
 const Dashboard = () => {
     const user = useAuth();
@@ -41,8 +42,8 @@ const Dashboard = () => {
 
     return (
         <Card className="">
-            <CardHeader className="flex justify-center">
-                <h1 className="text-2xl font-bold text-center">
+            <CardHeader className="flex justify-start">
+                <h1 className="text-sm text-gray-500 text-left font-bold italic">
                     House Points Dashboard
                 </h1>
             </CardHeader>
@@ -50,14 +51,15 @@ const Dashboard = () => {
                 {student != null || isAdmin ? (
                     <>
                         <div className="w-full max-w-7xl mx-auto">
-                            <div className="grid lg:grid-cols-3 gap-6 items-start">
+                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
                                 <div className="lg:col-span-2 w-full">
-                                    <h2 className="text-xl font-bold text-center mb-4 font-mono">
-                                        🏠 HOUSE LEADERBOARD 🏠
+                                    <h2 className="text-2xl md:text-3xl font-bold text-center mb-4 font-mono">
+                                        House Leaderboard
                                     </h2>
                                     <HousePointsContainer />
                                 </div>
                                 <div className="lg:col-span-1 w-full">
+                                    <HouseBarChart />
                                     <StudentLeaderboardContainer />
                                 </div>
                             </div>

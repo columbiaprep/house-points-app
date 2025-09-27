@@ -55,7 +55,7 @@ export const HousePointsRow: React.FC<HouseDocument> = ({
                 <style dangerouslySetInnerHTML={{ __html: glowKeyframes }} />
             )}
             <Link
-                className={`grid min-w-400 h-20 place-items-center ${gradientClasses} shadow-lg items-center flex rounded-xl bg-gradient-to-r mb-5 ${outlineThickness} relative overflow-hidden`}
+                className={`grid min-w-0 w-full h-20 place-items-center ${gradientClasses} shadow-lg items-center flex rounded-xl bg-gradient-to-r mb-5 ${outlineThickness} relative overflow-hidden`}
                 color={"foreground"}
                 href={`/spread/${houseImage.toLowerCase()}`}
                 isBlock={true}
@@ -90,7 +90,7 @@ export const HousePointsRow: React.FC<HouseDocument> = ({
             </div>
 
             <p
-                className={`ml-1 text-wrap text-center text-4xl align-middle basis-5/10 flex-grow flex-1 overflow-hidden text-ellipsis relative z-10`}
+                className={`ml-1 text-wrap text-center text-2xl sm:text-3xl lg:text-4xl align-middle basis-5/10 flex-grow flex-1 overflow-hidden text-ellipsis relative z-10`}
                 style={{
                     WebkitTextStroke: '2px white',
                     textShadow: '3px 3px 6px rgba(0,0,0,0.9), -3px -3px 6px rgba(255,255,255,0.8)',
@@ -106,7 +106,7 @@ export const HousePointsRow: React.FC<HouseDocument> = ({
             <p className="min-w-0 ml-1 me-2 text-xs basis-2/10 font-mono flex-shrink relative z-10">
                 Points:
                 <br />
-                <span className="text-xl font-bold">{totalPoints}</span>
+                <span className="text-base sm:text-xl font-bold">{totalPoints}</span>
             </p>
         </Link>
         </>

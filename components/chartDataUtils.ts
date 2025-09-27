@@ -88,7 +88,6 @@ export async function generateHouseChartData(houseColorName: string) {
 
         // Check if all data is zero
         const allZero = data.every(value => value === 0);
-        console.log("House chart data generated:", { labels, data, houseName: houseData.name, allZero });
 
         // Return null for all-zero data - will be handled in the component
         if (allZero) {
@@ -392,7 +391,6 @@ export async function generateHouseStudentChartData(houseColorName: string) {
 
         // Check if all data is zero
         const allZero = data.every(value => value === 0);
-        console.log("Student chart data generated:", { labels, data, houseName, allZero });
 
         if (allZero) {
             return null;
@@ -532,7 +530,6 @@ export async function generateHouseBonusChartData(houseColorName: string) {
 
         // Check if all data is zero
         const allZero = data.every(value => value === 0) || data.length === 0;
-        console.log("Bonus chart data generated:", { labels, data, houseName, allZero });
 
         if (allZero) {
             return null;

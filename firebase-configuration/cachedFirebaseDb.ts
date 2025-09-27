@@ -193,10 +193,8 @@ export async function batchWritePoints(
             const affectedStudents = updates.map(update => update.studentId);
 
             // Log individual events for each student (enables surgical rollback)
-            console.log(`[batchWritePoints] Logging ${updates.length} individual events with batchId: ${batchId}`);
             for (const update of updates) {
                 try {
-                    console.log(`[batchWritePoints] Logging event for student: ${update.studentId}, house: ${update.house}, category: ${update.category}, points: ${update.points}`);
                     await logPointEvent({
                         studentId: update.studentId,
                         studentName: update.studentName || update.studentId, // Use name if available
@@ -208,13 +206,10 @@ export async function batchWritePoints(
                         type: batchType,
                         batchId: batchId,
                     });
-                    console.log(`[batchWritePoints] Successfully logged event for ${update.studentId}`);
                 } catch (error) {
-                    console.error(`[batchWritePoints] Failed to log event for ${update.studentId}:`, error);
+                    console.error(`Failed to log event for ${update.studentId}:`, error);
                 }
             }
-
-            console.log(`[batchWritePoints] Individual event logging completed for batchId: ${batchId}`);
         }
 
         return {

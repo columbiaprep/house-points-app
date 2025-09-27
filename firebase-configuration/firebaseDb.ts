@@ -11,6 +11,7 @@ import {
     or,
     and,
     limit,
+    writeBatch,
 } from "@firebase/firestore";
 
 import { db } from "./firebaseApp";
@@ -350,7 +351,7 @@ export async function writeToHouseData(
         // Update studentPoints and totalPoints for student-earned points
         if (ptsCategory !== "totalPoints" && ptsCategory !== "studentPoints" && ptsCategory !== "bonusPoints") {
             updateData.studentPoints = (houseData.studentPoints || 0) + points;
-            updateData.totalPoints = (houseData.studentPoints || 0) + points + (houseData.bonusPoints || 0);
+            updateData.totalPoints = updateData.studentPoints + (houseData.bonusPoints || 0);
         }
     } else {
         // Initialize new house document with default values
@@ -842,15 +843,12 @@ export async function logPointEvent(event: Omit<PointEvent, 'id'>): Promise<stri
 }
 
 export async function getAllPointEvents(limitCount: number = 50): Promise<PointEvent[]> {
-    console.log(`[getAllPointEvents] Querying pointsEvents collection with limit: ${limitCount}`);
     const eventsQuery = query(
         collection(db, "pointsEvents"),
         orderBy("timestamp", "desc"),
         limit(limitCount),
     );
     const querySnapshot = await getDocs(eventsQuery);
-
-    console.log(`[getAllPointEvents] Found ${querySnapshot.docs.length} documents`);
 
     const events = querySnapshot.docs.map((doc) => {
         const data = doc.data();
@@ -859,17 +857,6 @@ export async function getAllPointEvents(limitCount: number = 50): Promise<PointE
             timestamp: data.timestamp.toDate(),
         } as PointEvent;
     });
-
-    console.log(`[getAllPointEvents] First few events:`, events.slice(0, 3).map(e => ({
-        id: e.id,
-        studentId: e.studentId,
-        house: e.house,
-        category: e.category,
-        points: e.points,
-        type: e.type,
-        batchId: e.batchId,
-        timestamp: e.timestamp.toISOString()
-    })));
 
     return events;
 }
@@ -1251,6 +1238,138 @@ export async function getAllRollbackRequests(): Promise<RollbackRequest[]> {
             executedAt: data.executedAt?.toDate(),
         } as RollbackRequest;
     });
+}
+
+// Recalculate house totals from individual student data
+export async function recalculateHouseTotals(): Promise<{
+    success: boolean;
+    results: Array<{
+        house: string;
+        oldTotal: number;
+        newTotal: number;
+        difference: number;
+        categoryBreakdown: Record<string, number>;
+    }>;
+    error?: string;
+}> {
+    try {
+        console.log("Starting house totals recalculation...");
+
+        // Get all students and current point categories
+        const [students, categories, houses] = await Promise.all([
+            fetchAllIndividuals(),
+            getPointCategories(),
+            fetchAllHouses()
+        ]);
+
+        console.log(`Found ${students.length} students, ${categories.length} categories, ${houses.length} houses`);
+
+        // Group students by house and calculate totals
+        const houseCalculations = new Map<string, {
+            students: IndividualDocument[];
+            categoryTotals: Record<string, number>;
+            totalStudentPoints: number;
+        }>();
+
+        // Initialize house data
+        for (const house of houses) {
+            houseCalculations.set(house.id, {
+                students: [],
+                categoryTotals: {},
+                totalStudentPoints: 0
+            });
+
+            // Initialize category totals to 0
+            for (const category of categories) {
+                houseCalculations.get(house.id)!.categoryTotals[category.key] = 0;
+            }
+        }
+
+        // Aggregate student points by house
+        for (const student of students) {
+            if (!student.house) {
+                console.warn(`Student ${student.id} has no house assigned`);
+                continue;
+            }
+
+            const houseData = houseCalculations.get(student.house);
+            if (!houseData) {
+                console.warn(`Unknown house: ${student.house} for student ${student.id}`);
+                continue;
+            }
+
+            houseData.students.push(student);
+
+            // Add student's points to house totals
+            for (const category of categories) {
+                const studentPoints = student[category.key] || 0;
+                houseData.categoryTotals[category.key] += studentPoints;
+
+                // Don't double-count totalPoints in the aggregation
+                if (category.key !== 'totalPoints') {
+                    houseData.totalStudentPoints += studentPoints;
+                }
+            }
+        }
+
+        // Update house documents with corrected totals
+        const results = [];
+        const batch = writeBatch(db);
+
+        for (const [houseId, calculation] of houseCalculations) {
+            const currentHouse = houses.find(h => h.id === houseId);
+            if (!currentHouse) continue;
+
+            const oldTotal = currentHouse.totalPoints || 0;
+            const currentBonusPoints = currentHouse.bonusPoints || 0;
+            const newStudentPoints = calculation.totalStudentPoints;
+            const newTotal = newStudentPoints + currentBonusPoints;
+
+            console.log(`House ${houseId}: ${calculation.students.length} students, ${newStudentPoints} student points, ${currentBonusPoints} bonus points`);
+
+            // Prepare update data
+            const updateData: any = {
+                studentPoints: newStudentPoints,
+                totalPoints: newTotal,
+                bonusPoints: currentBonusPoints, // Keep existing bonus points
+            };
+
+            // Update individual category totals
+            for (const [categoryKey, total] of Object.entries(calculation.categoryTotals)) {
+                updateData[categoryKey] = total;
+            }
+
+            // Add to batch
+            const houseRef = doc(db, "houses", houseId);
+            batch.update(houseRef, updateData);
+
+            results.push({
+                house: houseId,
+                oldTotal,
+                newTotal,
+                difference: newTotal - oldTotal,
+                categoryBreakdown: calculation.categoryTotals
+            });
+        }
+
+        // Commit all changes
+        await batch.commit();
+
+        console.log("House totals recalculation completed successfully");
+
+        return {
+            success: true,
+            results: results.sort((a, b) => Math.abs(b.difference) - Math.abs(a.difference)) // Sort by largest differences first
+        };
+
+    } catch (error) {
+        console.error("Error recalculating house totals:", error);
+        return {
+            success: false,
+            results: [],
+            error: error instanceof Error ? error.message : "Unknown error"
+        };
+    }
 }
 
 export async function deletePointEvent(eventId: string): Promise<void> {

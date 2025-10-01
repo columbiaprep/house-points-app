@@ -138,10 +138,8 @@ export async function batchWritePoints(
                     "studentPoints",
                     (houseCategories.get("studentPoints") || 0) + update.points,
                 );
-                houseCategories.set(
-                    "totalPoints",
-                    (houseCategories.get("totalPoints") || 0) + update.points,
-                );
+                // NOTE: totalPoints is calculated later as studentPoints + bonusPoints
+                // Don't accumulate it here to avoid double-counting
             } else {
                 console.error(`Student document not found: ${update.studentId}`);
                 return {
@@ -168,14 +166,15 @@ export async function batchWritePoints(
                 const updateData: any = {};
 
                 for (const [category, pointDelta] of Array.from(categoryUpdates.entries())) {
-                    if (category === "totalPoints") {
-                        // For totalPoints, we need to recalculate based on studentPoints + bonusPoints
-                        const newStudentPoints = (currentData.studentPoints || 0) + (categoryUpdates.get("studentPoints") || 0);
-                        const existingBonusPoints = currentData.bonusPoints || 0;
-                        updateData.totalPoints = newStudentPoints + existingBonusPoints;
-                    } else {
-                        updateData[category] = (currentData[category] || 0) + pointDelta;
-                    }
+                    updateData[category] = (currentData[category] || 0) + pointDelta;
+                }
+
+                // Calculate totalPoints as studentPoints + bonusPoints (CRITICAL: prevents double-counting)
+                if (categoryUpdates.has("studentPoints")) {
+                    // Use the updated studentPoints value from updateData
+                    const newStudentPoints = updateData.studentPoints;
+                    const existingBonusPoints = currentData.bonusPoints || 0;
+                    updateData.totalPoints = newStudentPoints + existingBonusPoints;
                 }
 
                 batch.update(houseRef, updateData);

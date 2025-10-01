@@ -120,6 +120,7 @@ export async function generateHouseChartData(houseColorName: string) {
                     legend: {
                         display: true,
                         position: "bottom",
+                        maxHeight: 200,
                         labels: {
                             boxWidth: 15,
                             padding: 10,
@@ -128,20 +129,23 @@ export async function generateHouseChartData(houseColorName: string) {
                                 const data = chart.data;
 
                                 if (
+                                    data.labels &&
                                     data.labels.length &&
+                                    data.datasets &&
                                     data.datasets.length
                                 ) {
                                     return data.labels.map((label, index) => {
                                         const dataset = data.datasets[0];
                                         const value = dataset.data[index];
+                                        const labelText = typeof label === 'string' ? label.split(":")[0] : String(label);
 
                                         return {
-                                            text: `${label.split(":")[0]}: ${value} pts`,
+                                            text: `${labelText}: ${value} pts`,
                                             fillStyle:
-                                                dataset.backgroundColor[index],
+                                                dataset.backgroundColor?.[index] || 'rgba(0,0,0,0.1)',
                                             strokeStyle:
-                                                dataset.borderColor[index],
-                                            lineWidth: dataset.borderWidth,
+                                                dataset.borderColor?.[index] || 'rgba(0,0,0,1)',
+                                            lineWidth: dataset.borderWidth || 1,
                                             hidden: false,
                                             index: index,
                                         };
@@ -253,6 +257,7 @@ export async function generatePersonalChartData(
                     legend: {
                         display: true,
                         position: "bottom",
+                        maxHeight: 200,
                         labels: {
                             boxWidth: 15,
                             padding: 10,
@@ -261,20 +266,23 @@ export async function generatePersonalChartData(
                                 const data = chart.data;
 
                                 if (
+                                    data.labels &&
                                     data.labels.length &&
+                                    data.datasets &&
                                     data.datasets.length
                                 ) {
                                     return data.labels.map((label, index) => {
                                         const dataset = data.datasets[0];
                                         const value = dataset.data[index];
+                                        const labelText = typeof label === 'string' ? label.split(":")[0] : String(label);
 
                                         return {
-                                            text: `${label.split(":")[0]}: ${value} pts`,
+                                            text: `${labelText}: ${value} pts`,
                                             fillStyle:
-                                                dataset.backgroundColor[index],
+                                                dataset.backgroundColor?.[index] || 'rgba(0,0,0,0.1)',
                                             strokeStyle:
-                                                dataset.borderColor[index],
-                                            lineWidth: dataset.borderWidth,
+                                                dataset.borderColor?.[index] || 'rgba(0,0,0,1)',
+                                            lineWidth: dataset.borderWidth || 1,
                                             hidden: false,
                                             index: index,
                                         };
@@ -416,6 +424,7 @@ export async function generateHouseStudentChartData(houseColorName: string) {
                     legend: {
                         display: true,
                         position: "bottom",
+                        maxHeight: 200,
                         labels: {
                             boxWidth: 15,
                             padding: 10,
@@ -424,20 +433,23 @@ export async function generateHouseStudentChartData(houseColorName: string) {
                                 const data = chart.data;
 
                                 if (
+                                    data.labels &&
                                     data.labels.length &&
+                                    data.datasets &&
                                     data.datasets.length
                                 ) {
                                     return data.labels.map((label, index) => {
                                         const dataset = data.datasets[0];
                                         const value = dataset.data[index];
+                                        const labelText = typeof label === 'string' ? label.split(":")[0] : String(label);
 
                                         return {
-                                            text: `${label.split(":")[0]}: ${value} pts`,
+                                            text: `${labelText}: ${value} pts`,
                                             fillStyle:
-                                                dataset.backgroundColor[index],
+                                                dataset.backgroundColor?.[index] || 'rgba(0,0,0,0.1)',
                                             strokeStyle:
-                                                dataset.borderColor[index],
-                                            lineWidth: dataset.borderWidth,
+                                                dataset.borderColor?.[index] || 'rgba(0,0,0,1)',
+                                            lineWidth: dataset.borderWidth || 1,
                                             hidden: false,
                                             index: index,
                                         };
@@ -555,6 +567,7 @@ export async function generateHouseBonusChartData(houseColorName: string) {
                     legend: {
                         display: true,
                         position: "bottom",
+                        maxHeight: 200,
                         labels: {
                             boxWidth: 15,
                             padding: 10,
@@ -563,20 +576,23 @@ export async function generateHouseBonusChartData(houseColorName: string) {
                                 const data = chart.data;
 
                                 if (
+                                    data.labels &&
                                     data.labels.length &&
+                                    data.datasets &&
                                     data.datasets.length
                                 ) {
                                     return data.labels.map((label, index) => {
                                         const dataset = data.datasets[0];
                                         const value = dataset.data[index];
+                                        const labelText = typeof label === 'string' ? label.split(":")[0] : String(label);
 
                                         return {
-                                            text: `${label.split(":")[0]}: ${value} pts`,
+                                            text: `${labelText}: ${value} pts`,
                                             fillStyle:
-                                                dataset.backgroundColor[index],
+                                                dataset.backgroundColor?.[index] || 'rgba(0,0,0,0.1)',
                                             strokeStyle:
-                                                dataset.borderColor[index],
-                                            lineWidth: dataset.borderWidth,
+                                                dataset.borderColor?.[index] || 'rgba(0,0,0,1)',
+                                            lineWidth: dataset.borderWidth || 1,
                                             hidden: false,
                                             index: index,
                                         };

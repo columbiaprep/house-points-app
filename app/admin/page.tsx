@@ -10,6 +10,7 @@ import AdminStudentManager from "@/components/Admin/AdminStudentManager";
 import HouseBonusPointsManager from "@/components/Admin/HouseBonusPointsManager";
 import UnifiedHistoryViewer from "@/components/Admin/UnifiedHistoryViewer";
 import BatchRollbackManager from "@/components/Admin/BatchRollbackManager";
+import RecalculateHouseTotals from "@/components/Admin/RecalculateHouseTotals";
 
 export default function AdminPage() {
     const auth = useAuth();
@@ -63,6 +64,11 @@ export default function AdminPage() {
                         <div>
                             <AggregatedDataManager />
                         </div>
+                    </div>
+
+                    {/* House Totals Recalculation */}
+                    <div className="w-full mb-8">
+                        <RecalculateHouseTotals />
                     </div>
 
                     {/* Database Reset - Full Width Warning Section */}

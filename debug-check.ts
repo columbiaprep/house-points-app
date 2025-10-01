@@ -19,22 +19,22 @@ async function checkData() {
     console.log('\n=== Fetching all houses ===');
     const houses = await fetchAllHouses();
 
-    const pinkHouse = houses.find(house => house.id === 'pink' || house.name === 'pink');
-    if (pinkHouse) {
-      console.log('Pink Panthers house data:');
-      console.log(JSON.stringify(pinkHouse, null, 2));
+    const silverHouse = houses.find(house => house.id === 'Silver Knights' || house.name === 'Silver Knights');
+    if (silverHouse) {
+      console.log('Silver Knights house data:');
+      console.log(JSON.stringify(silverHouse, null, 2));
     } else {
-      console.log('Pink Panthers house not found');
+      console.log('Silver Knights house not found');
     }
 
-    console.log('\n=== Calculating Pink Panthers totals from individuals ===');
-    const pinkStudents = individuals.filter(person => person.house === 'pink');
-    console.log(`Found ${pinkStudents.length} Pink Panthers students`);
+    console.log('\n=== Calculating Silver Knights totals from individuals ===');
+    const silverStudents = individuals.filter(person => person.house === 'Silver Knights');
+    console.log(`Found ${silverStudents.length} Silver Knights students`);
 
     let calculatedTotal = 0;
     const categoryTotals = {};
 
-    pinkStudents.forEach(student => {
+    silverStudents.forEach(student => {
       calculatedTotal += student.totalPoints || 0;
 
       // Sum up category points
@@ -50,19 +50,19 @@ async function checkData() {
     console.log(`\nCalculated total from students: ${calculatedTotal}`);
     console.log('Category totals from students:', categoryTotals);
 
-    if (pinkHouse) {
-      console.log(`House record studentPoints: ${pinkHouse.studentPoints || 0}`);
-      console.log(`House record totalPoints: ${pinkHouse.totalPoints || 0}`);
-      console.log(`House record bonusPoints: ${pinkHouse.bonusPoints || 0}`);
+    if (silverHouse) {
+      console.log(`House record studentPoints: ${silverHouse.studentPoints || 0}`);
+      console.log(`House record totalPoints: ${silverHouse.totalPoints || 0}`);
+      console.log(`House record bonusPoints: ${silverHouse.bonusPoints || 0}`);
 
-      const expectedTotal = (pinkHouse.studentPoints || 0) + (pinkHouse.bonusPoints || 0);
+      const expectedTotal = (silverHouse.studentPoints || 0) + (silverHouse.bonusPoints || 0);
       console.log(`Expected total (studentPoints + bonusPoints): ${expectedTotal}`);
 
-      if (calculatedTotal !== (pinkHouse.studentPoints || 0)) {
+      if (calculatedTotal !== (silverHouse.studentPoints || 0)) {
         console.log(`\n🚨 DISCREPANCY FOUND!`);
         console.log(`  Sum of individual students: ${calculatedTotal}`);
-        console.log(`  House studentPoints field: ${pinkHouse.studentPoints || 0}`);
-        console.log(`  Difference: ${calculatedTotal - (pinkHouse.studentPoints || 0)}`);
+        console.log(`  House studentPoints field: ${silverHouse.studentPoints || 0}`);
+        console.log(`  Difference: ${calculatedTotal - (silverHouse.studentPoints || 0)}`);
       } else {
         console.log(`\n✅ Student points match between individuals and house record`);
       }

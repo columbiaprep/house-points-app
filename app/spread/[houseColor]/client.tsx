@@ -18,7 +18,7 @@ interface HouseSpreadPageClientProps {
 }
 
 const HouseSpreadPageClient = ({ houseColor }: HouseSpreadPageClientProps) => {
-    const { user, accountType } = useAuth();
+    const { user, accountType, userDbData } = useAuth();
     const router = useRouter();
 
     const [loading, setLoading] = useState(true);
@@ -31,6 +31,9 @@ const HouseSpreadPageClient = ({ houseColor }: HouseSpreadPageClientProps) => {
     const [averageScore, setAverageScore] = useState(100);
 
     console.log(user?.email);
+
+    // Check if user belongs to this house
+    const userBelongsToHouse = userDbData?.house?.toLowerCase().includes(housecolor.toLowerCase());
 
     useEffect(() => {
         if (accountType === "admin") {
@@ -81,7 +84,8 @@ const HouseSpreadPageClient = ({ houseColor }: HouseSpreadPageClientProps) => {
                     console.log("Generated house chart data:", houseChartData);
                     setChartDataState(houseChartData);
 
-                    if (viewPersonal && user?.email) {
+                    // Only show personal data if user belongs to this house
+                    if (viewPersonal && user?.email && userBelongsToHouse) {
                         console.log(
                             "Fetching personal data for email:",
                             user.email,
@@ -133,7 +137,7 @@ const HouseSpreadPageClient = ({ houseColor }: HouseSpreadPageClientProps) => {
         };
 
         loadChartData();
-    }, [housecolor, user?.email, testMode, isAdmin]);
+    }, [housecolor, user?.email, testMode, isAdmin, viewPersonal, userBelongsToHouse]);
 
     if (loading) {
         return (

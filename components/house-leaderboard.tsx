@@ -25,13 +25,17 @@ const glowKeyframes = `
 // Color mappings for glow effect
 const colorToRgb: Record<string, string> = {
   blue: "59, 130, 246",
+  cyan: "59, 130, 246",
   yellow: "251, 191, 36",
+  gold: "251, 191, 36",
   green: "34, 197, 94",
   orange: "249, 115, 22",
   pink: "236, 72, 153",
   purple: "147, 51, 234",
   red: "239, 68, 68",
   slate: "100, 116, 139",
+  gray: "100, 116, 139",
+  silver: "100, 116, 139",
 };
 
 export const HousePointsRow: React.FC<HouseDocument> = ({

@@ -171,7 +171,8 @@ export async function batchWritePoints(
 
                 // Calculate totalPoints as studentPoints + bonusPoints (CRITICAL: prevents double-counting)
                 if (categoryUpdates.has("studentPoints")) {
-                    const newStudentPoints = (currentData.studentPoints || 0) + (categoryUpdates.get("studentPoints") || 0);
+                    // Use the updated studentPoints value from updateData
+                    const newStudentPoints = updateData.studentPoints;
                     const existingBonusPoints = currentData.bonusPoints || 0;
                     updateData.totalPoints = newStudentPoints + existingBonusPoints;
                 }

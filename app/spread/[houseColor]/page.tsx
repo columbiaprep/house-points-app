@@ -43,6 +43,7 @@ const HouseSpreadPage = () => {
     const [testPoints, setTestPoints] = useState(150);
 
     const isAdmin = accountType === "admin";
+    const isTeacher = accountType === "teacher";
 
     // Fetch user's house information
     useEffect(() => {
@@ -55,9 +56,9 @@ const HouseSpreadPage = () => {
 
             console.log("Fetching house for user:", user.email, "accountType:", accountType);
 
-            // Skip individual lookup for admins
-            if (accountType === "admin") {
-                console.log("User is admin, using URL house color");
+            // Skip individual lookup for admins and teachers
+            if (accountType === "admin" || accountType === "teacher") {
+                console.log("User is admin or teacher, using URL house color");
                 const fallbackHouseMap: { [key: string]: string } = {
                     blue: "Blue House",
                     gold: "Gold House",
@@ -83,10 +84,10 @@ const HouseSpreadPage = () => {
                     console.log("Set userHouse to:", userInfo.house);
                 } else {
                     console.log(
-                        "User has no house assigned, using fallback for admin",
+                        "User has no house assigned, using fallback for admin/teacher",
                     );
-                    // User exists but has no house - use fallback for admin testing
-                    if (isAdmin && housecolor) {
+                    // User exists but has no house - use fallback for admin/teacher
+                    if ((isAdmin || isTeacher) && housecolor) {
                         // Fetch houses to get real house names that match the color
                         try {
                             const housesData = await fetchAllHouses();
@@ -133,7 +134,7 @@ const HouseSpreadPage = () => {
             } catch (error) {
                 console.error("Error fetching user house:", error);
                 // For testing purposes, let's use the house color from URL as fallback
-                if (isAdmin && housecolor) {
+                if ((isAdmin || isTeacher) && housecolor) {
                     const fallbackHouseMap: { [key: string]: string } = {
                         blue: "Blue House",
                         gold: "Gold House",
@@ -148,7 +149,7 @@ const HouseSpreadPage = () => {
                         fallbackHouseMap[housecolor] || "Blue House";
 
                     console.log(
-                        "Using fallback house for admin (error case):",
+                        "Using fallback house for admin/teacher (error case):",
                         fallbackHouse,
                     );
                     setUserHouse(fallbackHouse);
@@ -186,8 +187,8 @@ const HouseSpreadPage = () => {
                 if (testMode && isAdmin) {
                     // Use mock data when test mode is enabled for admins
                     personalData = generateMockPersonalChartData(housecolor);
-                } else if (isAdmin) {
-                    // For admins when test mode is off, show a default message or empty state
+                } else if (isAdmin || isTeacher) {
+                    // For admins/teachers when test mode is off, show a default message or empty state
                     personalData = null;
                 } else {
                     // Use real data for students
@@ -356,14 +357,16 @@ const HouseSpreadPage = () => {
                                     title={`Personal Points Spread${testMode && isAdmin ? " (Test Data)" : ""}`}
                                     type="pie"
                                 />
-                            ) : isAdmin && !testMode ? (
+                            ) : (isAdmin || isTeacher) && !testMode ? (
                                 <div className="text-center p-8 bg-gray-100 rounded-lg">
                                     <p className="text-gray-600 mb-2">
-                                        Personal data not available for admin accounts
+                                        Personal data not available for {isAdmin ? "admin" : "teacher"} accounts
                                     </p>
-                                    <p className="text-sm text-gray-500">
-                                        Toggle "Test Student Mode" to see sample data
-                                    </p>
+                                    {isAdmin && (
+                                        <p className="text-sm text-gray-500">
+                                            Toggle "Test Student Mode" to see sample data
+                                        </p>
+                                    )}
                                 </div>
                             ) : null}
                         </div>
@@ -371,7 +374,7 @@ const HouseSpreadPage = () => {
                         {/* Nearby Rankings Leaderboard */}
                         <div className="flex flex-col items-center">
                             <div className="w-full max-w-sm">
-                                {user?.email && userHouse && (isAdmin || userHouse.toLowerCase().includes(housecolor)) && (
+                                {user?.email && userHouse && (isAdmin || isTeacher || userHouse.toLowerCase().includes(housecolor)) && (
                                     <NearbyRankingsContainer
                                         currentStudentEmail={user.email}
                                         houseFilter={userHouse}

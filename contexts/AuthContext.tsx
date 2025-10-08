@@ -81,8 +81,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
                     setAccountType(accountType);
 
-                    // Only fetch individual data for students, not admins
-                    if (accountType === "student") {
+                    // Fetch individual data for students and teachers, but not admins
+                    if (accountType === "student" || accountType === "teacher") {
                         const userData = await retryFirestoreCall(() => getDataDoc(user.email!));
                         setUserDbData(userData);
                     } else {

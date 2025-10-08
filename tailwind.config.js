@@ -26,9 +26,11 @@ module.exports = {
 
     // Blue Thunder
     'from-cyan-400',
+    'from-blue-400',
     'to-blue-700',
     'outline-blue-900',
     'shadow-cyan-500/50',
+    'shadow-blue-500/50',
 
     // Red Phoenix
     'from-red-400',
@@ -56,9 +58,11 @@ module.exports = {
 
     // Silver Knights
     'from-gray-400',
+    'from-slate-400',
     'to-slate-700',
     'outline-slate-900',
     'shadow-gray-500/50',
+    'shadow-slate-500/50',
   ],
   darkMode: "class",
   theme: {

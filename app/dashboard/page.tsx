@@ -14,6 +14,7 @@ const Dashboard = () => {
     const accountType = user.accountType;
     const student = user.userDbData;
     const isAdmin = accountType === "admin";
+    const isTeacher = accountType === "teacher";
     const loading = user.loading;
 
     // Show loading while authentication is being resolved
@@ -48,7 +49,7 @@ const Dashboard = () => {
                 </h1>
             </CardHeader>
             <CardBody>
-                {student != null || isAdmin ? (
+                {student != null || isAdmin || isTeacher ? (
                     <>
                         <div className="w-full max-w-7xl mx-auto">
                             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">

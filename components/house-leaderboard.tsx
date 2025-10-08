@@ -48,10 +48,14 @@ export const HousePointsRow: React.FC<HouseDocument> = ({
     totalPoints,
     isStudentHouse,
 }) => {
-    const gradientClasses = `from-${colorName}-400 to-${accentColor}-700 outline-${accentColor}-900 shadow-${colorName}-500/50`;
-    const outlineThickness = isStudentHouse ? "outline-8" : "hover:outline-4";
+    const gradientClasses = `from-${colorName}-400 to-${accentColor}-700 shadow-${colorName}-500/50`;
     const isFirstPlace = place === 1;
     const glowColor = colorToRgb[colorName] || colorToRgb.blue;
+
+    // Use consistent border styling instead of outline
+    const borderStyle = isStudentHouse
+        ? `2px solid rgba(${glowColor}, 0.6)`
+        : 'none';
 
     return (
         <>
@@ -59,7 +63,7 @@ export const HousePointsRow: React.FC<HouseDocument> = ({
                 <style dangerouslySetInnerHTML={{ __html: glowKeyframes }} />
             )}
             <Link
-                className={`grid min-w-0 w-full h-20 place-items-center ${gradientClasses} shadow-lg items-center flex rounded-xl bg-gradient-to-r mb-5 ${outlineThickness} relative overflow-hidden`}
+                className={`grid min-w-0 w-full h-20 place-items-center ${gradientClasses} shadow-lg items-center flex rounded-xl bg-gradient-to-r mb-5 relative overflow-hidden hover:shadow-xl transition-shadow`}
                 color={"foreground"}
                 href={`/spread/${houseImage.toLowerCase()}`}
                 isBlock={true}
@@ -68,7 +72,9 @@ export const HousePointsRow: React.FC<HouseDocument> = ({
                     '--glow-color': glowColor,
                     animation: 'championGlow 2s ease-in-out infinite',
                     border: `3px solid rgba(${glowColor}, 0.8)`,
-                } as React.CSSProperties : {}}
+                } as React.CSSProperties : {
+                    border: borderStyle,
+                } as React.CSSProperties}
             >
             <div
                 className="absolute inset-0 opacity-30 pointer-events-none"

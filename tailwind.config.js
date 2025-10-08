@@ -12,6 +12,7 @@ module.exports = {
     'outline-8',
     'outline-6',
     'outline-4',
+    'hover:outline-4',
     // Green Ivy
     'from-green-400',
     'to-emerald-700',
@@ -26,9 +27,11 @@ module.exports = {
 
     // Blue Thunder
     'from-cyan-400',
+    'from-blue-400',
     'to-blue-700',
     'outline-blue-900',
     'shadow-cyan-500/50',
+    'shadow-blue-500/50',
 
     // Red Phoenix
     'from-red-400',
@@ -56,9 +59,11 @@ module.exports = {
 
     // Silver Knights
     'from-gray-400',
+    'from-slate-400',
     'to-slate-700',
     'outline-slate-900',
     'shadow-gray-500/50',
+    'shadow-slate-500/50',
   ],
   darkMode: "class",
   theme: {

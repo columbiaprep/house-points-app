@@ -12,6 +12,7 @@ module.exports = {
     'outline-8',
     'outline-6',
     'outline-4',
+    'hover:outline-4',
     // Green Ivy
     'from-green-400',
     'to-emerald-700',
